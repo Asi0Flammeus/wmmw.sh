@@ -22,6 +22,10 @@ export default defineConfig({
     inlineStylesheets: "always",
   },
   vite: {
+    // Pre-bundle heavy deps at dev startup so first navigation to a page that
+    // uses them (katex on post pages) does not trigger a mid-swap Vite
+    // re-optimize (504), which would stall a ClientRouter navigation.
+    optimizeDeps: { include: ["katex"] },
     resolve: {
       alias: {
         "@": "/src",

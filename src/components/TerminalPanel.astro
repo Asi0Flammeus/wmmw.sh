@@ -92,39 +92,29 @@ const { path, class: className } = Astro.props;
 </style>
 
 <style is:global>
-  /* ---------- typing / fade gates ----------
-     Only bite once JS has armed the sequence (html.anim.armed); no-JS and
-     reduced-motion keep the markup fully visible. Confined to .panel
-     descendants so page authors get typing behaviour for free. */
-  html.anim.armed .panel [data-step="fade"] {
+  /* ---------- block reveal gates ----------
+     Bite once JS arms the sequence (html.anim.armed). Each step block (a
+     command line or an output) stays hidden until its turn, then reveals as a
+     whole block, so the next command appears only after the previous output.
+     No-JS and reduced-motion keep the markup fully visible. */
+  html.anim.armed .panel [data-step] {
     opacity: 0;
     transform: translateY(5px);
   }
-  html.anim.armed .panel [data-step="fade"].on {
+  html.anim.armed .panel [data-step].on {
     opacity: 1;
     transform: none;
     transition:
-      opacity 0.55s ease,
-      transform 0.55s ease;
+      opacity 0.4s ease,
+      transform 0.4s ease;
   }
-  html.anim.armed .panel .cmd-text {
-    visibility: hidden;
-  }
-  html.anim.armed .panel .cmdline.on .cmd-text,
-  html.anim.armed .panel .cmdline.typing .cmd-text,
-  html.anim.armed .panel .cmdline.done .cmd-text {
-    visibility: visible;
-  }
+  /* Caret blinks on the active command line until its output prints. */
   html.anim .panel .caret {
-    display: inline-block;
-    opacity: 0.4;
-  }
-  html.anim .panel .cmdline.typing .caret {
-    opacity: 1;
-    animation: blink 1.05s steps(1) infinite;
-  }
-  html.anim .panel .cmdline.done .caret {
     display: none;
+  }
+  html.anim.armed .panel .cmdline[data-step="type"].on:not(.done) .caret {
+    display: inline-block;
+    animation: blink 1.05s steps(1) infinite;
   }
   html.anim .panel .caret-final {
     animation: blink 1.05s steps(1) infinite;

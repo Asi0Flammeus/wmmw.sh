@@ -1,17 +1,16 @@
 /**
- * Terminal typing engine (ported from mockup D "hybride").
+ * Terminal block-reveal engine.
  *
- * On first viewport entry of each `.panel`, sequentially types every
- * `[data-step="type"]` command, then fades in the following
- * `[data-step="fade"]` output, preserving document order across panels
- * that hold several command groups. Runs once per panel.
+ * On first viewport entry of each `.panel`, reveals its `[data-step]` blocks
+ * in document order: a command line (`data-step="type"`) appears as a whole
+ * block, then its output (`data-step="fade"`) prints, and only then the next
+ * command, like a real shell running commands one by one. No character typing.
+ * Runs once per panel.
  *
  * Gating:
- *  - No `html.anim`  -> no-op. The markup is already the final rendered
- *    state (CSS gates only bite under `html.anim.armed`).
+ *  - No `html.anim`  -> no-op. Markup already carries the final visible state.
  *  - `html.anim`, no IntersectionObserver -> reveal everything immediately.
- *  - `html.anim` + IO -> arm (`html.armed`), stash + clear command text,
- *    then type on intersection.
+ *  - `html.anim` + IO -> arm (`html.armed`) and reveal blocks on intersection.
  */
 /** Active observer from the last run; disconnected before each re-init (SPA swaps). */
 let activeObserver: IntersectionObserver | null = null;
@@ -44,16 +43,10 @@ export function initTermTyping(): void {
   }
 
   try {
-    // Stash each command's text, then blank it so it can be typed back in.
-    panels.forEach((panel) => {
-      panel
-        .querySelectorAll<HTMLElement>('[data-step="type"] .cmd-text')
-        .forEach((span) => {
-          span.dataset.full = span.textContent ?? "";
-          span.textContent = "";
-        });
-    });
     docEl.classList.add("armed");
+
+    const CMD_TO_OUT = 240; // command block shown -> its output prints
+    const OUT_TO_NEXT = 460; // output shown -> next command appears
 
     const runSeq = (panel: HTMLElement): void => {
       const steps = Array.prototype.slice.call(
@@ -64,25 +57,15 @@ export function initTermTyping(): void {
         if (i >= steps.length) return;
         const el = steps[i++];
         if (!el) return;
+        el.classList.add("on");
         if (el.getAttribute("data-step") === "type") {
-          el.classList.add("typing");
-          const span = el.querySelector<HTMLElement>(".cmd-text");
-          const full = (span && span.dataset.full) || "";
-          let j = 0;
-          const tick = (): void => {
-            if (span && j < full.length) {
-              span.textContent = full.slice(0, ++j);
-              setTimeout(tick, 24 + Math.random() * 14);
-            } else {
-              el.classList.remove("typing");
-              el.classList.add("done");
-              setTimeout(next, 170);
-            }
-          };
-          tick();
+          // Caret blinks on the active command until its output prints.
+          setTimeout(() => {
+            el.classList.add("done");
+            next();
+          }, CMD_TO_OUT);
         } else {
-          el.classList.add("on");
-          setTimeout(next, 380);
+          setTimeout(next, OUT_TO_NEXT);
         }
       };
       next();
