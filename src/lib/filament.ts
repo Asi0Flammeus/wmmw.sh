@@ -36,13 +36,13 @@ export interface Filament {
 
 /* ---------------- tuning ---------------- */
 
-const RIB_WID = 15; // trunk lateral cells (odd -> centred guide)
-const BR_WID = 9; // branch lateral cells
-const LAT_SCALE = 2.2; // px per lateral cell  (~31px ribbon, <=64)
-const BR_LAT = 2.0; // px per lateral cell for branches
+const RIB_WID = 21; // trunk lateral cells (odd -> centred guide)
+const BR_WID = 13; // branch lateral cells
+const LAT_SCALE = 2.4; // px per lateral cell  (~48px ribbon, <=64)
+const BR_LAT = 2.2; // px per lateral cell for branches
 const ARC_STRIDE = 4; // px per trunk arc cell
 const BR_ARC = 6; // px per branch arc cell
-const GUIDE_SIGMA = 1.7; // guide gaussian width, cells
+const GUIDE_SIGMA = 2.5; // guide gaussian width, cells (wider -> thicker strand)
 const GUIDE_PEAK = 1; // guide attractant peak
 const GUIDE_WEIGHT = 0.7; // guide contribution when sensing
 const SD = 3; // sensor distance, cells
@@ -60,7 +60,7 @@ const DIFFUSE_MARGIN = 6; // rows kept evaporating past the frontier
 const MAX_AGENTS = 2000;
 const MAX_TRUNK_AGENTS = 1400;
 const VMAX = CAP + GUIDE_PEAK * GUIDE_WEIGHT; // sensed value ceiling
-const DOT = 2; // agent dot, css px
+const DOT = 3.5; // agent dot, css px (thicker living footprint)
 
 const cosSA = Math.cos(SA);
 const sinSA = Math.sin(SA);
@@ -275,6 +275,15 @@ function stepRibbon(r: Ribbon): void {
     let nv = field[idx]! + DEPOSIT;
     if (nv > CAP) nv = CAP;
     field[idx] = nv;
+    // lateral spread thickens the reinforced core of the strand
+    if (ui > 0) {
+      let lv2 = field[idx - 1]! + DEPOSIT * 0.45;
+      field[idx - 1] = lv2 > CAP ? CAP : lv2;
+    }
+    if (ui < wid - 1) {
+      let rv2 = field[idx + 1]! + DEPOSIT * 0.45;
+      field[idx + 1] = rv2 > CAP ? CAP : rv2;
+    }
   }
 }
 
@@ -590,7 +599,10 @@ export function mountFilament(root: HTMLElement): Filament {
 
     let startY: number;
     if (hero) {
-      startY = hero.getBoundingClientRect().bottom + scrollY - vh * 0.06;
+      // Begin inside the hero (~40% down) so the strand reads as growing OUT
+      // of the hero network, through the fondu, into the page below.
+      const hr = hero.getBoundingClientRect();
+      startY = hr.top + scrollY + hr.height * 0.4;
     } else {
       const main = document.querySelector("main");
       startY = main ? main.getBoundingClientRect().top + scrollY + 8 : 80;
@@ -649,20 +661,25 @@ export function mountFilament(root: HTMLElement): Filament {
       const head = heads[idx]!;
       const hr = head.getBoundingClientRect();
       const attachY = hr.top + scrollY + hr.height * 0.5;
-      if (attachY < startY + 20 || attachY > endY) continue;
-      const sx = trunkXAt(pts, attachY);
-      const sy = attachY;
+      if (attachY < startY + 44 || attachY > endY) continue;
+      // Depart the trunk a little above the header, then pour down-and-across.
+      const drop = mobile ? 30 : 64;
+      let sy = attachY - drop;
+      if (sy < startY + 20) sy = startY + 20;
+      const sx = trunkXAt(pts, sy);
       const tx = mobile ? Math.min(hr.left + scrollX + 40, W - 12) : hr.left + scrollX + 34;
       const ty = attachY;
       const dx = tx - sx;
       const dy = ty - sy;
       if (Math.abs(dx) < 10) continue;
       const br = mulberry32((0xa11ce + idx * 2654435761) | 0);
-      const up = br() < 0.5 ? -1 : 1;
-      const c1x = sx + dx * 0.35;
-      const c1y = sy + up * (12 + br() * 26);
-      const c2x = sx + dx * 0.72;
-      const c2y = ty - up * (6 + br() * 20);
+      // Leave tangentially downward (c1 mostly down, barely across), then sweep
+      // across into the header horizontally (c2 pulled back at header height):
+      // an S that pours, never a perpendicular T.
+      const c1x = sx + dx * (0.04 + br() * 0.06);
+      const c1y = sy + dy * (0.82 + br() * 0.12);
+      const c2x = tx - dx * (0.24 + br() * 0.12);
+      const c2y = ty - (2 + br() * 6);
       let d =
         "M" +
         sx.toFixed(1) +
@@ -683,7 +700,7 @@ export function mountFilament(root: HTMLElement): Filament {
       // 1-2 decorative sub-branchlets (SVG guide only; not simulated)
       const nb = 1 + (br() < 0.6 ? 1 : 0);
       for (let bb = 0; bb < nb; bb++) {
-        const f = 0.4 + bb * 0.28 + br() * 0.1;
+        const f = 0.5 + bb * 0.24 + br() * 0.1;
         const mx = sx + dx * f;
         const my = sy + dy * f;
         const len = (mobile ? 16 : 30) + br() * (mobile ? 14 : 34);
@@ -709,7 +726,7 @@ export function mountFilament(root: HTMLElement): Filament {
       const path = document.createElementNS(SVGNS, "path");
       path.setAttribute("d", d);
       brg!.appendChild(path);
-      defs.push({ sx, sy, c1x, c1y, c2x, c2y, tx, ty, anchorY: attachY });
+      defs.push({ sx, sy, c1x, c1y, c2x, c2y, tx, ty, anchorY: sy });
     }
 
     if (!anim) {

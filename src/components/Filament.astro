@@ -80,13 +80,29 @@
 </style>
 
 <script>
-  import { mountFilament } from "@lib/filament";
+  import { mountFilament, type Filament } from "@lib/filament";
 
-  const root = document.querySelector<HTMLElement>(".fila");
-  if (root) {
-    const handle = mountFilament(root);
-    document.addEventListener("astro:before-swap", () => handle.destroy(), {
-      once: true,
-    });
+  // Under Astro ClientRouter the <Filament> element is replaced on every
+  // navigation and module scripts run once per visit. Mount on each fresh
+  // element (astro:page-load fires on initial load too); destroy the live
+  // instance before the DOM swaps so no rAF loop survives on a dead canvas.
+  let handle: Filament | null = null;
+
+  function mount(): void {
+    const root = document.querySelector<HTMLElement>(".fila");
+    if (!root || root.dataset.filaMounted) return;
+    root.dataset.filaMounted = "1";
+    handle = mountFilament(root);
   }
+
+  function unmount(): void {
+    if (handle) {
+      handle.destroy();
+      handle = null;
+    }
+  }
+
+  document.addEventListener("astro:page-load", mount);
+  document.addEventListener("astro:before-swap", unmount);
+  mount();
 </script>

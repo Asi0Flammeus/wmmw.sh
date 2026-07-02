@@ -27,11 +27,25 @@ interface IdleWindow {
 }
 
 export function mountHeroSim(canvas: HTMLCanvasElement): HeroSim {
+  /* guard double-mount: the canvas persists across ClientRouter swaps
+     (transition:persist), so a second call must be a no-op. */
+  if (canvas.dataset.heroMounted === "1") return { destroy() {} };
   const ctx = canvas.getContext("2d", { alpha: true });
-  const hero = canvas.parentElement;
-  if (!ctx || !hero) return { destroy() {} };
+  if (!ctx) return { destroy() {} };
+  canvas.dataset.heroMounted = "1";
 
   const anim = document.documentElement.classList.contains("anim");
+
+  /* measure the canvas itself, not the section: it is CSS-sized to the full
+     viewport (height:100dvh, anchored top) in every variant, so the sim
+     resolution stays constant across page swaps and the persisted canvas
+     never resizes (no distortion, seamless continuation). */
+  function measure(): { vw: number; vh: number } {
+    return {
+      vw: canvas.clientWidth || window.innerWidth,
+      vh: canvas.clientHeight || window.innerHeight,
+    };
+  }
 
   /* --- Jones-model parameters (validated in mockup D) --- */
   const SD = 7.5; /* sensor distance, cells */
@@ -64,8 +78,7 @@ export function mountHeroSim(canvas: HTMLCanvasElement): HeroSim {
   let buf32 = new Uint32Array(0);
 
   function init(): void {
-    const vw = hero!.clientWidth || window.innerWidth;
-    const vh = hero!.clientHeight || window.innerHeight;
+    const { vw, vh } = measure();
     const aspect = vw / Math.max(1, vh);
     if (aspect >= 1) {
       W = 320;
@@ -276,8 +289,7 @@ export function mountHeroSim(canvas: HTMLCanvasElement): HeroSim {
   function onResize(): void {
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => {
-      const vw = hero!.clientWidth || window.innerWidth;
-      const vh = hero!.clientHeight || window.innerHeight;
+      const { vw, vh } = measure();
       const a = vw / Math.max(1, vh);
       const cur = W / H;
       if (Math.abs(a - cur) / cur > 0.25) {
@@ -334,6 +346,7 @@ export function mountHeroSim(canvas: HTMLCanvasElement): HeroSim {
       }
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", onResize);
+      delete canvas.dataset.heroMounted;
     },
   };
 }

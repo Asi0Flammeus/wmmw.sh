@@ -100,3 +100,13 @@ All pages except `/` skip the hero sim; they keep the scroll filament (shorter r
 - Language: FR-first, trilingual routing from day one.
 - Design: mockup D + physarum-driven scroll filament (this spec).
 - Mockups A/B/C: kept in `mockups/` as exploration record; deleted when v1 ships.
+
+## 8. Addendum: v1 QA round (2026-07-02, user-decided)
+
+Supersedes the matching points above:
+
+- **Hero on every page, persistent across navigation.** Site uses Astro `<ClientRouter />`; the sim canvas carries `transition:persist="hero-sim"` so the physarum network keeps living across page swaps (no visual refresh). Home = `full` variant (100dvh, thesis copy); all other pages = `band` variant (clamp(230px, 38dvh, 420px)) whose h1 is the page title (BaseLayout `heroVariant` / `heroTitle` props). Canvas stays 100dvh anchored top in both variants; the section crops it (no resize, no distortion). This replaces "all pages except / skip the hero sim" (§3) and the zero-client-JS budget on post pages (§4): ClientRouter ships everywhere by design.
+- **Hero bottom fondu.** The hero dissolves into `--bg` via a long veil ramp (no visible seam at the section edge, both variants).
+- **Filament**: trunk originates inside the hero (~40% of its height) so it grows out of the hero network through the fondu; visibly wider (~+75% dot footprint, ribbon ≤64px equivalent kept); branches depart low and "pour" (tangential-down then sweep across into the panel header, never a perpendicular T). SPA lifecycle: remount on `astro:page-load`, destroy on `astro:before-swap`.
+- **Terminal typing** starts later on scroll: panel top must cross ~72% of viewport height (IO rootMargin -28%), re-armed per ClientRouter page load.
+- **Header**: single overlay style on every page, soft top scrim, `aria-current` nav state; not persisted (lang switcher is path-dependent).

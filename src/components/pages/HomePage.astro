@@ -4,7 +4,6 @@ import { type Locale, t, localePath } from "@i18n/index";
 import { SITE_URL, GITHUB_URL, TERM_USER } from "@lib/site";
 import { publishedWritings, baseSlug } from "@lib/writings";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import Hero from "@components/Hero.astro";
 import TerminalPanel from "@components/TerminalPanel.astro";
 import TermCmd from "@components/TermCmd.astro";
 
@@ -99,11 +98,9 @@ const tz = teaser[locale];
   title="wmmw.sh"
   description={chrome.meta.home}
   path="/"
-  hero={true}
+  heroVariant="full"
   jsonLd={jsonLd}
 >
-  <Hero locale={locale} />
-
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">

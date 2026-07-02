@@ -4,9 +4,11 @@ import { TERM_USER } from "@lib/site";
 
 interface Props {
   locale: Locale;
+  variant: "full" | "band";
+  heading?: string;
 }
 
-const { locale } = Astro.props;
+const { locale, variant, heading = "" } = Astro.props;
 const chrome = t(locale);
 const { h1a, h1aEm, h1b, sub, cta } = chrome.hero;
 
@@ -17,19 +19,43 @@ const h1aAfter = emAt >= 0 ? h1a.slice(emAt + h1aEm.length) : "";
 const h1aHasEm = emAt >= 0;
 ---
 
-<section class="hero">
-  <canvas id="sim" aria-hidden="true"></canvas>
+<section class:list={["hero", variant]}>
+  {/* one persistent sim: the node survives ClientRouter swaps, keeping the
+      running simulation alive; both variants crop the same 100dvh canvas */}
+  <canvas id="sim" aria-hidden="true" transition:persist="hero-sim"></canvas>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-copy">
-    <h1>
-      <span>{h1aHasEm ? <>{h1aBefore}<em>{h1aEm}</em>{h1aAfter}</> : h1a}</span>{" "}
-      <span>{h1b}</span>
-    </h1>
-    <p class="hero-sub">{sub}</p>
-    <p class="hero-cmd">
-      <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-      <a class="cta-chip" href={localePath(locale, "/manifeste")}>{cta}</a>
-    </p>
+    {
+      variant === "full" ? (
+        <>
+          <h1>
+            <span>
+              {h1aHasEm ? (
+                <>
+                  {h1aBefore}
+                  <em>{h1aEm}</em>
+                  {h1aAfter}
+                </>
+              ) : (
+                h1a
+              )}
+            </span>{" "}
+            <span>{h1b}</span>
+          </h1>
+          <p class="hero-sub">{sub}</p>
+          <p class="hero-cmd">
+            <span class="ps">
+              <b>{TERM_USER}</b>:~$
+            </span>{" "}
+            <a class="cta-chip" href={localePath(locale, "/manifeste")}>
+              {cta}
+            </a>
+          </p>
+        </>
+      ) : (
+        <h1 class="band-h">{heading}</h1>
+      )
+    }
   </div>
 </section>
 
@@ -37,28 +63,62 @@ const h1aHasEm = emAt >= 0;
   .hero {
     position: relative;
     z-index: 5;
-    min-height: 100dvh;
     display: flex;
     align-items: flex-end;
     overflow: hidden;
   }
+  .hero.full {
+    min-height: 100dvh;
+  }
+  .hero.band {
+    min-height: clamp(230px, 38dvh, 420px);
+  }
+
+  /* canvas stays full-viewport tall, anchored to the top, in BOTH variants:
+     the section crops it via overflow:hidden, so it never resizes between
+     pages and the persisted sim continues without distortion. */
   #sim {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 100dvh;
     display: block;
     z-index: 0;
   }
+
   .hero-veil {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
+  }
+  /* long soft fondu: sim pixels dissolve into --bg well before the section
+     edge, so there is no seam against the page below. */
+  .hero.full .hero-veil {
     background:
       radial-gradient(120% 95% at 55% 15%, transparent 50%, rgba(18, 16, 13, 0.55) 100%),
-      linear-gradient(to bottom, rgba(18, 16, 13, 0.4), transparent 20% 60%, var(--bg) 97%);
+      linear-gradient(
+        to bottom,
+        rgba(18, 16, 13, 0.4) 0%,
+        transparent 18%,
+        transparent 55%,
+        rgba(18, 16, 13, 0.85) 82%,
+        var(--bg) 93%
+      );
   }
+  /* band is short: start the fondu proportionally lower so the whole band
+     resolves into --bg and the heading stays legible. */
+  .hero.band .hero-veil {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 40%,
+      rgba(18, 16, 13, 0.85) 78%,
+      var(--bg) 92%
+    );
+  }
+
   .hero-copy {
     position: relative;
     z-index: 2;
@@ -66,7 +126,7 @@ const h1aHasEm = emAt >= 0;
     padding-inline: var(--pad);
     padding-bottom: clamp(3.5rem, 9vh, 6rem);
   }
-  .hero-copy::before {
+  .hero.full .hero-copy::before {
     content: "";
     position: absolute;
     inset: -4rem -6rem -2rem -4rem;
@@ -78,6 +138,11 @@ const h1aHasEm = emAt >= 0;
       transparent 100%
     );
   }
+  .hero.band .hero-copy {
+    max-width: var(--maxw);
+    padding-bottom: clamp(1.5rem, 4vh, 2.6rem);
+  }
+
   .hero h1 {
     font-family: var(--disp);
     font-weight: 500;
@@ -89,6 +154,16 @@ const h1aHasEm = emAt >= 0;
   .hero h1 em {
     font-style: normal;
     color: var(--accent);
+  }
+  .hero .band-h {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+    color: var(--bone);
+    max-width: 24ch;
   }
   .hero-sub {
     margin-top: 1.4rem;
@@ -135,12 +210,12 @@ const h1aHasEm = emAt >= 0;
   }
 
   @media (min-width: 768px) {
-    .hero h1 span {
+    .hero.full h1 span {
       display: block;
     }
   }
   @media (max-width: 767px) {
-    .hero-copy {
+    .hero.full .hero-copy {
       padding-bottom: clamp(4.5rem, 12vh, 7rem);
     }
   }
@@ -155,6 +230,9 @@ const h1aHasEm = emAt >= 0;
 <script>
   import { mountHeroSim } from "@lib/physarum-hero";
 
+  /* module script: runs once per site visit under ClientRouter. The canvas is
+     persisted (transition:persist), so the sim is mounted once and continues
+     across page swaps; mountHeroSim additionally guards against double-mount. */
   const canvas = document.getElementById("sim");
   if (canvas instanceof HTMLCanvasElement) {
     mountHeroSim(canvas);

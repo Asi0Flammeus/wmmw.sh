@@ -33,7 +33,6 @@ const { Content } = await render(entry);
 
     <header class="post-head">
       <p class="post-path">{dict.ecrits.readingDir}{slug}.md</p>
-      <h1 class="disp-h">{data.title}</h1>
       <p class="post-meta">
         <span>{dict.ecrits.published} {formatDate(data.publishedAt, locale)}</span>
         {
@@ -133,10 +132,6 @@ const { Content } = await render(entry);
     font-size: 0.8rem;
     color: var(--ink-3);
     margin-bottom: 1rem;
-  }
-  .post-head .disp-h {
-    max-width: 100%;
-    margin-bottom: 1.2rem;
   }
   .post-meta {
     font-family: var(--mono);

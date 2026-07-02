@@ -13,7 +13,16 @@
  *  - `html.anim` + IO -> arm (`html.armed`), stash + clear command text,
  *    then type on intersection.
  */
+/** Active observer from the last run; disconnected before each re-init (SPA swaps). */
+let activeObserver: IntersectionObserver | null = null;
+
 export function initTermTyping(): void {
+  // Re-runnable across ClientRouter navigations: drop any prior observer.
+  if (activeObserver) {
+    activeObserver.disconnect();
+    activeObserver = null;
+  }
+
   const docEl = document.documentElement;
   const panels = Array.prototype.slice.call(
     document.querySelectorAll(".panel"),
@@ -86,11 +95,15 @@ export function initTermTyping(): void {
           if (!e.isIntersecting) return;
           io.unobserve(e.target);
           runSeq(e.target as HTMLElement);
-          if (--remaining <= 0) io.disconnect();
+          if (--remaining <= 0) {
+            io.disconnect();
+            activeObserver = null;
+          }
         });
       },
-      { threshold: 0.05, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.05, rootMargin: "0px 0px -28% 0px" },
     );
+    activeObserver = io;
     panels.forEach((panel) => io.observe(panel));
   } catch {
     docEl.classList.remove("armed");
