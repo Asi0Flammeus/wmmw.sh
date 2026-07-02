@@ -1,0 +1,96 @@
+---
+/**
+ * Mycelium layer (spec 2.1 + 2.3, unified). Rendered once per page by
+ * BaseLayout, above the page background and below the content/hero.
+ *
+ * One document-level canvas carries the whole living organism: the hero bloom
+ * (rasterised into the measured hero rect) and the below-hero predilection
+ * channels (trunk + pouring branches). The wrapper persists across ClientRouter
+ * navigations (transition:persist) so the sim instance and its bloom state
+ * survive page swaps; `Mycelium.rebuild()` re-measures each new page.
+ *
+ * The `.myc-svg` is the reduced-motion / static fallback: JS draws the full
+ * trunk + branch strokes into it and it is the visible layer when `html.anim`
+ * is absent. Under `html.anim` the SVG is hidden and the canvas is the show.
+ * Under no-JS nothing mounts and the layer stays blank (decorative only).
+ */
+---
+
+<div class="myc" aria-hidden="true" transition:persist="mycelium">
+  <canvas class="myc-canvas"></canvas>
+  <svg class="myc-svg" focusable="false" preserveAspectRatio="none" aria-hidden="true">
+    <path class="trunk"></path>
+    <g class="br"></g>
+  </svg>
+</div>
+
+<style>
+  /* Absolute, document-tall layer; height 0 so it never inflates page flow. */
+  .myc {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Canvas is sized to the whole document by the mount script; painted in
+     document coordinates so it scrolls with the page. */
+  .myc-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: block;
+  }
+
+  /* Static reference path (fallback); JS fills in the geometry. */
+  .myc-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: visible;
+  }
+  .myc-svg path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .myc-svg .trunk {
+    stroke-width: 1.4;
+    opacity: 0.5;
+  }
+  .myc-svg :global(.br path) {
+    stroke-width: 1;
+    opacity: 0.42;
+  }
+
+  /* When motion is welcome, the living canvas is the whole organism and the
+     static SVG steps aside. */
+  html.anim .myc-svg {
+    display: none;
+  }
+</style>
+
+<script>
+  import { mountMycelium, type Mycelium } from "@lib/mycelium";
+
+  // The wrapper persists across ClientRouter swaps, so the module script runs
+  // once and the single instance stays alive (bloom never restarts). On each
+  // navigation we re-measure the new page; guard against double-mount.
+  let inst: Mycelium | null = null;
+
+  function onLoad(): void {
+    const root = document.querySelector<HTMLElement>(".myc");
+    if (!root) return;
+    if (!inst) inst = mountMycelium(root);
+    else inst.rebuild();
+  }
+
+  document.addEventListener("astro:page-load", onLoad);
+  onLoad();
+</script>
