@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.github
+.vscode
+.claude
+.pi
+plans
+docs
+mockups
+.prototype-feedback
+*.md
+!README.md
+.env
+.env.*
+!.env.example
+deploy.sh
