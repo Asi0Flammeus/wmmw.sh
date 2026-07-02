@@ -1,0 +1,142 @@
+---
+import { TERM_USER } from "@lib/site";
+
+interface Props {
+  path: string;
+  class?: string;
+}
+
+const { path, class: className } = Astro.props;
+---
+
+<div class:list={["panel", className]}>
+  <div class="panel-head"><span class="ph-path"><b>{TERM_USER}</b>:{path}</span></div>
+  <div class="panel-body"><slot /></div>
+</div>
+
+<style>
+  /* ---------- terminal panel (component-owned structure) ---------- */
+  .panel {
+    background: var(--surf);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--r-tile);
+    overflow: hidden;
+  }
+  .panel-head {
+    background: var(--surf-head);
+    border-bottom: 1px solid var(--hair-2);
+    padding: 0.55rem 1.1rem;
+  }
+  .ph-path {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    color: var(--ink-3);
+  }
+  .ph-path b {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .panel-body {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    padding: 1.4rem clamp(1.1rem, 3vw, 1.9rem) 1.7rem;
+  }
+  @media (max-width: 767px) {
+    .panel-body {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* ---------- shared prompt / terminal glyphs (page-authored slot children) ---------- */
+  .panel :global(.ps) {
+    color: var(--ink-3);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .panel :global(.ps b) {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .panel :global(.cmdline) {
+    font-family: var(--mono);
+    color: var(--bone);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .panel :global(.cmd-text) {
+    font-weight: 600;
+  }
+  .panel :global(.caret),
+  .panel :global(.caret-final) {
+    display: inline-block;
+    width: 0.6ch;
+    height: 1.05em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+  .panel :global(.caret) {
+    display: none;
+  }
+  .panel :global(.c) {
+    color: var(--ink-3);
+  }
+  .panel :global(.out) {
+    margin-top: 1rem;
+  }
+  .panel :global(.intro) {
+    margin-bottom: 1.4rem;
+  }
+</style>
+
+<style is:global>
+  /* ---------- typing / fade gates ----------
+     Only bite once JS has armed the sequence (html.anim.armed); no-JS and
+     reduced-motion keep the markup fully visible. Confined to .panel
+     descendants so page authors get typing behaviour for free. */
+  html.anim.armed .panel [data-step="fade"] {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  html.anim.armed .panel [data-step="fade"].on {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.55s ease,
+      transform 0.55s ease;
+  }
+  html.anim.armed .panel .cmd-text {
+    visibility: hidden;
+  }
+  html.anim.armed .panel .cmdline.on .cmd-text,
+  html.anim.armed .panel .cmdline.typing .cmd-text,
+  html.anim.armed .panel .cmdline.done .cmd-text {
+    visibility: visible;
+  }
+  html.anim .panel .caret {
+    display: inline-block;
+    opacity: 0.4;
+  }
+  html.anim .panel .cmdline.typing .caret {
+    opacity: 1;
+    animation: blink 1.05s steps(1) infinite;
+  }
+  html.anim .panel .cmdline.done .caret {
+    display: none;
+  }
+  html.anim .panel .caret-final {
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+</style>

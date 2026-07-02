@@ -1,0 +1,154 @@
+---
+import { type Locale, t, localePath, alternates } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  path: string;
+  hero?: boolean;
+}
+
+const { locale, path, hero = false } = Astro.props;
+const dict = t(locale);
+
+const navItems = [
+  { key: "projets", href: "/projets" },
+  { key: "outils", href: "/outils" },
+  { key: "ecrits", href: "/ecrits" },
+  { key: "nourritures", href: "/nourritures" },
+  { key: "manifeste", href: "/manifeste" },
+] as const;
+
+const langHrefs = alternates(path);
+const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
+---
+
+<header class:list={["site-head", { over: hero }]}>
+  <a
+    class="wordmark"
+    href={localePath(locale, "/")}
+    aria-label={dict.nav.home}>wmmw.sh</a
+  >
+  <nav class="site-nav" aria-label={dict.nav.ariaLabel}>
+    {
+      navItems.map((item) => (
+        <a href={localePath(locale, item.href)}>{dict.nav[item.key]}</a>
+      ))
+    }
+  </nav>
+  <nav class="lang" aria-label={dict.lang.label}>
+    {
+      langHrefs.map((alt, i) => (
+        <>
+          {i > 0 && <span class="dot" aria-hidden="true">·</span>}
+          <a
+            href={alt.href}
+            hreflang={alt.locale}
+            class:list={{ on: alt.locale === locale }}
+            aria-current={alt.locale === locale ? "true" : undefined}
+            aria-label={dict.lang.switchTo[alt.locale]}
+            >{langLabel[alt.locale]}</a
+          >
+        </>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  .site-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "mark nav lang";
+    align-items: center;
+    gap: 1rem 2rem;
+    padding: 1.35rem var(--pad);
+  }
+  .site-head.over {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+
+  .wordmark {
+    grid-area: mark;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    display: inline-block;
+    color: var(--bone);
+  }
+
+  .site-nav {
+    grid-area: nav;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1rem, 3vw, 2.2rem);
+    font-size: 0.92rem;
+  }
+  .site-nav a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .site-nav a:hover {
+    color: var(--bone);
+  }
+
+  .lang {
+    grid-area: lang;
+    justify-self: end;
+    font-family: var(--disp);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .lang a {
+    color: var(--ink-3);
+    text-decoration: none;
+  }
+  .lang a:hover {
+    color: var(--bone);
+  }
+  .lang a.on {
+    color: var(--accent);
+  }
+  .lang .dot {
+    color: var(--ink-3);
+  }
+
+  /* palindrome nod: wordmark mirrors on hover. reduced-motion + anim gated. */
+  :global(html.anim) .wordmark {
+    transition: transform 0.45s cubic-bezier(0.6, 0, 0.2, 1);
+  }
+  :global(html.anim) .wordmark:hover {
+    transform: scaleX(-1);
+  }
+  :global(html.anim) .site-nav a,
+  :global(html.anim) .lang a {
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  @media (max-width: 767px) {
+    .site-head {
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        "mark lang"
+        "nav  nav";
+      row-gap: 0.8rem;
+    }
+    .site-nav {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.88rem;
+    }
+  }
+</style>

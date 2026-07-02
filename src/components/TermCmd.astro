@@ -1,0 +1,14 @@
+---
+import { TERM_USER } from "@lib/site";
+
+interface Props {
+  command: string;
+  ariaLabel?: string;
+  class?: string;
+}
+
+const { command, ariaLabel, class: className } = Astro.props;
+const label = ariaLabel ?? `${TERM_USER}:~$ ${command}`;
+---
+
+<p class:list={["cmdline", className]} data-step="type" aria-label={label}><span class="ps"><b>{TERM_USER}</b>:~$</span> <span class="cmd-text">{command}</span><span class="caret" aria-hidden="true"></span></p>

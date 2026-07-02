@@ -1,0 +1,162 @@
+---
+import { type Locale, t, localePath } from "@i18n/index";
+import { TERM_USER } from "@lib/site";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const chrome = t(locale);
+const { h1a, h1aEm, h1b, sub, cta } = chrome.hero;
+
+/* wrap the accent <em> around the h1aEm substring of h1a (holds for fr/en/es) */
+const emAt = h1a.indexOf(h1aEm);
+const h1aBefore = emAt >= 0 ? h1a.slice(0, emAt) : h1a;
+const h1aAfter = emAt >= 0 ? h1a.slice(emAt + h1aEm.length) : "";
+const h1aHasEm = emAt >= 0;
+---
+
+<section class="hero">
+  <canvas id="sim" aria-hidden="true"></canvas>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1>
+      <span>{h1aHasEm ? <>{h1aBefore}<em>{h1aEm}</em>{h1aAfter}</> : h1a}</span>{" "}
+      <span>{h1b}</span>
+    </h1>
+    <p class="hero-sub">{sub}</p>
+    <p class="hero-cmd">
+      <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
+      <a class="cta-chip" href={localePath(locale, "/manifeste")}>{cta}</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 5;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  #sim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+  }
+  .hero-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 95% at 55% 15%, transparent 50%, rgba(18, 16, 13, 0.55) 100%),
+      linear-gradient(to bottom, rgba(18, 16, 13, 0.4), transparent 20% 60%, var(--bg) 97%);
+  }
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 42rem;
+    padding-inline: var(--pad);
+    padding-bottom: clamp(3.5rem, 9vh, 6rem);
+  }
+  .hero-copy::before {
+    content: "";
+    position: absolute;
+    inset: -4rem -6rem -2rem -4rem;
+    z-index: -1;
+    background: radial-gradient(
+      85% 90% at 30% 62%,
+      rgba(18, 16, 13, 0.9) 0%,
+      rgba(18, 16, 13, 0.55) 55%,
+      transparent 100%
+    );
+  }
+  .hero h1 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(2.5rem, 6.5vw, 5.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero-sub {
+    margin-top: 1.4rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: var(--ink-2);
+  }
+  .hero-cmd {
+    margin-top: 2.1rem;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.9ch;
+  }
+  .ps {
+    color: var(--ink-3);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .ps b {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .cta-chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(217, 162, 74, 0.5);
+    padding: 0.5em 0.95em;
+    border-radius: var(--r-tile);
+  }
+  .cta-chip:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .cta-chip:active {
+    transform: translateY(1px);
+  }
+
+  @media (min-width: 768px) {
+    .hero h1 span {
+      display: block;
+    }
+  }
+  @media (max-width: 767px) {
+    .hero-copy {
+      padding-bottom: clamp(4.5rem, 12vh, 7rem);
+    }
+  }
+
+  html.anim .cta-chip {
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+</style>
+
+<script>
+  import { mountHeroSim } from "@lib/physarum-hero";
+
+  const canvas = document.getElementById("sim");
+  if (canvas instanceof HTMLCanvasElement) {
+    mountHeroSim(canvas);
+  }
+</script>

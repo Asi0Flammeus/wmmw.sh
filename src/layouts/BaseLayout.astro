@@ -1,0 +1,155 @@
+---
+import "@fontsource-variable/space-grotesk/index.css";
+import "@fontsource-variable/instrument-sans/index.css";
+import "@fontsource-variable/jetbrains-mono/index.css";
+import "@styles/global.css";
+
+import { type Locale, t, localePath, alternates } from "@i18n/index";
+import { SITE_URL, SITE_NAME } from "@lib/site";
+import Filament from "@components/Filament.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+  ogImage?: string;
+  hero?: boolean;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { locale, title, description, path, ogImage, hero = false, jsonLd } =
+  Astro.props;
+
+const dict = t(locale);
+
+const isHome = path === "/";
+const pageTitle = isHome
+  ? "wmmw.sh : WilliaM Mycelic Wealth"
+  : `${title} · ${SITE_NAME}`;
+
+const canonical = SITE_URL + localePath(locale, path);
+
+/** Absolute alternates for hreflang (relative paths from i18n helper). */
+const alts = alternates(path).map((a) => ({
+  locale: a.locale,
+  href: SITE_URL + a.href,
+}));
+const xDefault = SITE_URL + localePath("fr", path);
+
+const ogLocale: Record<Locale, string> = {
+  fr: "fr_FR",
+  en: "en_US",
+  es: "es_ES",
+};
+
+const absoluteOg = ogImage
+  ? ogImage.startsWith("http")
+    ? ogImage
+    : SITE_URL + ogImage
+  : undefined;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      /* js + anim flags before first paint; animation only when motion is welcome */
+      (function () {
+        var c = "js";
+        try {
+          if (!matchMedia("(prefers-reduced-motion: reduce)").matches) c += " anim";
+        } catch (e) {}
+        document.documentElement.className = c;
+      })();
+    </script>
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#12100d" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content={isHome ? "website" : "article"} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {absoluteOg && <meta property="og:image" content={absoluteOg} />}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {absoluteOg && <meta name="twitter:image" content={absoluteOg} />}
+
+    {
+      alts.map((a) => (
+        <link rel="alternate" hreflang={a.locale} href={a.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
+
+    {
+      alternates("/rss.xml").map((a) => (
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={t(a.locale).rss.title}
+          href={SITE_URL + a.href}
+        />
+      ))
+    }
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {
+      jsonLd && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(jsonLd)}
+        />
+      )
+    }
+  </head>
+  <body>
+    <a class="skip" href="#contenu">{dict.skip}</a>
+    <Filament />
+    <Header locale={locale} path={path} hero={hero} />
+    <main id="contenu">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+
+    <script>
+      import { initTermTyping } from "@lib/term-type";
+
+      initTermTyping();
+
+      const anim = document.documentElement.classList.contains("anim");
+      if (anim && "IntersectionObserver" in window) {
+        const ro = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("in");
+                ro.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+        );
+        document
+          .querySelectorAll(".reveal")
+          .forEach((el) => ro.observe(el));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="wmmw.sh">
+  <rect width="32" height="32" rx="7" fill="#12100d"/>
+  <text x="16" y="16" text-anchor="middle" dominant-baseline="central"
+        font-family="'JetBrains Mono', ui-monospace, 'DejaVu Sans Mono', monospace"
+        font-size="17" font-weight="700" fill="#e8e2d5" letter-spacing="-1">w</text>
+  <rect x="9" y="24" width="14" height="2" rx="1" fill="#d9a24a"/>
+</svg>

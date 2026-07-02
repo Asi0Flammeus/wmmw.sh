@@ -1,0 +1,25 @@
+# wmmw.sh
+
+> wmmw.sh est le site personnel de William (alias asi0) : physicien de formation, tisseur de reseaux par nature. Le nom est un palindrome, WilliaM Mycelic Wealth, qui porte la these de la richesse mycelique : la richesse s'echange, elle ne s'empile pas. Elle est multidimensionnelle (financiere, relationnelle, intellectuelle, experientielle, emotionnelle). Apporter des ressources aux autres sans exiger de retour gagne sur le long terme. Ethos build-in-the-open, ton calme et artisanal, zero slop marketing. Site trilingue (FR par defaut, EN, ES).
+
+## Pages principales
+
+- [Accueil](https://wmmw.sh/): manifeste condense, teasers projets, outils, ecrits et nourritures
+- [Manifeste](https://wmmw.sh/manifeste): la philosophie mycelique au long format (metaphore du mycelium, cinq dimensions de la richesse)
+- [Projets](https://wmmw.sh/projets): les arbres que le reseau nourrit (recherche ouverte, education Bitcoin, sites artisanaux, art emergent)
+- [Outils](https://wmmw.sh/outils): outils libres et repos, comme des spores : prenez, semez
+- [Ecrits](https://wmmw.sh/ecrits): essais sur la technique, la physique et ce qui circule entre les deux
+- [Nourritures](https://wmmw.sh/nourritures): livres, films et videos, le sol d'ou tout pousse
+
+## Versions linguistiques
+
+- Francais (defaut) : https://wmmw.sh/
+- English : https://wmmw.sh/en
+- Espanol : https://wmmw.sh/es
+
+## A propos
+
+- Auteur : William, alias asi0
+- Code : ouvert, construit au grand jour
+- GitHub : https://github.com/Asi0Flammeus
+- Flux RSS : https://wmmw.sh/rss.xml
