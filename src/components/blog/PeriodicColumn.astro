@@ -1,0 +1,135 @@
+---
+import type { Locale } from "@i18n/index";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const names: Record<Locale, [string, string, string, string, string, string, string]> = {
+  fr: ["Carbone", "Silicium", "Germanium", "Étain", "Plomb", "Flérovium", "Colonne IVA du tableau périodique : Carbone et Silicium"],
+  en: ["Carbon", "Silicon", "Germanium", "Tin", "Lead", "Flerovium", "Periodic table column IVA: Carbon and Silicon"],
+  es: ["Carbono", "Silicio", "Germanio", "Estaño", "Plomo", "Flerovio", "Columna IVA de la tabla periódica: Carbono y Silicio"],
+};
+const [carbon, silicon, germanium, tin, lead, flerovium, columnLabel] = names[lang];
+
+const elements = [
+  { symbol: "C", number: 6, name: carbon, highlight: "carbon" as const },
+  { symbol: "Si", number: 14, name: silicon, highlight: "silicon" as const },
+  { symbol: "Ge", number: 32, name: germanium, highlight: null },
+  { symbol: "Sn", number: 50, name: tin, highlight: null },
+  { symbol: "Pb", number: 82, name: lead, highlight: null },
+  { symbol: "Fl", number: 114, name: flerovium, highlight: null },
+];
+---
+
+<figure class="periodic-column" role="img" aria-label={columnLabel}>
+  <div class="periodic-stack">
+    <span class="periodic-header">IV A</span>
+    {elements.map((el) => (
+      <div
+        class:list={['periodic-tile', el.highlight && `periodic-tile--${el.highlight}`]}
+        title={`${el.name} (${el.number})`}
+      >
+        <span class="periodic-number">{el.number}</span>
+        <span class="periodic-symbol">{el.symbol}</span>
+        <span class="periodic-name">{el.name}</span>
+      </div>
+    ))}
+  </div>
+</figure>
+
+<style>
+  .periodic-column {
+    margin-block: var(--space-6);
+    display: flex;
+    justify-content: center;
+  }
+
+  .periodic-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 140px;
+  }
+
+  .periodic-header {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: var(--font-semibold, 600);
+    color: var(--text-tertiary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-1);
+  }
+
+  .periodic-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background: color-mix(in oklab, var(--bg-primary) 45%, transparent);
+    border: 1px solid color-mix(in oklab, var(--text-primary) 10%, transparent);
+    border-radius: var(--radius-sm, 6px);
+    padding: var(--space-2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    opacity: 0.5;
+  }
+
+  .periodic-tile--carbon {
+    opacity: 1;
+    border-color: var(--orange-400);
+    background: color-mix(in oklab, var(--orange-400) 14%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--orange-400) 15%, transparent);
+  }
+
+  .periodic-tile--silicon {
+    opacity: 1;
+    border-color: var(--cyan-400);
+    background: color-mix(in oklab, var(--cyan-400) 14%, transparent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--cyan-400) 15%, transparent);
+  }
+
+  .periodic-tile--carbon .periodic-symbol {
+    color: var(--orange-400);
+  }
+
+  .periodic-tile--silicon .periodic-symbol {
+    color: var(--cyan-400);
+  }
+
+  .periodic-number {
+    font-family: var(--font-sans);
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    align-self: flex-end;
+    line-height: 1;
+  }
+
+  .periodic-symbol {
+    font-family: var(--font-sans);
+    font-size: 2rem;
+    font-weight: var(--font-semibold, 600);
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+
+  .periodic-name {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-top: var(--space-1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .periodic-tile {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,11 @@
+{
+  "name": "agentic-cloud",
+  "blurb": {
+    "fr": "CLI multi-Nextcloud au-dessus de rclone. Montages VFS, partages publics.",
+    "en": "Multi-Nextcloud CLI on top of rclone. VFS mounts, public shares.",
+    "es": "CLI multi-Nextcloud sobre rclone. Montajes VFS, enlaces públicos."
+  },
+  "repo": "https://github.com/Asi0Flammeus/agentic-cloud",
+  "status": "stable",
+  "order": 5
+}

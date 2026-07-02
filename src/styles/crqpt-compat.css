@@ -1,0 +1,49 @@
+/*
+ * Adapter for article components ported from crqpt (src/components/blog/).
+ * Maps crqpt's token vocabulary onto wmmw tokens so the components stay
+ * close to their source. Scope: writings post pages only.
+ * Hues are desaturated to sit inside the humus/gold palette.
+ */
+.crqpt-compat {
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --font-sans: var(--body);
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-primary: var(--bone);
+  --text-secondary: var(--ink-2);
+  --text-tertiary: var(--ink-3);
+  --border-subtle: var(--hair);
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surf);
+  --bg-tertiary: var(--surf-head);
+  --black: #000;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+
+  --red-400: #c47f6b;
+  --red-600: #a8654f;
+  --orange-400: var(--accent);
+  --orange-600: #b5813a;
+  --yellow-400: #cdb96a;
+  --yellow-600: #a99646;
+  --green-400: #93ad7c;
+  --green-600: #75905e;
+  --cyan-400: #7fb0a4;
+  --cyan-600: #5f9186;
+  --blue-400: #7f96b5;
+  --blue-600: #617a9c;
+  --magenta-400: #b285a3;
+  --magenta-600: #946985;
+  --purple-400: #9c8ab5;
+  --purple-600: #7d6c99;
+}

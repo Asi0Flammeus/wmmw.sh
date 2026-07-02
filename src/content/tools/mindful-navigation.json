@@ -1,0 +1,11 @@
+{
+  "name": "mindful-navigation",
+  "blurb": {
+    "fr": "Extension navigateur : une pause d'intention avant les sites distrayants.",
+    "en": "Browser extension: a pause for intention before distracting sites.",
+    "es": "Extensión de navegador: una pausa de intención antes de los sitios que distraen."
+  },
+  "repo": "https://github.com/Asi0Flammeus/mindful-navigation",
+  "status": "stable",
+  "order": 4
+}

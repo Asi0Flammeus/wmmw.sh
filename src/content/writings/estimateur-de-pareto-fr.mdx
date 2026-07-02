@@ -1,0 +1,287 @@
+---
+title: "L'estimateur de Pareto"
+description: "Pousser jusqu'au bout la logique de l'approche Pareto pour en faire un outil d'estimation universel, utilisable même quand on manque d'information."
+publishedAt: 2026-02-09
+author: "asi0"
+tags: ["réflexion", "productivité", "modèle mental"]
+image: "./estimateur-de-pareto-cover.png"
+imageAlt: "Spirale de Fibonacci aux branches récursives suivant la proportion 80/20"
+draft: false
+lang: "fr"
+translationOf: "estimateur-de-pareto"
+---
+
+import Math from '../../components/blog/Math.astro';
+
+![Vue aérienne d'une route de montagne en lacets formant une courbe de Fibonacci dans une vallée alpine](./pareto-road.png)
+
+Les longues virées en voiture ont cette capacité de transformer l'esprit en un laboratoire d'idées. Sur la route entre Lugano et Turin, une réflexion m'a obsédé pendant près de deux heures et demie. Elle est assez simple dans son principe, mais ses implications m'ont semblé suffisamment profondes pour mériter d'être posées par écrit.
+
+L'idée : pousser jusqu'au bout la logique de l'approche Pareto, et en faire un outil d'estimation utilisable même quand on manque d'information.
+
+## Le point de départ : la nature cyclique
+
+On connaît tous le principe de Pareto : 20% des inputs produisent 80% des outputs. On essaie d'en tenir compte, plus ou moins consciemment. Mais ce qui m'a frappé, c'est le côté cyclique de cette observation. Si je produis 20% des efforts et que j'obtiens 80% du résultat, que se passe-t-il si je réapplique la même logique aux 20% restants ?
+
+En deux cycles, je peux atteindre 80% + 80% des 20% restants, soit 96% du résultat. En seulement deux itérations de 20% d'effort ciblé. Et de manière générale, à chaque fois que je manque d'information, je considérerai que le principe de Pareto s'applique.
+
+<figure>
+<div style="display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.5rem;">
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <span style="min-width: 5rem; font-size: 0.875rem; color: var(--text-secondary); font-weight: 600;">Cycle 1</span>
+    <div style="flex: 1; height: 2rem; background: var(--bg-tertiary); border-radius: 0.375rem; overflow: hidden; display: flex;">
+      <div style="width: 80%; background: var(--orange-400); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">80%</div>
+    </div>
+    <span style="font-size: 0.75rem; color: var(--text-tertiary); min-width: 5rem;">20% effort</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 1rem;">
+    <span style="min-width: 5rem; font-size: 0.875rem; color: var(--text-secondary); font-weight: 600;">Cycle 2</span>
+    <div style="flex: 1; height: 2rem; background: var(--bg-tertiary); border-radius: 0.375rem; overflow: hidden; display: flex;">
+      <div style="width: 80%; background: var(--orange-400); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">80%</div>
+      <div style="width: 16%; background: var(--magenta-400); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">+16%</div>
+    </div>
+    <span style="font-size: 0.75rem; color: var(--text-tertiary); min-width: 5rem;">+20% effort</span>
+  </div>
+  <p style="text-align: center; font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem; font-style: italic;">= 96% du résultat avec ~36% de l'effort total</p>
+</div>
+<figcaption>Cumul des résultats sur deux cycles de Pareto</figcaption>
+</figure>
+
+## Devenir excellent au Go
+
+Prenons un exemple concret. Je veux développer un excellent niveau au [Go](https://www.youtube.com/watch?v=yYvLfeFnrCU) — le jeu de stratégie, pas le langage. Mon niveau est relatif à une population. Je définis donc mon objectif : être meilleur que 80% des gens (donc dans le top 20%).
+
+Pour y arriver, je cherche les 20% de connaissances et de pratiques qui vont produire l'essentiel de ma progression. Supposons qu'après un temps T, j'ai atteint ce premier palier.
+
+Maintenant, je veux continuer : être meilleur que 80% du top 20%, donc faire partie du top 4%. Il va falloir que je trouve les nouveaux 20% pertinents à ce niveau — les concepts qui n'existaient même pas dans mon champ de vision initial. Et là, quelque chose d'intéressant se produit : le temps nécessaire n'est pas le même.
+
+En fait, tout ce que j'ai investi jusqu'ici ne représente que 20% de l'effort pour débloquer ce deuxième cycle. Autrement dit, il me faut 4T supplémentaires. Au total : **5T pour être dans le top 4%**.
+
+Si je pousse encore — top 0,8% — le même raisonnement s'applique. Les 5T investis ne représentent que 20% du prochain cycle. Il me faut donc 20T de plus, soit **25T au total**.
+
+<figure>
+<div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.5rem;">
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <span style="min-width: 4.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Cycle 0</span>
+    <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 1%; min-width: 6px; height: 1.75rem; background: var(--orange-400); border-radius: 0.25rem;"></div>
+      <span style="font-size: 0.75rem; color: var(--text-tertiary);">T = 1</span>
+    </div>
+    <span style="font-size: 0.875rem; color: var(--cyan-600); font-weight: 600; min-width: 5.5rem; text-align: right;">Top 20%</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <span style="min-width: 4.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Cycle 1</span>
+    <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 4%; min-width: 6px; height: 1.75rem; background: var(--orange-400); border-radius: 0.25rem;"></div>
+      <span style="font-size: 0.75rem; color: var(--text-tertiary);">T = 5</span>
+    </div>
+    <span style="font-size: 0.875rem; color: var(--cyan-600); font-weight: 600; min-width: 5.5rem; text-align: right;">Top 4%</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <span style="min-width: 4.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Cycle 2</span>
+    <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 20%; min-width: 6px; height: 1.75rem; background: var(--orange-400); border-radius: 0.25rem;"></div>
+      <span style="font-size: 0.75rem; color: var(--text-tertiary);">T = 25</span>
+    </div>
+    <span style="font-size: 0.875rem; color: var(--cyan-600); font-weight: 600; min-width: 5.5rem; text-align: right;">Top 0.8%</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <span style="min-width: 4.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-primary);">Cycle 3</span>
+    <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+      <div style="width: 100%; min-width: 6px; height: 1.75rem; background: var(--orange-400); border-radius: 0.25rem;"></div>
+      <span style="font-size: 0.75rem; color: var(--text-tertiary);">T = 125</span>
+    </div>
+    <span style="font-size: 0.875rem; color: var(--cyan-600); font-weight: 600; min-width: 5.5rem; text-align: right;">Top 0.16%</span>
+  </div>
+</div>
+<figcaption>Effort cumulé par cycle — chaque cycle nécessite ~4× plus que le précédent</figcaption>
+</figure>
+
+Si le premier cycle prend 1 mois, le deuxième sera atteint après 5 mois, le troisième en 25 mois — soit 2 ans et 1 mois. Cela illustre pourquoi devenir un excellent joueur de Go est difficile : la profondeur des connaissances augmente de manière géométrique. Ce n'est pas juste "plus de la même chose" — c'est une redécouverte constante de ce qui compte à chaque niveau.
+
+## L'estimateur de Pareto : formalisation
+
+C'est là que l'idée d'un estimateur prend forme. Je définis l'estimateur de Pareto comme un ensemble de mesures : la série uₙ, l'effort cumulé Iₙ, et la production d'output Oₙ.
+
+<Math formula="u_{n+1} = 4 \cdot (u_0 + u_1 + \ldots + u_n)" />
+
+<Math formula="I_n = \sum_{k=0}^{n} u_k" />
+
+<Math formula="O_n = 0.2^{\,n+1}" />
+
+| n | uₙ | Iₙ (effort cumulé) | Oₙ (top %) |
+|---|-----|---------------------|------------|
+| 0 | 1   | 1                   | 20%        |
+| 1 | 4   | 5                   | 4%         |
+| 2 | 20  | 25                  | 0.8%       |
+| 3 | 100 | 125                 | 0.16%      |
+| 4 | 500 | 625                 | 0.032%     |
+
+Ce qui rend cet estimateur utile, c'est qu'il fonctionne même quand on manque d'information. Imaginons qu'on me donne une mission. Je me dis : "À la louche, si je me concentre bien, en deux heures je devrais pouvoir produire 80% de ce qu'on me demande."
+
+Je me lance. Après deux heures, je fais le point. Est-ce que j'ai vraiment atteint 80% ? Si j'ai l'impression d'avoir fait seulement la moitié, ça me donne deux indications :
+
+1. Soit je ne me suis pas assez focalisé sur les 20% d'actions les plus importantes
+2. Soit j'ai mal évalué l'échelle de temps de référence
+
+Dans les deux cas, je peux réajuster. L'estimateur devient un outil de feedback constant.
+
+## Appliquer ça à un comportement : le café
+
+Là où ça devient vraiment intéressant, c'est quand on l'applique à des objectifs comportementaux. Je veux avoir une consommation de café raisonnable.
+
+Qu'est-ce que ça veut dire, "raisonnable" ? Je n'ai même pas besoin de répondre précisément. Je peux directement appliquer Pareto.
+
+- Pire cas : café tous les jours → 30 fois par mois
+- Meilleur cas : 0 café
+
+Mon objectif devient : ne pas consommer de café dans 80% des cas, j'ai donc un **taux d'échec de 20%**, soit 6 jours par mois.
+
+{/* Calendar visualization: 30 days, 6 coffee days scattered */}
+<figure>
+<div style="padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.5rem;">
+  <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.75rem; font-size: 0.75rem; color: var(--text-tertiary);">
+    <span style="width: 2rem; text-align: center;">L</span>
+    <span style="width: 2rem; text-align: center;">M</span>
+    <span style="width: 2rem; text-align: center;">M</span>
+    <span style="width: 2rem; text-align: center;">J</span>
+    <span style="width: 2rem; text-align: center;">V</span>
+    <span style="width: 2rem; text-align: center;">S</span>
+    <span style="width: 2rem; text-align: center;">D</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(7, 2rem); gap: 0.25rem; justify-content: center;">
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--orange-400); border-radius: 0.25rem; font-size: 0.75rem;">&#9749;</div>
+
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+    <div style="aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--bg-tertiary); border-radius: 0.25rem; font-size: 0.625rem;"></div>
+  </div>
+  <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; font-size: 0.75rem; color: var(--text-tertiary);">
+    <span><span style="display: inline-block; width: 0.75rem; height: 0.75rem; background: var(--orange-400); border-radius: 0.125rem; vertical-align: middle; margin-right: 0.25rem;"></span> Jour avec café (6)</span>
+    <span><span style="display: inline-block; width: 0.75rem; height: 0.75rem; background: var(--bg-tertiary); border-radius: 0.125rem; vertical-align: middle; margin-right: 0.25rem;"></span> Sans café (24)</span>
+  </div>
+</div>
+<figcaption>Un mois avec un taux d'échec de 20% — 6 cafés sur 30 jours</figcaption>
+</figure>
+
+Autrement dit, si je me limite à 6 cafés par mois, je suis sur la bonne trajectoire. Et surtout, si j'échoue certains jours, ce n'est pas la fin du monde — c'est prévu dans le modèle. La métrique Oₙ devient un taux d'échec acceptable, me permettant d'être moins intransigeant avec moi-même tout en restant sur une trajectoire de progression.
+
+## La propriété fractale
+
+![Tasse de café vue du dessus sur une surface sombre](./pareto-coffee.png)
+
+Et c'est là qu'apparaît une propriété fascinante : l'auto-similarité.
+
+Reprenons le café. J'ai mon objectif (6 jours max). Maintenant, quelle est l'action principale qui va m'assurer de réussir dans 80% des cas ?
+
+La réponse : **ne pas boire de café chez moi**.
+
+Si je m'impose cette règle, la plupart du temps je n'aurai simplement pas accès au café. Mais je peux descendre encore d'un niveau. Qu'est-ce qui va faire que cette règle fonctionne 80% du temps ?
+
+- Option 1 : ne pas avoir de café chez moi du tout — radical mais efficace
+- Option 2 (ce que j'ai fait) : avoir une alternative — décaféiné, chicorée
+
+{/* Decision tree visualization */}
+<figure>
+<div style="padding: 1.5rem; background: var(--bg-secondary); border-radius: 0.5rem;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <div style="padding: 0.5rem 1.25rem; background: var(--orange-400); color: white; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; text-align: center;">Objectif : max 6 cafés/mois</div>
+    <div style="width: 2px; height: 1.5rem; background: var(--text-tertiary);"></div>
+    <div style="padding: 0.5rem 1.25rem; background: var(--magenta-400); color: white; border-radius: 0.375rem; font-weight: 600; font-size: 0.875rem; text-align: center;">Action : ne pas boire chez moi</div>
+    <div style="width: 2px; height: 1.5rem; background: var(--text-tertiary);"></div>
+    <div style="width: 60%; height: 2px; background: var(--text-tertiary);"></div>
+    <div style="display: flex; width: 60%; justify-content: space-between;">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 2px; height: 1rem; background: var(--text-tertiary);"></div>
+        <div style="padding: 0.375rem 0.75rem; background: var(--bg-tertiary); border-radius: 0.375rem; font-size: 0.75rem; text-align: center; color: var(--text-secondary);">Pas de stock chez moi</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 2px; height: 1rem; background: var(--text-tertiary);"></div>
+        <div style="padding: 0.375rem 0.75rem; background: var(--bg-tertiary); border-radius: 0.375rem; font-size: 0.75rem; text-align: center; color: var(--text-secondary);">Alternatives : déca, chicorée</div>
+      </div>
+    </div>
+  </div>
+</div>
+<figcaption>Structure fractale : chaque niveau suit la même logique 80/20</figcaption>
+</figure>
+
+On retrouve la même structure à chaque niveau : une ou deux actions produisent l'essentiel du résultat. C'est fractal — la structure se répète à mesure qu'on zoome, ce qui explique pourquoi l'approche reste utilisable même avec peu d'information.
+
+## L'universalité — et ses limites instructives
+
+![Coquille de nautile vue du dessus sur une eau sombre, les ondulations déformant la géométrie de Fibonacci](./pareto-theory-reality.png)
+
+Ce qui donne à cette approche sa puissance, c'est qu'elle s'applique partout. Le domaine change, les métriques changent, mais la structure reste.
+
+Prenons un exemple : évaluer sa position relative en Bitcoin.
+
+21 millions de BTC ÷ 8 milliards d'humains ≈ **250 000 sats** par personne.
+
+| Cycle | Seuil | Position |
+|-------|-------|----------|
+| 1 | 250 000 sats | Top 20% |
+| 2 | 1 million sats | Top 4% |
+| 3 | 5 millions sats | Top 0.8% |
+| 4 | 25 millions sats | Top 0.16% |
+
+Mais attendons — si on applique 4 cycles de Pareto, on devrait être dans le top 0.16%. Or dans la réalité, quelqu'un avec 25 millions de sats (~0.25 BTC) n'est probablement pas dans une élite aussi restreinte. Le modèle ne colle pas exactement.
+
+**Et c'est précisément là que l'estimateur devient un outil de diagnostic.**
+
+Si la réalité dévie du modèle, c'est qu'il y a des facteurs perturbateurs. Et ces facteurs, eux-mêmes, suivent probablement une distribution de Pareto. Alors je les liste :
+
+1. La distribution réelle des richesses est plus inégale que Pareto — une poignée de wallets détient une part disproportionnée
+2. 3-4 millions de BTC sont perdus à jamais
+3. La population mondiale n'est pas 100% exposée au Bitcoin
+4. L'échelle de temps compte — horizon d'investissement, capacité à sécuriser
+
+Maintenant, lequel de ces facteurs explique **80% de l'écart** avec mon modèle ?
+
+Probablement le premier : l'inégalité extrême de la distribution. Si je comprends ce facteur, j'ai déjà 80% de l'explication. Et je pourrais appliquer le même raisonnement pour identifier ce qui, dans cette inégalité, pèse le plus — par exemple, les early adopters et les exchanges.
+
+L'estimateur ne prédit pas la réalité exacte. Il fournit une baseline à partir de laquelle je peux identifier ce qui perturbe le modèle — et prioriser ma compréhension de ces perturbations.
+
+## Un outil de priorisation radicale
+
+Au fond, l'estimateur de Pareto est un outil de clarification. Quand tu as du brouillard dans la tête, tu listes tout ce qui te passe par l'esprit. Tu ordonnes. Et tu gardes le top 5 — qui représente 80% de 80% de ce qui compte vraiment.
+
+Le reste, tu peux l'écarter. Pas définitivement, mais pour l'instant.
+
+Et cette opération, tu peux la répéter à chaque niveau de zoom. Que tu planifies un projet sur un an ou que tu décides quoi faire dans les deux prochaines heures.
+
+## Une dernière chose
+
+L'estimateur de Pareto permet aussi de décider consciemment si on veut passer au cycle suivant. Savoir que le prochain niveau demande 4 fois plus d'effort change la perspective. Parfois, rester au cycle actuel est le bon choix.
+
+Et d'ailleurs, ce que vous lisez ici est lui-même un premier cycle de Pareto. Il m'a fallu un certain temps pour le produire. Si je voulais l'améliorer significativement — mieux structurer, ajouter des visualisations, peaufiner chaque phrase — il me faudrait probablement quatre fois ce temps.
+
+Pour l'instant, deux cycles de Pareto me suffisent.

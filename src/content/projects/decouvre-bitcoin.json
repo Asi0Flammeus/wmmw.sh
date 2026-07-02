@@ -1,0 +1,12 @@
+{
+  "name": "decouvre-bitcoin/",
+  "title": "Découvre Bitcoin & Plan B Network",
+  "blurb": {
+    "fr": "Éducation Bitcoin libre et open-source, du contenu francophone à l'académie internationale.",
+    "en": "Free and open-source Bitcoin education, from French-language content to an international academy.",
+    "es": "Educación Bitcoin libre y de código abierto, del contenido francófono a la academia internacional."
+  },
+  "url": "https://planb.network",
+  "status": "actif",
+  "order": 2
+}

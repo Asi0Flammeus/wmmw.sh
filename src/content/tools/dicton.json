@@ -1,0 +1,12 @@
+{
+  "name": "dicton",
+  "blurb": {
+    "fr": "Dictée vocale française sub-seconde. Whisper turbo, nettoyage LLM.",
+    "en": "Sub-second French voice dictation. Whisper turbo, LLM cleanup.",
+    "es": "Dictado por voz en francés en menos de un segundo. Whisper turbo, limpieza con LLM."
+  },
+  "repo": "https://github.com/Asi0Flammeus/dicton",
+  "status": "stable",
+  "install": "curl -fsSL https://raw.githubusercontent.com/Asi0Flammeus/dicton/main/install.sh | bash",
+  "order": 2
+}

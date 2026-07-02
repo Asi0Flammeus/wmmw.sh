@@ -1,0 +1,12 @@
+{
+  "name": "lazyagent",
+  "blurb": {
+    "fr": "TUI façon lazygit pour surveiller ses agents IA dans tmux, en local comme en ssh.",
+    "en": "A lazygit-style TUI to monitor your AI agents in tmux, locally or over ssh.",
+    "es": "Una TUI al estilo lazygit para supervisar tus agentes de IA en tmux, en local o por ssh."
+  },
+  "repo": "https://github.com/Asi0Flammeus/lazyagent",
+  "status": "stable",
+  "install": "cargo install --path .",
+  "order": 1
+}

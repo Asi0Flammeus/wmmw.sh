@@ -1,0 +1,275 @@
+---
+import type { Locale } from "@i18n/index";
+
+interface Props {
+  lang: Locale;
+}
+
+const { lang } = Astro.props;
+
+const allLabels: Record<Locale, { start: string; breathe: string; welcomeBack: string }> = {
+  fr: { start: "Prendre une minute", breathe: "Respire...", welcomeBack: "Bon retour." },
+  en: { start: "Take a minute", breathe: "Breathe...", welcomeBack: "Welcome back." },
+  es: { start: "Tómate un minuto", breathe: "Respira...", welcomeBack: "Bienvenido de vuelta." },
+};
+const labels = allLabels[lang];
+---
+
+<div class="zen-countdown" data-labels={JSON.stringify(labels)}>
+  <button class="zen-trigger" type="button" aria-label={labels.start}>
+    <span class="zen-trigger-text">{labels.start}</span>
+    <svg class="zen-trigger-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5" opacity="0.5" />
+      <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <div class="zen-space" aria-live="polite" aria-atomic="true" hidden>
+    <svg class="zen-ring" viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="zen-ring-bg" cx="60" cy="60" r="52" />
+      <circle class="zen-ring-arc" cx="60" cy="60" r="52" />
+    </svg>
+    <div class="zen-center">
+      <span class="zen-number" aria-label="">60</span>
+      <span class="zen-breathe">{labels.breathe}</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .zen-countdown {
+    margin-block: var(--space-8);
+    display: flex;
+    justify-content: center;
+  }
+
+  .zen-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: color-mix(in oklab, var(--bg-primary) 50%, transparent);
+    border: 1px solid color-mix(in oklab, var(--text-primary) 12%, transparent);
+    border-radius: var(--radius-md, 8px);
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: var(--font-medium, 500);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.02em;
+  }
+
+  .zen-trigger:hover {
+    color: var(--cyan-400);
+    border-color: var(--cyan-400);
+    background: color-mix(in oklab, var(--cyan-400) 14%, transparent);
+  }
+
+  .zen-trigger:focus-visible {
+    outline: 2px solid var(--cyan-400);
+    outline-offset: 2px;
+  }
+
+  .zen-trigger[hidden] {
+    display: none;
+  }
+
+  .zen-trigger-icon {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .zen-trigger:hover .zen-trigger-icon {
+    opacity: 1;
+  }
+
+  .zen-space {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: min(200px, 50vw);
+    height: min(200px, 50vw);
+    animation: zen-fade-in 0.6s ease-out;
+  }
+
+  .zen-space[hidden] {
+    display: none;
+  }
+
+  @keyframes zen-fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .zen-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .zen-ring-bg {
+    fill: none;
+    stroke: var(--border-subtle);
+    stroke-width: 2;
+  }
+
+  .zen-ring-arc {
+    fill: none;
+    stroke: var(--cyan-400);
+    stroke-width: 3;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    /* circumference = 2 * π * 52 ≈ 326.73 */
+    stroke-dasharray: 326.73;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--cyan-400) 40%, transparent));
+  }
+
+  .zen-center {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    z-index: 1;
+  }
+
+  .zen-number {
+    font-family: var(--font-sans);
+    font-size: 2.5rem;
+    font-weight: var(--font-semibold, 600);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .zen-breathe {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+    animation: zen-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes zen-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .zen-complete .zen-number {
+    font-size: 1.1rem;
+    font-weight: var(--font-medium, 500);
+    color: var(--cyan-400);
+    animation: zen-fade-in 0.5s ease-out;
+  }
+
+  .zen-complete .zen-breathe {
+    display: none;
+  }
+
+  .zen-complete .zen-ring-arc {
+    opacity: 0.3;
+    transition: opacity 0.5s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zen-space {
+      animation: none;
+    }
+
+    .zen-breathe {
+      animation: none;
+      opacity: 0.7;
+    }
+
+    .zen-ring-arc {
+      transition: none;
+      filter: none;
+    }
+  }
+</style>
+
+<script>
+  function initZenCountdown(container: HTMLElement) {
+    const labels = JSON.parse(container.dataset.labels || '{}');
+    const trigger = container.querySelector<HTMLButtonElement>('.zen-trigger')!;
+    const space = container.querySelector<HTMLElement>('.zen-space')!;
+    const numberEl = container.querySelector<HTMLElement>('.zen-number')!;
+    const arc = container.querySelector<SVGCircleElement>('.zen-ring-arc')!;
+
+    const DURATION = 60;
+    const CIRCUMFERENCE = 2 * Math.PI * 52;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let animationId: number | null = null;
+
+    trigger.addEventListener('click', () => {
+      if (prefersReducedMotion) {
+        // Skip animation entirely — show welcome message immediately
+        trigger.hidden = true;
+        space.hidden = false;
+        numberEl.textContent = labels.welcomeBack;
+        arc.style.strokeDashoffset = String(CIRCUMFERENCE);
+        space.classList.add('zen-complete');
+        scheduleCollapse();
+        return;
+      }
+
+      trigger.hidden = true;
+      space.hidden = false;
+
+      const startTime = performance.now();
+
+      function tick(now: number) {
+        const elapsed = (now - startTime) / 1000;
+        const remaining = Math.max(0, DURATION - elapsed);
+        const seconds = Math.ceil(remaining);
+
+        numberEl.textContent = String(seconds);
+        numberEl.setAttribute('aria-label', `${seconds}`);
+
+        const progress = elapsed / DURATION;
+        arc.style.strokeDashoffset = String(CIRCUMFERENCE * progress);
+
+        if (remaining > 0) {
+          animationId = requestAnimationFrame(tick);
+        } else {
+          onComplete();
+        }
+      }
+
+      animationId = requestAnimationFrame(tick);
+    });
+
+    function onComplete() {
+      numberEl.textContent = labels.welcomeBack;
+      numberEl.removeAttribute('aria-label');
+      space.classList.add('zen-complete');
+      scheduleCollapse();
+    }
+
+    function scheduleCollapse() {
+      setTimeout(() => {
+        space.hidden = true;
+        space.classList.remove('zen-complete');
+        trigger.hidden = false;
+        arc.style.strokeDashoffset = '0';
+        numberEl.textContent = '60';
+        if (animationId) cancelAnimationFrame(animationId);
+      }, 4000);
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('.zen-countdown').forEach(initZenCountdown);
+</script>
