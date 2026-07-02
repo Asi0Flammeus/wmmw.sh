@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wmmw.sh : WilliaM Mycelic Wealth</title>
+<meta name="description" content="La richesse s'échange, elle ne s'empile pas. William, physicien de formation, tisseur de réseaux par nature.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12100d;
+    --bg-tile: #191510;
+    --bone: #e8e2d5;
+    --ink-2: #b6ae9e;
+    --ink-3: #8d8472;
+    --accent: #d9a24a;
+    --accent-soft: rgba(217, 162, 74, 0.14);
+    --hair: rgba(232, 226, 213, 0.14);
+    --pad: clamp(1.25rem, 5vw, 3rem);
+    --maxw: 1200px;
+    --r-tile: 10px;
+    --r-pill: 999px;
+    --disp: 'Space Grotesk', sans-serif;
+    --body: 'Instrument Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    color-scheme: dark;
+    scroll-padding-top: 2rem;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: var(--body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--pad);
+  }
+
+  /* ---------- header ---------- */
+
+  .site-head {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "mark nav lang";
+    align-items: center;
+    gap: 1rem 2rem;
+    padding: 1.35rem var(--pad);
+  }
+
+  .wordmark {
+    grid-area: mark;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .site-nav {
+    grid-area: nav;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1rem, 3vw, 2.2rem);
+    font-size: 0.92rem;
+  }
+  .site-nav a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .site-nav a:hover { color: var(--bone); }
+
+  .lang {
+    grid-area: lang;
+    justify-self: end;
+    font-family: var(--disp);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .lang .on { color: var(--accent); }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    position: relative;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  #sim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+  }
+
+  .hero-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 95% at 55% 15%, transparent 50%, rgba(18, 16, 13, 0.55) 100%),
+      linear-gradient(to bottom, rgba(18, 16, 13, 0.4), transparent 20% 60%, var(--bg) 97%);
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 42rem;
+    padding-inline: var(--pad);
+    padding-bottom: clamp(3.5rem, 9vh, 6rem);
+  }
+  .hero-copy::before {
+    content: "";
+    position: absolute;
+    inset: -4rem -6rem -2rem -4rem;
+    z-index: -1;
+    background: radial-gradient(85% 90% at 30% 62%, rgba(18, 16, 13, 0.9) 0%, rgba(18, 16, 13, 0.55) 55%, transparent 100%);
+  }
+
+  .hero h1 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(2.5rem, 6.5vw, 5.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    margin-top: 1.4rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: var(--ink-2);
+  }
+
+  .cta {
+    display: inline-block;
+    margin-top: 2.1rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 0.98rem;
+    text-decoration: none;
+    padding: 0.85rem 1.6rem;
+    border-radius: var(--r-pill);
+  }
+  .cta:hover { background: #e4b262; }
+
+  /* ---------- shared section chrome ---------- */
+
+  .sec { padding-block: clamp(4.5rem, 12vh, 8.5rem) 0; }
+  .sec:last-of-type { padding-bottom: clamp(4.5rem, 12vh, 8.5rem); }
+
+  .sec h2 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .lede {
+    margin-top: 0.8rem;
+    font-size: 1.15rem;
+    color: var(--ink-2);
+    max-width: 46ch;
+  }
+
+  /* ---------- manifeste ---------- */
+
+  .quote {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(2rem, 4.6vw, 3.6rem);
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    max-width: 26ch;
+  }
+  .quote .gold { color: var(--accent); }
+
+  .manifeste-intro {
+    margin-top: 2.4rem;
+    margin-bottom: clamp(3rem, 7vh, 4.5rem);
+    max-width: 60ch;
+    font-size: 1.2rem;
+    line-height: 1.65;
+    color: var(--bone);
+  }
+
+  .dims {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 72%;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-inline: var(--pad);
+    padding-bottom: 0.5rem;
+    scrollbar-width: none;
+    max-width: calc(var(--maxw) + 2 * var(--pad));
+    margin-inline: auto;
+  }
+  .dims::-webkit-scrollbar { display: none; }
+
+  .dim {
+    scroll-snap-align: start;
+    border-left: 1px solid var(--hair);
+    padding-left: 1.25rem;
+    padding-block: 0.4rem;
+  }
+  .dim h3 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    color: var(--accent);
+  }
+  .dim p {
+    margin-top: 0.65rem;
+    font-size: 0.98rem;
+    color: var(--ink-2);
+  }
+
+  /* ---------- projets : typographic list ---------- */
+
+  .proj {
+    list-style: none;
+    margin-top: clamp(2.5rem, 6vh, 4rem);
+  }
+  .proj li {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 1rem 3rem;
+    align-items: end;
+    padding-block: clamp(1.6rem, 4vh, 2.4rem);
+    border-top: 1px solid var(--hair);
+  }
+  .proj li:last-child { border-bottom: 1px solid var(--hair); }
+  .proj h3 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4.4vw, 3.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .proj p {
+    color: var(--ink-2);
+    font-size: 1rem;
+    max-width: 44ch;
+    justify-self: end;
+  }
+  .proj li:hover h3 { color: var(--accent); }
+
+  /* ---------- outils : bento 5 ---------- */
+
+  .bento {
+    margin-top: clamp(2.5rem, 6vh, 4rem);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(150px, auto);
+    gap: 0.8rem;
+  }
+  .tile {
+    border: 1px solid var(--hair);
+    border-radius: var(--r-tile);
+    background: var(--bg-tile);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.55rem;
+  }
+  .tile h3 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.35rem;
+    letter-spacing: -0.015em;
+  }
+  .tile p { color: var(--ink-2); font-size: 0.95rem; max-width: 40ch; }
+
+  .t-a { grid-column: 1 / 5; grid-row: 1 / 3; }
+  .t-b { grid-column: 5 / 7; grid-row: 1; }
+  .t-c { grid-column: 5 / 7; grid-row: 2; }
+  .t-d { grid-column: 1 / 4; grid-row: 3; }
+  .t-e { grid-column: 4 / 7; grid-row: 3; }
+
+  .t-a h3 { font-size: clamp(1.7rem, 2.6vw, 2.2rem); }
+
+  .tint-a {
+    background:
+      radial-gradient(110% 95% at 18% 0%, var(--accent-soft), transparent 58%),
+      var(--bg-tile);
+  }
+  .tint-b {
+    background:
+      radial-gradient(120% 130% at 85% 100%, rgba(217, 162, 74, 0.1), transparent 55%),
+      var(--bg-tile);
+  }
+
+  /* ---------- ecrits : editorial stack ---------- */
+
+  .ecrits-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: 3rem clamp(3rem, 7vw, 6rem);
+    align-items: start;
+  }
+  .ecrits-head {
+    position: sticky;
+    top: clamp(2rem, 10vh, 6rem);
+  }
+  .ecrits-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.6rem, 6vh, 4rem);
+  }
+  .ecrit .year {
+    font-family: var(--disp);
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+  .ecrit h3 {
+    margin-top: 0.3rem;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .ecrit p {
+    margin-top: 0.7rem;
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+
+  /* ---------- nourritures ---------- */
+
+  .nour {
+    margin-top: clamp(2.5rem, 6vh, 4rem);
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 3rem clamp(3rem, 6vw, 5rem);
+    align-items: start;
+  }
+  .nour h3 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.1rem;
+  }
+  .books {
+    list-style: none;
+    columns: 2;
+    column-gap: 3rem;
+  }
+  .books li {
+    break-inside: avoid;
+    margin-bottom: 0.95rem;
+    color: var(--bone);
+  }
+  .books i { color: var(--ink-2); }
+  .soon-col { display: flex; flex-direction: column; gap: 2.2rem; }
+  .soon p { color: var(--ink-3); font-style: italic; }
+
+  /* ---------- footer ---------- */
+
+  .site-foot {
+    margin-top: clamp(4.5rem, 12vh, 8.5rem);
+    border-top: 1px solid var(--hair);
+    padding-block: 3rem 4.5rem;
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 4rem;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .palin {
+    max-width: 46ch;
+    color: var(--ink-2);
+    font-size: 0.98rem;
+  }
+  .palin .fm {
+    font-family: var(--disp);
+    font-weight: 500;
+    color: var(--bone);
+  }
+  .foot-links {
+    display: flex;
+    gap: 1.6rem;
+    font-size: 0.92rem;
+  }
+  .foot-links a {
+    color: var(--ink-2);
+    text-decoration-color: var(--hair);
+    text-underline-offset: 4px;
+  }
+  .foot-links a:hover { color: var(--accent); }
+
+  /* ---------- switcher ---------- */
+
+  .switcher {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    background: rgba(18, 16, 13, 0.84);
+    border: 1px solid var(--hair);
+    border-radius: var(--r-pill);
+    padding: 0.42rem 0.85rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .sw-name {
+    color: var(--ink-3);
+    padding-right: 0.55rem;
+    border-right: 1px solid var(--hair);
+  }
+  .switcher a {
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 0.1rem 0.42rem;
+    border-radius: var(--r-pill);
+  }
+  .switcher a:hover { color: var(--bone); }
+  .switcher a.on {
+    color: var(--bg);
+    background: var(--accent);
+    font-weight: 700;
+  }
+  .switcher .dot { color: var(--ink-3); }
+
+  /* ---------- motion (all gated) ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+
+    html.js .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 0.6, 0.2, 1);
+    }
+    html.js .reveal.in { opacity: 1; transform: none; }
+    html.js .dims .dim:nth-child(2), html.js .bento .tile:nth-child(2) { transition-delay: 0.07s; }
+    html.js .dims .dim:nth-child(3), html.js .bento .tile:nth-child(3) { transition-delay: 0.14s; }
+    html.js .dims .dim:nth-child(4), html.js .bento .tile:nth-child(4) { transition-delay: 0.21s; }
+    html.js .dims .dim:nth-child(5), html.js .bento .tile:nth-child(5) { transition-delay: 0.28s; }
+
+    .wordmark { transition: transform 0.45s cubic-bezier(0.6, 0, 0.2, 1); }
+    .wordmark:hover { transform: scaleX(-1); }
+
+    .proj h3 { transition: color 0.25s ease, transform 0.35s cubic-bezier(0.22, 0.6, 0.2, 1); }
+    .proj li:hover h3 { transform: translateX(0.5ch); }
+    .proj li { transition: border-color 0.25s ease; }
+    .proj li:hover { border-top-color: rgba(217, 162, 74, 0.45); }
+
+    .cta { transition: background-color 0.2s ease; }
+    .site-nav a, .foot-links a, .switcher a { transition: color 0.2s ease; }
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (min-width: 768px) {
+    .hero h1 span { display: block; }
+    .dims {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(5, 1fr);
+      grid-auto-columns: unset;
+      overflow: visible;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .site-head {
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        "mark lang"
+        "nav  nav";
+      row-gap: 0.8rem;
+    }
+    .site-nav { justify-content: flex-start; flex-wrap: wrap; gap: 1rem; font-size: 0.88rem; }
+
+    .hero-copy { padding-bottom: clamp(4.5rem, 12vh, 7rem); }
+
+    .proj li { grid-template-columns: 1fr; align-items: start; }
+    .proj p { justify-self: start; }
+
+    .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .t-a, .t-b, .t-c, .t-d, .t-e { grid-column: auto; grid-row: auto; }
+    .t-a { min-height: 210px; }
+    .tile { min-height: 0; padding: 1.35rem; }
+
+    .ecrits-grid { grid-template-columns: 1fr; }
+    .ecrits-head { position: static; }
+
+    .nour { grid-template-columns: 1fr; }
+    .books { columns: 1; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <a class="wordmark" href="#" aria-label="wmmw.sh, retour en haut">wmmw.sh</a>
+  <nav class="site-nav" aria-label="Sections">
+    <a href="#projets">Projets</a>
+    <a href="#outils">Outils</a>
+    <a href="#ecrits">Écrits</a>
+    <a href="#nourritures">Nourritures</a>
+  </nav>
+  <div class="lang" aria-label="Langues, français actif">
+    <span class="on">FR</span><span aria-hidden="true">·</span><span>EN</span><span aria-hidden="true">·</span><span>ES</span>
+  </div>
+</header>
+
+<section class="hero">
+  <canvas id="sim" aria-hidden="true"></canvas>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1><span>La richesse <em>s'échange</em>.</span> <span>Elle ne s'empile pas.</span></h1>
+    <p class="hero-sub">William. Physicien de formation, tisseur de réseaux par nature. Je fais circuler le code, le savoir et la valeur.</p>
+    <a class="cta" href="#manifeste">Lire le manifeste</a>
+  </div>
+</section>
+
+<main>
+
+  <section id="manifeste" class="sec">
+    <div class="wrap">
+      <h2 class="quote reveal">La forêt n'a pas besoin d'un arbre de plus. <span class="gold">Elle a besoin de mycélium.</span></h2>
+      <p class="manifeste-intro reveal">Le mycélium ne discrimine pas entre les nutriments. Il transporte ce dont la forêt a besoin. La richesse mycélique, c'est apporter des ressources aux autres comme si ta vie en dépendait, sans exiger de retour. Le retour vient toujours, sous une forme qu'on n'attendait pas.</p>
+    </div>
+    <div class="dims" role="list">
+      <div class="dim reveal" role="listitem">
+        <h3>Financière</h3>
+        <p>Des liquidités pour soutenir le vivant.</p>
+      </div>
+      <div class="dim reveal" role="listitem">
+        <h3>Relationnelle</h3>
+        <p>La confiance, tissée lien par lien.</p>
+      </div>
+      <div class="dim reveal" role="listitem">
+        <h3>Intellectuelle</h3>
+        <p>Le savoir qui circule dans le réseau.</p>
+      </div>
+      <div class="dim reveal" role="listitem">
+        <h3>Expérientielle</h3>
+        <p>Les aventures que la forêt produit.</p>
+      </div>
+      <div class="dim reveal" role="listitem">
+        <h3>Émotionnelle</h3>
+        <p>Ce que le sol nourrit en silence.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="projets" class="sec">
+    <div class="wrap">
+      <h2 class="reveal">Projets</h2>
+      <p class="lede reveal">Les arbres que le réseau nourrit.</p>
+      <ul class="proj">
+        <li class="reveal">
+          <h3>Recherche ouverte</h3>
+          <p>Thèse de doctorat en physique. Un algorithme kinetic Monte Carlo quasi-O(1), 420 fois plus rapide. Publication en préparation.</p>
+        </li>
+        <li class="reveal">
+          <h3>Découvre Bitcoin &amp; Plan B Network</h3>
+          <p>Éducation Bitcoin libre et open-source, du contenu francophone à l'académie internationale.</p>
+        </li>
+        <li class="reveal">
+          <h3>alysis.cat</h3>
+          <p>Des sites artisanaux pour les artisans. Le web fait main, au service du fait main.</p>
+        </li>
+        <li class="reveal">
+          <h3>unfocus-art</h3>
+          <p>Faire éclore l'œuvre de Moris, artiste émergente. À paraître : Dédale des Décors Dansants.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="outils" class="sec">
+    <div class="wrap">
+      <h2 class="reveal">Outils &amp; repos</h2>
+      <p class="lede reveal">Des outils libres, comme des spores : prenez, semez.</p>
+      <div class="bento">
+        <article class="tile t-a tint-a reveal">
+          <h3>lazyagent</h3>
+          <p>TUI façon lazygit pour surveiller ses agents IA dans tmux, en local comme en ssh.</p>
+        </article>
+        <article class="tile t-b reveal">
+          <h3>dicton</h3>
+          <p>Dictée vocale française sub-seconde. Whisper turbo, nettoyage LLM.</p>
+        </article>
+        <article class="tile t-c reveal">
+          <h3>mindful-navigation</h3>
+          <p>Extension navigateur : une pause d'intention avant les sites distrayants.</p>
+        </article>
+        <article class="tile t-d reveal">
+          <h3>don-popote</h3>
+          <p>Assistant de cuisine. En bêta.</p>
+        </article>
+        <article class="tile t-e tint-b reveal">
+          <h3>agentic-cloud</h3>
+          <p>CLI multi-Nextcloud au-dessus de rclone. Montages VFS, partages publics.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="ecrits" class="sec">
+    <div class="wrap ecrits-grid">
+      <header class="ecrits-head">
+        <h2 class="reveal">Écrits</h2>
+        <p class="lede reveal">Des signaux envoyés dans le réseau.</p>
+      </header>
+      <div class="ecrits-list">
+        <article class="ecrit reveal">
+          <p class="year">2026</p>
+          <h3>Discuter avec Silicium</h3>
+          <p>On peut parler à la matière maintenant, elle répond, et tu trouves ça normal ?</p>
+        </article>
+        <article class="ecrit reveal">
+          <p class="year">2026</p>
+          <h3>Ce Rien Qui Peut Tout</h3>
+          <p>L'origine d'un nom. Le paradoxe où le vide contient tout, entre mathématiques, physique quantique et sagesses anciennes.</p>
+        </article>
+        <article class="ecrit reveal">
+          <p class="year">2026</p>
+          <h3>L'estimateur de Pareto</h3>
+          <p>Pousser la logique de Pareto jusqu'au bout pour en faire un outil d'estimation universel.</p>
+        </article>
+        <article class="ecrit reveal">
+          <p class="year">2026</p>
+          <h3>L'invitation</h3>
+          <p>Un point d'entrée pour me découvrir.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="nourritures" class="sec">
+    <div class="wrap">
+      <h2 class="reveal">Nourritures</h2>
+      <p class="lede reveal">Ce qui me nourrit. Le sol d'où tout pousse.</p>
+      <div class="nour">
+        <div class="livres reveal">
+          <h3>Livres</h3>
+          <ul class="books">
+            <li>Donna Haraway, <i>Staying with the Trouble</i></li>
+            <li>Ken Wilber, <i>Integral Psychology</i></li>
+            <li>Sönke Ahrens, <i>How to Take Smart Notes</i></li>
+            <li>Carlo Rovelli, <i>L'Ordre du temps</i></li>
+            <li>Hunt &amp; Thomas, <i>The Pragmatic Programmer</i></li>
+            <li>Laozi, <i>Tao Te King</i></li>
+          </ul>
+        </div>
+        <div class="soon-col">
+          <div class="soon reveal">
+            <h3>Films</h3>
+            <p>bientôt</p>
+          </div>
+          <div class="soon reveal">
+            <h3>Vidéos</h3>
+            <p>bientôt</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot">
+    <p class="palin"><span class="fm">wmmw.sh</span> : WilliaM Mycelic Wealth. Un palindrome. Ce qui sort du réseau y revient.</p>
+    <nav class="foot-links" aria-label="Liens">
+      <a href="https://github.com/Asi0Flammeus">GitHub</a>
+      <a href="#">Écrits (RSS)</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<nav class="switcher" aria-label="Maquettes">
+  <span class="sw-name">réseau vivant</span>
+  <a href="a-sous-bois.html">A</a><span class="dot" aria-hidden="true">·</span><a href="b-shell.html">B</a><span class="dot" aria-hidden="true">·</span><a href="c-reseau-vivant.html" class="on" aria-current="page">C</a><span class="dot" aria-hidden="true">·</span><a href="d-hybride.html">D</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- reveal on scroll ---------- */
+
+  if (!reduced && 'IntersectionObserver' in window) {
+    document.documentElement.classList.add('js');
+    var ro = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) {
+          entries[i].target.classList.add('in');
+          ro.unobserve(entries[i].target);
+        }
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    var revs = document.querySelectorAll('.reveal');
+    for (var r = 0; r < revs.length; r++) ro.observe(revs[r]);
+  }
+
+  /* ---------- physarum simulation (Jones model, CPU) ----------
+     Trail field: Float32Array at low internal resolution, CSS-upscaled.
+     Per agent per step: sense 3 trail sensors, steer, move 1 cell,
+     torus wrap, deposit. Then 3x3 box blur + evaporation, single pass.
+     Rendered through a warm umber-to-gold LUT, transparent below threshold. */
+
+  var canvas = document.getElementById('sim');
+  var hero = canvas.parentElement;
+  var ctx = canvas.getContext('2d', { alpha: true });
+
+  var SD = 7.5;        /* sensor distance, cells */
+  var SA = 0.4;        /* sensor angle, rad */
+  var TA = 0.45;       /* turn angle, rad */
+  var SPEED = 1.0;     /* cells per step */
+  var DEPOSIT = 0.15;
+  var EVAP = 0.94;
+  var JIT = 0.12;      /* heading jitter keeps the network alive long-run */
+  var CAP = 6;         /* trail ceiling, prevents runaway trunks */
+  var KNEE = 0.8;      /* soft-knee tone mapping: n = v / (v + KNEE) */
+  var cosSA = Math.cos(SA), sinSA = Math.sin(SA);
+  var cosTA = Math.cos(TA), sinTA = Math.sin(TA);
+  var TAU = Math.PI * 2;
+
+  /* warm colormap LUT, packed little-endian ABGR */
+  var LUT = (function () {
+    var stops = [
+      [0.00, 18, 16, 13, 0],
+      [0.05, 31, 23, 14, 0],
+      [0.16, 47, 33, 18, 110],
+      [0.35, 107, 74, 30, 185],
+      [0.55, 168, 120, 48, 235],
+      [0.78, 217, 162, 74, 255],
+      [1.00, 236, 203, 127, 255]
+    ];
+    var lut = new Uint32Array(256);
+    for (var i = 0; i < 256; i++) {
+      var t = i / 255, s0 = stops[0], s1 = stops[stops.length - 1];
+      for (var s = 0; s < stops.length - 1; s++) {
+        if (t >= stops[s][0] && t <= stops[s + 1][0]) { s0 = stops[s]; s1 = stops[s + 1]; break; }
+      }
+      var f = s1[0] === s0[0] ? 0 : (t - s0[0]) / (s1[0] - s0[0]);
+      var rr = (s0[1] + (s1[1] - s0[1]) * f) | 0;
+      var gg = (s0[2] + (s1[2] - s0[2]) * f) | 0;
+      var bb = (s0[3] + (s1[3] - s0[3]) * f) | 0;
+      var aa = (s0[4] + (s1[4] - s0[4]) * f) | 0;
+      lut[i] = (aa << 24) | (bb << 16) | (gg << 8) | rr;
+    }
+    return lut;
+  })();
+
+  var W, H, CELLS, N, RESPAWN, trail, tmp, ag, img, buf32;
+
+  function init() {
+    var vw = hero.clientWidth || window.innerWidth;
+    var vh = hero.clientHeight || window.innerHeight;
+    var aspect = vw / Math.max(1, vh);
+    if (aspect >= 1) { W = 320; H = Math.max(110, Math.round(320 / aspect)); }
+    else { H = 300; W = Math.max(120, Math.round(300 * aspect)); }
+    canvas.width = W;
+    canvas.height = H;
+    CELLS = W * H;
+    trail = new Float32Array(CELLS);
+    tmp = new Float32Array(CELLS);
+    img = ctx.createImageData(W, H);
+    buf32 = new Uint32Array(img.data.buffer);
+    N = Math.min(12000, Math.max(6000, Math.round(CELLS * 0.18)));
+    RESPAWN = Math.max(1, (N * 0.002) | 0);
+    ag = new Float32Array(N * 3);
+    seed();
+  }
+
+  function seed() {
+    /* ring right of center (hero copy sits bottom-left) + 2 spore clusters */
+    var cx = W * 0.62, cy = H * 0.46, R = Math.min(W, H) * 0.32;
+    var nRing = Math.floor(N * 0.6);
+    var k = 0, i, a, rr;
+    for (i = 0; i < nRing; i++) {
+      a = Math.random() * TAU;
+      rr = R * (0.92 + Math.random() * 0.16);
+      ag[k++] = (cx + Math.cos(a) * rr + W) % W;
+      ag[k++] = (cy + Math.sin(a) * rr + H) % H;
+      ag[k++] = a + Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+    }
+    var c1x = W * 0.25, c1y = H * 0.72, c2x = W * 0.86, c2y = H * 0.24;
+    var cr = Math.min(W, H) * 0.08;
+    for (i = nRing; i < N; i++) {
+      var even = (i & 1) === 0;
+      a = Math.random() * TAU;
+      rr = cr * Math.sqrt(Math.random());
+      ag[k++] = ((even ? c1x : c2x) + Math.cos(a) * rr + W) % W;
+      ag[k++] = ((even ? c1y : c2y) + Math.sin(a) * rr + H) % H;
+      ag[k++] = Math.random() * TAU;
+    }
+  }
+
+  function sense(sx, sy) {
+    var xi = sx | 0, yi = sy | 0;
+    if (xi < 0) xi += W; else if (xi >= W) xi -= W;
+    if (yi < 0) yi += H; else if (yi >= H) yi -= H;
+    return trail[yi * W + xi];
+  }
+
+  function step() {
+    var i, j, x, y, h, ch, sh, f, l, r, d, s, c2, s2, ti, nv;
+    for (i = 0; i < N; i++) {
+      j = i * 3;
+      x = ag[j]; y = ag[j + 1];
+      h = ag[j + 2] + (Math.random() - 0.5) * JIT;
+      ch = Math.cos(h); sh = Math.sin(h);
+      f = sense(x + ch * SD, y + sh * SD);
+      l = sense(x + (ch * cosSA + sh * sinSA) * SD, y + (sh * cosSA - ch * sinSA) * SD);
+      r = sense(x + (ch * cosSA - sh * sinSA) * SD, y + (sh * cosSA + ch * sinSA) * SD);
+      if (f >= l && f >= r) d = 0;
+      else if (l > f && r > f) d = Math.random() < 0.5 ? -TA : TA;
+      else if (l > r) d = -TA;
+      else d = TA;
+      if (d !== 0) {
+        s = d > 0 ? sinTA : -sinTA;
+        c2 = ch * cosTA - sh * s;
+        s2 = sh * cosTA + ch * s;
+        ch = c2; sh = s2; h += d;
+      }
+      x += ch * SPEED; y += sh * SPEED;
+      if (x < 0) x += W; else if (x >= W) x -= W;
+      if (y < 0) y += H; else if (y >= H) y -= H;
+      ag[j] = x; ag[j + 1] = y; ag[j + 2] = h;
+      ti = (y | 0) * W + (x | 0);
+      nv = trail[ti] + DEPOSIT;
+      trail[ti] = nv > CAP ? CAP : nv;
+    }
+    /* a few spores drift to fresh ground each step */
+    for (i = 0; i < RESPAWN; i++) {
+      j = ((Math.random() * N) | 0) * 3;
+      ag[j] = Math.random() * W;
+      ag[j + 1] = Math.random() * H;
+      ag[j + 2] = Math.random() * TAU;
+    }
+    /* 3x3 box blur + evaporation, single pass, ping-pong buffers */
+    var E9 = EVAP / 9, yy, xx, y0, y1, y2, x0, x2;
+    for (yy = 0; yy < H; yy++) {
+      y0 = ((yy - 1 + H) % H) * W; y1 = yy * W; y2 = ((yy + 1) % H) * W;
+      for (xx = 0; xx < W; xx++) {
+        x0 = xx === 0 ? W - 1 : xx - 1;
+        x2 = xx === W - 1 ? 0 : xx + 1;
+        tmp[y1 + xx] = (trail[y0 + x0] + trail[y0 + xx] + trail[y0 + x2]
+          + trail[y1 + x0] + trail[y1 + xx] + trail[y1 + x2]
+          + trail[y2 + x0] + trail[y2 + xx] + trail[y2 + x2]) * E9;
+      }
+    }
+    var t = trail; trail = tmp; tmp = t;
+  }
+
+  function render() {
+    for (var i = 0; i < CELLS; i++) {
+      var v = trail[i];
+      buf32[i] = LUT[(v / (v + KNEE) * 255) | 0];
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  /* ---------- loop, ~30fps, pauses when hidden or offscreen ---------- */
+
+  var rafId = 0, last = 0, running = false, heroVisible = true;
+
+  function frame(ts) {
+    rafId = requestAnimationFrame(frame);
+    if (ts - last < 29) return;
+    last = ts;
+    step();
+    render();
+  }
+
+  function start() {
+    if (running || reduced) return;
+    running = true;
+    last = 0;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function stop() {
+    if (!running) return;
+    running = false;
+    cancelAnimationFrame(rafId);
+  }
+
+  function update() {
+    if (!document.hidden && heroVisible) start(); else stop();
+  }
+
+  function freezeFrame() {
+    for (var s = 0; s < 300; s++) step();
+    render();
+  }
+
+  init();
+
+  if (reduced) {
+    /* static but designed: settle the network synchronously, draw once */
+    freezeFrame();
+  } else {
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        heroVisible = entries[0].isIntersecting;
+        update();
+      }, { threshold: 0, rootMargin: '120px 0px' });
+      io.observe(canvas);
+    }
+    document.addEventListener('visibilitychange', update);
+    update();
+  }
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      var vw = hero.clientWidth || window.innerWidth;
+      var vh = hero.clientHeight || window.innerHeight;
+      var a = vw / Math.max(1, vh), cur = W / H;
+      if (Math.abs(a - cur) / cur > 0.25) {
+        init();
+        if (reduced) freezeFrame();
+      }
+    }, 300);
+  });
+})();
+</script>
+
+</body>
+</html>

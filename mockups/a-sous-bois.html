@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="La richesse s'échange. Elle ne s'empile pas. William, physicien de formation, tisseur de réseaux par nature.">
+<title>wmmw.sh · WilliaM Mycelic Wealth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root{
+    --paper: #f1f2ea;
+    --paper-deep: #e8eadc;
+    --ink: #20281d;
+    --ink-2: #46503f;
+    --ink-3: #5e675a;
+    --moss: #3f6d3a;
+    --moss-deep: #345c30;
+    --earth: #c9c4b0;
+    --earth-2: #b6af97;
+    --hairline: #d9dbcb;
+    --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --r-pill: 999px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--paper);
+  }
+
+  body {
+    margin: 0;
+    position: relative;
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--ink);
+    background: linear-gradient(180deg, #f2f3ec 0%, #eff1e6 100%);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: #dde5cd; }
+
+  a { color: var(--moss); text-decoration-color: color-mix(in srgb, var(--moss) 45%, transparent); text-underline-offset: 3px; }
+  a:hover { color: var(--moss-deep); }
+  :focus-visible { outline: 2px solid var(--moss); outline-offset: 3px; border-radius: 2px; }
+
+  h1, h2, h3 { font-weight: 500; margin: 0; }
+  p { margin: 0; }
+
+  /* ============ mycelium rail ============ */
+  #mycelium {
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+  #mycelium path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  #mycelium g.grown path { stroke-dashoffset: 0 !important; }
+
+  /* mobile filament dividers */
+  .filament { display: none; }
+
+  header.top, main, footer { position: relative; z-index: 1; }
+
+  /* ============ header ============ */
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .6rem 2.4rem;
+    padding: 1.35rem clamp(1.25rem, 4vw, 3rem) 1.2rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .wordmark {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wordmark .tld { color: var(--moss); font-weight: 500; }
+  header.top nav {
+    margin-left: auto;
+    display: flex;
+    gap: 1.5rem;
+    font-family: var(--sans);
+    font-size: .88rem;
+  }
+  header.top nav a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  header.top nav a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--moss);
+    text-underline-offset: 5px;
+  }
+  .lang {
+    font-family: var(--sans);
+    font-size: .78rem;
+    color: var(--ink-3);
+    letter-spacing: .05em;
+  }
+  .lang .on { color: var(--ink); font-weight: 500; }
+  .lang .sep { margin: 0 .3rem; color: var(--earth-2); }
+
+  /* ============ hero ============ */
+  .hero {
+    text-align: center;
+    padding: 5.5rem clamp(1.25rem, 4vw, 3rem) 8rem;
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-size: clamp(2.7rem, 6.4vw, 4.9rem);
+    line-height: 1.06;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  .hero h1 em { font-style: italic; font-weight: 500; }
+  .hero-sub {
+    margin: 1.8rem auto 0;
+    max-width: 34rem;
+    font-size: 1.22rem;
+    color: var(--ink-2);
+  }
+  .cta {
+    display: inline-block;
+    margin-top: 2.4rem;
+    font-family: var(--sans);
+    font-size: .92rem;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--moss);
+    background: transparent;
+    border: 1px solid var(--moss);
+    border-radius: var(--r-pill);
+    padding: .78rem 1.7rem;
+    text-decoration: none;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  .cta:hover { background: var(--moss); color: #f4f6ee; }
+
+  .js .hero h1, .js .hero-sub, .js .cta {
+    animation: heroUp .9s cubic-bezier(.25,.6,.25,1) both;
+  }
+  .js .hero-sub { animation-delay: .18s; }
+  .js .cta { animation-delay: .34s; }
+  @keyframes heroUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* ============ page column (leaves the left gutter to the roots) ============ */
+  .page {
+    padding: 0 clamp(1.25rem, 4vw, 3rem) 2rem;
+  }
+  @media (min-width: 768px) {
+    .page {
+      padding-left: clamp(150px, 17vw, 250px);
+      padding-right: clamp(1.5rem, 5vw, 4.5rem);
+      max-width: 1180px;
+    }
+  }
+
+  section.sec {
+    padding: 4.5rem 0 3.5rem;
+    scroll-margin-top: 2rem;
+  }
+  .sec-head { margin-bottom: 2.4rem; }
+  .sec-head h2 {
+    font-size: clamp(1.9rem, 3.2vw, 2.5rem);
+    letter-spacing: -0.008em;
+  }
+  .sec-intro {
+    margin-top: .5rem;
+    font-style: italic;
+    font-size: 1.22rem;
+    color: var(--moss);
+  }
+
+  .prose { max-width: 62ch; }
+
+  /* reveals */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .8s ease var(--d, 0s), transform .8s cubic-bezier(.25,.6,.25,1) var(--d, 0s);
+  }
+  .js .sec.in .reveal { opacity: 1; transform: none; }
+
+  /* ============ manifeste : hanging definition list ============ */
+  .lead {
+    font-size: 1.34rem;
+    line-height: 1.65;
+    max-width: 58ch;
+  }
+  dl.dims {
+    margin: 3.2rem 0 0;
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) minmax(0, 46ch);
+    column-gap: 2.6rem;
+    row-gap: 1.35rem;
+  }
+  dl.dims dt {
+    grid-column: 1;
+    text-align: right;
+    font-style: italic;
+    font-size: 1.28rem;
+    line-height: 1.5;
+    color: var(--moss);
+  }
+  dl.dims dd {
+    grid-column: 2;
+    margin: 0;
+    font-size: 1.14rem;
+    color: var(--ink-2);
+  }
+  @media (min-width: 1100px) {
+    dl.dims { margin-left: -3.5rem; }
+  }
+  .epigram {
+    margin-top: 3.6rem;
+    font-style: italic;
+    font-size: clamp(1.45rem, 2.6vw, 1.75rem);
+    line-height: 1.45;
+    max-width: 30ch;
+  }
+
+  /* ============ projets : alternating asymmetric rows ============ */
+  ol.projets {
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .projet {
+    display: grid;
+    grid-template-columns: clamp(5.5rem, 9vw, 9rem) minmax(0, 34rem);
+    column-gap: 2.6rem;
+    align-items: start;
+    margin-bottom: 4.2rem;
+  }
+  .projet:last-child { margin-bottom: 0; }
+  .projet .num {
+    grid-column: 1;
+    grid-row: 1;
+    font-family: var(--serif);
+    font-size: clamp(3.4rem, 7vw, 5.4rem);
+    line-height: .9;
+    text-align: right;
+    color: var(--earth-2);
+    user-select: none;
+    padding-top: .3rem;
+  }
+  .projet .body { grid-column: 2; grid-row: 1; }
+  .projet h3 { font-size: 1.5rem; margin-bottom: .45rem; }
+  .projet p { font-size: 1.1rem; line-height: 1.65; color: var(--ink-2); }
+  .projet.flip {
+    grid-template-columns: minmax(0, 32rem) clamp(5.5rem, 9vw, 9rem);
+    justify-content: start;
+  }
+  .projet.flip .num { grid-column: 2; text-align: left; }
+  .projet.flip .body { grid-column: 1; }
+  .projet.push { margin-left: clamp(0rem, 8vw, 6.5rem); }
+  .projet.push-sm { margin-left: clamp(0rem, 4vw, 3.2rem); }
+
+  /* ============ outils : two-column index cards ============ */
+  ul.outils {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 3.6rem;
+  }
+  @media (min-width: 768px) {
+    ul.outils { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  ul.outils li {
+    border-top: 1px solid var(--hairline);
+    padding: 1.15rem 0 1.45rem;
+  }
+  .tool-name {
+    font-family: var(--mono);
+    font-size: .95rem;
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--ink);
+    margin-bottom: .4rem;
+  }
+  ul.outils p { font-size: 1.06rem; line-height: 1.6; color: var(--ink-2); }
+
+  /* ============ ecrits : table of contents ============ */
+  ol.toc {
+    list-style: none;
+    margin: 0; padding: 0;
+    max-width: 44rem;
+  }
+  ol.toc li + li { margin-top: 1.9rem; }
+  .toc-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .toc-title {
+    font-size: 1.42rem;
+    color: var(--ink);
+    text-decoration: none;
+    flex-shrink: 1;
+  }
+  .toc-title:hover {
+    color: var(--moss-deep);
+    text-decoration: underline;
+    text-decoration-color: var(--moss);
+    text-underline-offset: 4px;
+  }
+  .toc-leader {
+    flex: 1 1 3rem;
+    min-width: 2.5rem;
+    border-bottom: 1px dotted var(--earth-2);
+    transform: translateY(-.3rem);
+  }
+  .toc-date {
+    font-family: var(--mono);
+    font-size: .8rem;
+    color: var(--ink-3);
+  }
+  .toc-desc {
+    margin-top: .45rem;
+    font-size: 1.08rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 56ch;
+  }
+
+  /* ============ nourritures : tabs + bibliography ============ */
+  .tabs {
+    display: flex;
+    gap: .6rem;
+    margin: 0 0 2rem;
+  }
+  .tab {
+    font-family: var(--sans);
+    font-size: .86rem;
+    font-weight: 500;
+    color: var(--ink-2);
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-pill);
+    padding: .45rem 1.15rem;
+    cursor: pointer;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .tab:hover { border-color: var(--earth-2); color: var(--ink); }
+  .tab[aria-selected="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .panel { min-height: 11rem; }
+  ul.biblio {
+    list-style: none;
+    margin: 0; padding: 0;
+    max-width: 52rem;
+  }
+  @media (min-width: 768px) {
+    ul.biblio { columns: 2; column-gap: 4rem; }
+  }
+  ul.biblio li {
+    break-inside: avoid;
+    padding: .5rem 0 .5rem 1.4rem;
+    text-indent: -1.4rem;
+    font-size: 1.12rem;
+    border-bottom: 1px solid transparent;
+  }
+  ul.biblio .auth { font-weight: 500; }
+  ul.biblio cite { font-style: italic; color: var(--ink-2); }
+  .soon {
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-3);
+    padding-top: .4rem;
+  }
+
+  /* ============ footer : humus band ============ */
+  footer {
+    margin-top: 5rem;
+    background: #20281d;
+    color: #dfe4d4;
+    padding: 3.8rem clamp(1.25rem, 4vw, 3rem) 3.2rem;
+  }
+  .foot-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+  @media (min-width: 768px) {
+    .foot-inner { padding-left: clamp(150px, 17vw, 250px); }
+  }
+  .mirror {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    letter-spacing: .55em;
+    color: #8fa584;
+    user-select: none;
+  }
+  .foot-line {
+    font-size: 1.08rem;
+    max-width: 48ch;
+    line-height: 1.65;
+  }
+  footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.7rem;
+    font-family: var(--sans);
+    font-size: .88rem;
+  }
+  footer nav a {
+    color: #b9cfae;
+    text-decoration-color: color-mix(in srgb, #b9cfae 45%, transparent);
+  }
+  footer nav a:hover { color: #d3e3c9; }
+
+  /* ============ variant switcher ============ */
+  .switcher {
+    position: fixed;
+    right: .9rem;
+    bottom: .9rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    font-family: var(--mono);
+    font-size: .72rem;
+    background: rgba(241, 242, 234, .93);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-pill);
+    padding: .28rem .5rem .28rem .8rem;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 1px 6px rgba(32, 40, 29, .07);
+  }
+  .switcher .sw-label {
+    color: var(--ink-3);
+    letter-spacing: .04em;
+    margin-right: .2rem;
+  }
+  .switcher .dot { color: var(--earth-2); }
+  .switcher a {
+    display: grid;
+    place-items: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: var(--r-pill);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .switcher a:hover { background: var(--paper-deep); }
+  .switcher a.on { background: var(--moss); color: #f4f6ee; }
+
+  /* ============ mobile ============ */
+  @media (max-width: 767px) {
+    body { font-size: 1.12rem; }
+    #mycelium { display: none; }
+    .filament {
+      display: block;
+      margin: .4rem 0;
+    }
+    .filament svg { display: block; }
+    header.top nav { margin-left: 0; flex-wrap: wrap; gap: 1rem 1.3rem; order: 3; width: 100%; }
+    .lang { margin-left: auto; }
+    .hero { padding: 3.5rem 1.25rem 4.5rem; }
+    section.sec { padding: 3.2rem 0 2.6rem; }
+    dl.dims { grid-template-columns: 1fr; row-gap: .35rem; }
+    dl.dims dt { text-align: left; }
+    dl.dims dd { margin-bottom: 1.1rem; }
+    .projet, .projet.flip {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+    }
+    .projet .num, .projet.flip .num {
+      grid-column: 1; grid-row: auto;
+      text-align: left;
+      font-size: 2.1rem;
+      padding-top: 0;
+      margin-bottom: .2rem;
+    }
+    .projet .body, .projet.flip .body { grid-column: 1; grid-row: auto; }
+    .projet.push, .projet.push-sm { margin-left: 0; }
+    .toc-title { font-size: 1.28rem; }
+    .tabs { flex-wrap: wrap; }
+  }
+
+  /* ============ reduced motion : everything settled, fully drawn ============ */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .hero h1, .js .hero-sub, .js .cta { animation: none; }
+    .js .reveal {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    #mycelium path { transition: none !important; stroke-dashoffset: 0 !important; }
+    .cta, .tab { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg id="mycelium" aria-hidden="true" focusable="false"></svg>
+
+<header class="top">
+  <a class="wordmark" href="#">wmmw<span class="tld">.sh</span></a>
+  <nav aria-label="Sections">
+    <a href="#projets">Projets</a>
+    <a href="#outils">Outils</a>
+    <a href="#ecrits">Écrits</a>
+    <a href="#nourritures">Nourritures</a>
+  </nav>
+  <div class="lang" aria-label="Langue : français. Anglais et espagnol bientôt.">
+    <span class="on">FR</span><span class="sep">·</span><span>EN</span><span class="sep">·</span><span>ES</span>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="hero">
+    <h1>La richesse s&rsquo;échange.<br><em>Elle ne s&rsquo;empile pas.</em></h1>
+    <p class="hero-sub">William. Physicien de formation, tisseur de réseaux par nature. Je fais circuler le code, le savoir et la valeur.</p>
+    <a class="cta" href="#manifeste">Lire le manifeste</a>
+  </section>
+
+  <div class="page">
+
+    <div class="filament" aria-hidden="true">
+      <svg viewBox="0 0 24 96" width="24" height="96"><path d="M12 0C8 18 16 34 11 52C8 66 14 78 12 96" fill="none" stroke="#c9c4b0" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+
+    <section id="manifeste" class="sec" data-myco>
+      <header class="sec-head reveal">
+        <h2>Manifeste</h2>
+      </header>
+      <p class="prose lead reveal" style="--d:.08s">Le mycélium ne discrimine pas entre les nutriments. Il transporte ce dont la forêt a besoin. La richesse mycélique, c&rsquo;est apporter des ressources aux autres comme si ta vie en dépendait, sans exiger de retour. Le retour vient toujours, sous une forme qu&rsquo;on n&rsquo;attendait pas.</p>
+      <dl class="dims reveal" style="--d:.16s">
+        <dt>Financière</dt>
+        <dd>Des liquidités pour soutenir le vivant.</dd>
+        <dt>Relationnelle</dt>
+        <dd>La confiance, tissée lien par lien.</dd>
+        <dt>Intellectuelle</dt>
+        <dd>Le savoir qui circule dans le réseau.</dd>
+        <dt>Expérientielle</dt>
+        <dd>Les aventures que la forêt produit.</dd>
+        <dt>Émotionnelle</dt>
+        <dd>Ce que le sol nourrit en silence.</dd>
+      </dl>
+      <p class="epigram reveal" style="--d:.24s">La forêt n&rsquo;a pas besoin d&rsquo;un arbre de plus. Elle a besoin de mycélium.</p>
+    </section>
+
+    <div class="filament" aria-hidden="true">
+      <svg viewBox="0 0 24 96" width="24" height="96"><path d="M12 0C15 20 7 36 12 56C15 70 9 82 12 96" fill="none" stroke="#c9c4b0" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+
+    <section id="projets" class="sec" data-myco>
+      <header class="sec-head reveal">
+        <h2>Projets</h2>
+        <p class="sec-intro">Les arbres que le réseau nourrit.</p>
+      </header>
+      <ol class="projets">
+        <li class="projet reveal" style="--d:.06s">
+          <span class="num" aria-hidden="true">I</span>
+          <div class="body">
+            <h3>Recherche ouverte</h3>
+            <p>Thèse de doctorat en physique. Un algorithme kinetic Monte Carlo quasi-O(1), 420 fois plus rapide. Publication en préparation.</p>
+          </div>
+        </li>
+        <li class="projet flip reveal" style="--d:.12s">
+          <span class="num" aria-hidden="true">II</span>
+          <div class="body">
+            <h3>Découvre Bitcoin &amp; Plan B Network</h3>
+            <p>Éducation Bitcoin libre et open-source, du contenu francophone à l&rsquo;académie internationale.</p>
+          </div>
+        </li>
+        <li class="projet flip push reveal" style="--d:.18s">
+          <span class="num" aria-hidden="true">III</span>
+          <div class="body">
+            <h3>alysis.cat</h3>
+            <p>Des sites artisanaux pour les artisans. Le web fait main, au service du fait main.</p>
+          </div>
+        </li>
+        <li class="projet push-sm reveal" style="--d:.24s">
+          <span class="num" aria-hidden="true">IV</span>
+          <div class="body">
+            <h3>unfocus-art</h3>
+            <p>Faire éclore l&rsquo;œuvre de Moris, artiste émergente. À paraître : Dédale des Décors Dansants.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <div class="filament" aria-hidden="true">
+      <svg viewBox="0 0 24 96" width="24" height="96"><path d="M12 0C10 16 15 30 10 48C7 64 15 80 12 96" fill="none" stroke="#c9c4b0" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+
+    <section id="outils" class="sec" data-myco>
+      <header class="sec-head reveal">
+        <h2>Outils &amp; repos</h2>
+        <p class="sec-intro">Des outils libres, comme des spores : prenez, semez.</p>
+      </header>
+      <ul class="outils reveal" style="--d:.1s">
+        <li>
+          <div class="tool-name">lazyagent</div>
+          <p>TUI façon lazygit pour surveiller ses agents IA dans tmux, en local comme en ssh.</p>
+        </li>
+        <li>
+          <div class="tool-name">dicton</div>
+          <p>Dictée vocale française sub-seconde. Whisper turbo, nettoyage LLM.</p>
+        </li>
+        <li>
+          <div class="tool-name">don-popote</div>
+          <p>Assistant de cuisine. En bêta.</p>
+        </li>
+        <li>
+          <div class="tool-name">mindful-navigation</div>
+          <p>Extension navigateur : une pause d&rsquo;intention avant les sites distrayants.</p>
+        </li>
+        <li>
+          <div class="tool-name">agentic-cloud</div>
+          <p>CLI multi-Nextcloud au-dessus de rclone. Montages VFS, partages publics.</p>
+        </li>
+      </ul>
+    </section>
+
+    <div class="filament" aria-hidden="true">
+      <svg viewBox="0 0 24 96" width="24" height="96"><path d="M12 0C8 18 16 34 11 52C8 66 14 78 12 96" fill="none" stroke="#c9c4b0" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+
+    <section id="ecrits" class="sec" data-myco>
+      <header class="sec-head reveal">
+        <h2>Écrits</h2>
+        <p class="sec-intro">Des signaux envoyés dans le réseau.</p>
+      </header>
+      <ol class="toc">
+        <li class="reveal" style="--d:.06s">
+          <div class="toc-row">
+            <a class="toc-title" href="#">Discuter avec Silicium</a>
+            <span class="toc-leader" aria-hidden="true"></span>
+            <span class="toc-date">2026</span>
+          </div>
+          <p class="toc-desc">On peut parler à la matière maintenant, elle répond, et tu trouves ça normal ?</p>
+        </li>
+        <li class="reveal" style="--d:.12s">
+          <div class="toc-row">
+            <a class="toc-title" href="#">Ce Rien Qui Peut Tout</a>
+            <span class="toc-leader" aria-hidden="true"></span>
+            <span class="toc-date">2026</span>
+          </div>
+          <p class="toc-desc">L&rsquo;origine d&rsquo;un nom. Le paradoxe où le vide contient tout, entre mathématiques, physique quantique et sagesses anciennes.</p>
+        </li>
+        <li class="reveal" style="--d:.18s">
+          <div class="toc-row">
+            <a class="toc-title" href="#">L&rsquo;estimateur de Pareto</a>
+            <span class="toc-leader" aria-hidden="true"></span>
+            <span class="toc-date">2026</span>
+          </div>
+          <p class="toc-desc">Pousser la logique de Pareto jusqu&rsquo;au bout pour en faire un outil d&rsquo;estimation universel.</p>
+        </li>
+        <li class="reveal" style="--d:.24s">
+          <div class="toc-row">
+            <a class="toc-title" href="#">L&rsquo;invitation</a>
+            <span class="toc-leader" aria-hidden="true"></span>
+            <span class="toc-date">2026</span>
+          </div>
+          <p class="toc-desc">Un point d&rsquo;entrée pour me découvrir.</p>
+        </li>
+      </ol>
+    </section>
+
+    <div class="filament" aria-hidden="true">
+      <svg viewBox="0 0 24 96" width="24" height="96"><path d="M12 0C15 20 7 36 12 56C15 70 9 82 12 96" fill="none" stroke="#c9c4b0" stroke-width="1" stroke-linecap="round"/></svg>
+    </div>
+
+    <section id="nourritures" class="sec" data-myco>
+      <header class="sec-head reveal">
+        <h2>Nourritures</h2>
+        <p class="sec-intro">Ce qui me nourrit. Le sol d&rsquo;où tout pousse.</p>
+      </header>
+      <div class="reveal" style="--d:.1s">
+        <div class="tabs" role="tablist" aria-label="Nourritures">
+          <button class="tab" id="tab-livres" role="tab" aria-selected="true" aria-controls="panel-livres">Livres</button>
+          <button class="tab" id="tab-films" role="tab" aria-selected="false" aria-controls="panel-films" tabindex="-1">Films</button>
+          <button class="tab" id="tab-videos" role="tab" aria-selected="false" aria-controls="panel-videos" tabindex="-1">Vidéos</button>
+        </div>
+        <div class="panel" id="panel-livres" role="tabpanel" aria-labelledby="tab-livres">
+          <ul class="biblio">
+            <li><span class="auth">Donna Haraway</span>, <cite>Staying with the Trouble</cite></li>
+            <li><span class="auth">Ken Wilber</span>, <cite>Integral Psychology</cite></li>
+            <li><span class="auth">Sönke Ahrens</span>, <cite>How to Take Smart Notes</cite></li>
+            <li><span class="auth">Carlo Rovelli</span>, <cite>L&rsquo;Ordre du temps</cite></li>
+            <li><span class="auth">Hunt &amp; Thomas</span>, <cite>The Pragmatic Programmer</cite></li>
+            <li><span class="auth">Laozi</span>, <cite>Tao Te King</cite></li>
+          </ul>
+        </div>
+        <div class="panel" id="panel-films" role="tabpanel" aria-labelledby="tab-films" hidden>
+          <p class="soon">Bientôt.</p>
+        </div>
+        <div class="panel" id="panel-videos" role="tabpanel" aria-labelledby="tab-videos" hidden>
+          <p class="soon">Bientôt.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <p class="mirror" aria-hidden="true">w&nbsp;m&nbsp;m&nbsp;w</p>
+    <p class="foot-line">wmmw.sh : WilliaM Mycelic Wealth. Un palindrome. Ce qui sort du réseau y revient.</p>
+    <nav aria-label="Liens">
+      <a href="https://github.com/Asi0Flammeus" rel="noopener">GitHub</a>
+      <a href="#">Écrits (RSS)</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<nav class="switcher" aria-label="Variantes de maquette">
+  <span class="sw-label">sous-bois</span>
+  <a href="a-sous-bois.html" class="on" aria-current="page">A</a>
+  <span class="dot" aria-hidden="true">·</span>
+  <a href="b-shell.html">B</a>
+  <span class="dot" aria-hidden="true">·</span>
+  <a href="c-reseau-vivant.html">C</a>
+  <span class="dot" aria-hidden="true">·</span>
+  <a href="d-hybride.html">D</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var svg = document.getElementById('mycelium');
+  var secs = Array.prototype.slice.call(document.querySelectorAll('section.sec[data-myco]'));
+  var grown = new Set();
+  var lastW = 0, lastH = 0;
+
+  /* deterministic rng so the drawing is stable across rebuilds */
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function absRect(el) {
+    var r = el.getBoundingClientRect();
+    return {
+      x: r.left + window.scrollX,
+      y: r.top + window.scrollY,
+      w: r.width,
+      h: r.height
+    };
+  }
+
+  function fx(n) { return n.toFixed(1); }
+
+  /* catmull-rom chain through pts[i0..i1], as cubic beziers */
+  function crChain(pts, i0, i1) {
+    var d = 'M ' + fx(pts[i0].x) + ' ' + fx(pts[i0].y);
+    for (var i = i0; i < i1; i++) {
+      var p0 = pts[Math.max(0, i - 1)];
+      var p1 = pts[i];
+      var p2 = pts[i + 1];
+      var p3 = pts[Math.min(pts.length - 1, i + 2)];
+      var c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+      var c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+      d += ' C ' + fx(c1x) + ' ' + fx(c1y) + ', ' + fx(c2x) + ' ' + fx(c2y) + ', ' + fx(p2.x) + ' ' + fx(p2.y);
+    }
+    return d;
+  }
+
+  function mkPath(d, stroke, width, opacity) {
+    var p = document.createElementNS(NS, 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('stroke', stroke);
+    p.setAttribute('stroke-width', width);
+    p.setAttribute('opacity', opacity);
+    return p;
+  }
+
+  /* 2 to 3 organic beziers reaching from the trunk toward a heading */
+  function branchPaths(r, B, E) {
+    var n = r() < 0.6 ? 3 : 2;
+    var out = [];
+    for (var k = 0; k < n; k++) {
+      var spread = (k - (n - 1) / 2) * (11 + r() * 8);
+      var ex = E.x + r() * 8 - 4;
+      var ey = E.y + spread;
+      var dx = ex - B.x, dy = ey - B.y;
+      var c1x = B.x + dx * (0.25 + r() * 0.15);
+      var c1y = B.y + dy * 0.1 + (r() * 30 - 15);
+      var c2x = B.x + dx * (0.68 + r() * 0.12);
+      var c2y = ey - dy * 0.15 + (r() * 24 - 12);
+      out.push('M ' + fx(B.x) + ' ' + fx(B.y) +
+        ' C ' + fx(c1x) + ' ' + fx(c1y) + ', ' + fx(c2x) + ' ' + fx(c2y) + ', ' + fx(ex) + ' ' + fx(ey));
+    }
+    return out;
+  }
+
+  /* short curling secondary branchlets sprouting off an existing path */
+  function branchlets(r, pathEl, count, maxLen) {
+    var L = pathEl.getTotalLength();
+    if (!L) return [];
+    var out = [];
+    for (var k = 0; k < count; k++) {
+      var t = 0.15 + r() * 0.7;
+      var p = pathEl.getPointAtLength(L * t);
+      var q = pathEl.getPointAtLength(Math.min(L, L * t + 4));
+      var tx = q.x - p.x, ty = q.y - p.y;
+      var m = Math.hypot(tx, ty) || 1;
+      tx /= m; ty /= m;
+      var side = r() < 0.5 ? 1 : -1;
+      var nx = -ty * side, ny = tx * side;
+      var len = maxLen * (0.4 + r() * 0.6);
+      var ex = p.x + nx * len * 0.8 + tx * len * 0.7;
+      var ey = p.y + ny * len * 0.8 + ty * len * 0.7;
+      var cx = p.x + nx * len * 0.25 + tx * len * 0.45;
+      var cy = p.y + ny * len * 0.25 + ty * len * 0.45;
+      out.push('M ' + fx(p.x) + ' ' + fx(p.y) + ' Q ' + fx(cx) + ' ' + fx(cy) + ', ' + fx(ex) + ' ' + fx(ey));
+    }
+    return out;
+  }
+
+  /* stroke-dashoffset line-draw prep for one section group */
+  function prep(g) {
+    var paths = g.querySelectorAll('path');
+    for (var k = 0; k < paths.length; k++) {
+      var p = paths[k];
+      var L = p.getTotalLength();
+      if (!L) continue;
+      p.style.strokeDasharray = L + ' ' + L;
+      p.style.strokeDashoffset = L;
+      var dur = Math.min(2.2, Math.max(0.7, L / 260));
+      p.style.transitionProperty = 'stroke-dashoffset';
+      p.style.transitionTimingFunction = 'cubic-bezier(.33,.1,.25,1)';
+      p.style.transitionDuration = dur.toFixed(2) + 's';
+      p.style.transitionDelay = (k * 0.13).toFixed(2) + 's';
+    }
+  }
+
+  function build() {
+    var W = document.documentElement.clientWidth;
+    if (W < 768) {
+      svg.innerHTML = '';
+      lastW = W;
+      return;
+    }
+    var H = Math.ceil(document.body.scrollHeight);
+    lastW = W; lastH = H;
+    svg.innerHTML = '';
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+
+    var r = mulberry32(20260702);
+
+    var hero = document.getElementById('hero');
+    var heroR = absRect(hero);
+    var heads = secs.map(function (s) {
+      var h = s.querySelector('h2');
+      var hr = absRect(h);
+      return { x: hr.x - 20, y: hr.y + hr.h * 0.55 };
+    });
+
+    var contentLeft = Math.min.apply(null, heads.map(function (h) { return h.x; }));
+    var railX = Math.max(44, contentLeft * 0.48);
+
+    /* trunk waypoints: hero root, a drift toward the rail, then one stop
+       per section heading with a wobbled midpoint between each pair */
+    var pts = [];
+    pts.push({ x: W / 2 - 30 + r() * 60, y: heroR.y + heroR.h - 44 });
+    pts.push({ x: railX + (W / 2 - railX) * 0.22, y: pts[0].y + (heads[0].y - pts[0].y) * 0.5 });
+    for (var i = 0; i < heads.length; i++) {
+      pts.push({ x: railX + r() * 30 - 15, y: heads[i].y });
+      if (i < heads.length - 1) {
+        pts.push({
+          x: railX + r() * 52 - 26,
+          y: heads[i].y + (heads[i + 1].y - heads[i].y) * (0.42 + r() * 0.16)
+        });
+      }
+    }
+    var tail = { x: railX - 14 + r() * 20, y: heads[heads.length - 1].y + 240 };
+    pts.push(tail);
+
+    /* a thinner companion strand, wobbling around the trunk */
+    var pts2 = pts.map(function (p) {
+      return { x: p.x + r() * 20 - 10, y: p.y + r() * 16 - 8 };
+    });
+
+    function headIdx(i) { return 2 + 2 * i; }
+
+    for (var s = 0; s < secs.length; s++) {
+      var g = document.createElementNS(NS, 'g');
+      g.setAttribute('data-i', s);
+
+      var i0 = s === 0 ? 0 : headIdx(s - 1);
+      var i1 = headIdx(s);
+
+      var trunkA = mkPath(crChain(pts, i0, i1), '#c2bca6', 1.25, 0.9);
+      var trunkB = mkPath(crChain(pts2, i0, i1), '#cfcab7', 0.7, 0.85);
+      g.appendChild(trunkA);
+      g.appendChild(trunkB);
+
+      /* tail sinking below the last section */
+      if (s === secs.length - 1) {
+        g.appendChild(mkPath(crChain(pts, i1, pts.length - 1), '#c2bca6', 1.1, 0.75));
+      }
+
+      /* branchlets along the trunk segment */
+      var lets = branchlets(r, trunkA, 3, 36);
+      for (var b = 0; b < lets.length; b++) {
+        g.appendChild(mkPath(lets[b], '#d4d0bf', 0.55, 0.9));
+      }
+
+      /* the hypha reaching toward the section heading */
+      var B = pts[i1];
+      var bps = branchPaths(r, B, heads[s]);
+      var firstBranch = null;
+      for (var k = 0; k < bps.length; k++) {
+        var bp = mkPath(bps[k], '#c5bfaa', 1, 0.95);
+        if (!firstBranch) firstBranch = bp;
+        g.appendChild(bp);
+      }
+      if (firstBranch) {
+        var blets = branchlets(r, firstBranch, 2, 18);
+        for (var b2 = 0; b2 < blets.length; b2++) {
+          g.appendChild(mkPath(blets[b2], '#d4d0bf', 0.55, 0.9));
+        }
+      }
+
+      svg.appendChild(g);
+      if (!reduce && !grown.has(s)) prep(g);
+      if (grown.has(s)) g.classList.add('grown');
+    }
+  }
+
+  var io = null;
+  function observe() {
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = secs.indexOf(e.target);
+        e.target.classList.add('in');
+        if (!grown.has(i)) {
+          grown.add(i);
+          var g = svg.querySelector('g[data-i="' + i + '"]');
+          if (g) {
+            requestAnimationFrame(function () { g.classList.add('grown'); });
+          }
+        }
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: '0px 0px -15% 0px', threshold: 0.01 });
+    secs.forEach(function (s) { io.observe(s); });
+  }
+
+  var rt = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      var W = document.documentElement.clientWidth;
+      var H = Math.ceil(document.body.scrollHeight);
+      if (W !== lastW || Math.abs(H - lastH) > 40) build();
+    }, 220);
+  });
+
+  function ready() {
+    build();
+    observe();
+  }
+
+  var loaded = new Promise(function (res) {
+    if (document.readyState === 'complete') res();
+    else window.addEventListener('load', res, { once: true });
+  });
+  var fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  Promise.all([loaded, fonts]).then(ready);
+
+  /* ---- nourritures tabs ---- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function (tab, idx) {
+    tab.addEventListener('click', function () { select(idx); });
+    tab.addEventListener('keydown', function (ev) {
+      var next = null;
+      if (ev.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+      if (ev.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+      if (next !== null) {
+        ev.preventDefault();
+        select(next);
+        tabs[next].focus();
+      }
+    });
+  });
+  function select(idx) {
+    tabs.forEach(function (t, k) {
+      var on = k === idx;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      if (panel) panel.hidden = !on;
+    });
+  }
+})();
+</script>
+</body>
+</html>

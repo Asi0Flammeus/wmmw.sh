@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wmmw.sh : WilliaM Mycelic Wealth</title>
+<meta name="description" content="La richesse s'échange, elle ne s'empile pas. William, physicien de formation, tisseur de réseaux par nature.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#12100d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+/* js + anim flags before first paint; animation only when motion is welcome */
+(function(){var c='js';try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)c+=' anim';}catch(e){}document.documentElement.className=c;})();
+</script>
+<style>
+  :root {
+    --bg: #12100d;
+    --bg-tile: #191510;
+    --surf: #1a1712;
+    --surf-head: #16130f;
+    --bone: #e8e2d5;
+    --ink-2: #b6ae9e;
+    --ink-3: #8d8472;
+    --accent: #d9a24a;
+    --accent-2: #e4b262;
+    --accent-soft: rgba(217, 162, 74, 0.12);
+    --hair: rgba(232, 226, 213, 0.14);
+    --hair-2: rgba(232, 226, 213, 0.12);
+    --pad: clamp(1.25rem, 5vw, 3rem);
+    --maxw: 1200px;
+    --panelw: 880px;
+    --r-tile: 10px;
+    --r-pill: 999px;
+    --disp: 'Space Grotesk', sans-serif;
+    --body: 'Instrument Sans', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    color-scheme: dark;
+    scroll-padding-top: 2rem;
+  }
+
+  body {
+    position: relative;
+    background: var(--bg);
+    color: var(--bone);
+    font-family: var(--body);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .skip {
+    position: fixed; top: -4rem; left: 0.9rem; z-index: 90;
+    background: var(--accent); color: var(--bg);
+    padding: 0.4rem 0.9rem; border-radius: var(--r-pill);
+    font-family: var(--mono); font-size: 0.82rem; text-decoration: none;
+    transition: top 0.15s;
+  }
+  .skip:focus { top: 0.9rem; }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--pad);
+  }
+
+  /* ---------- filament layer (scroll-grown mycelium) ---------- */
+
+  .fila {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 1;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .fila path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .fila .trunk { stroke-width: 1.4; opacity: 0.5; }
+  .fila .br path { stroke-width: 1; opacity: 0.42; }
+
+  html.anim .fila .br path {
+    transition: stroke-dashoffset 1.15s cubic-bezier(0.22, 0.6, 0.2, 1);
+  }
+
+  @keyframes fila-grow {
+    from { stroke-dashoffset: var(--len, 0); }
+    to   { stroke-dashoffset: 0; }
+  }
+  @supports (animation-timeline: scroll()) {
+    html.anim .fila.tl .trunk {
+      animation: fila-grow linear forwards;
+      animation-timeline: scroll(root block);
+      animation-range: var(--r0, 0%) var(--r1, 100%);
+    }
+  }
+
+  /* ---------- header ---------- */
+
+  .site-head {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "mark nav lang";
+    align-items: center;
+    gap: 1rem 2rem;
+    padding: 1.35rem var(--pad);
+  }
+  .wordmark {
+    grid-area: mark;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .site-nav {
+    grid-area: nav;
+    display: flex;
+    justify-content: center;
+    gap: clamp(1rem, 3vw, 2.2rem);
+    font-size: 0.92rem;
+  }
+  .site-nav a { color: var(--ink-2); text-decoration: none; }
+  .site-nav a:hover { color: var(--bone); }
+  .lang {
+    grid-area: lang;
+    justify-self: end;
+    font-family: var(--disp);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-3);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .lang .on { color: var(--accent); }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    position: relative;
+    z-index: 5;
+    min-height: 100dvh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  #sim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+  }
+  .hero-veil {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 95% at 55% 15%, transparent 50%, rgba(18, 16, 13, 0.55) 100%),
+      linear-gradient(to bottom, rgba(18, 16, 13, 0.4), transparent 20% 60%, var(--bg) 97%);
+  }
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    max-width: 42rem;
+    padding-inline: var(--pad);
+    padding-bottom: clamp(3.5rem, 9vh, 6rem);
+  }
+  .hero-copy::before {
+    content: "";
+    position: absolute;
+    inset: -4rem -6rem -2rem -4rem;
+    z-index: -1;
+    background: radial-gradient(85% 90% at 30% 62%, rgba(18, 16, 13, 0.9) 0%, rgba(18, 16, 13, 0.55) 55%, transparent 100%);
+  }
+  .hero h1 {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(2.5rem, 6.5vw, 5.2rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    margin-top: 1.4rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: var(--ink-2);
+  }
+  .hero-cmd {
+    margin-top: 2.1rem;
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.9ch;
+  }
+  .cta-chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(217, 162, 74, 0.5);
+    padding: 0.5em 0.95em;
+    border-radius: var(--r-tile);
+  }
+  .cta-chip:hover { background: var(--accent); color: var(--bg); }
+  .cta-chip:active { transform: translateY(1px); }
+
+  /* ---------- shared prompt / terminal glyphs ---------- */
+
+  .ps { color: var(--ink-3); font-weight: 400; white-space: nowrap; }
+  .ps b { color: var(--accent); font-weight: 500; }
+  .cmdline {
+    font-family: var(--mono);
+    color: var(--bone);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .cmd-text { font-weight: 600; }
+  .caret, .caret-final {
+    display: inline-block;
+    width: 0.6ch; height: 1.05em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+  }
+  .caret { display: none; }
+  .c { color: var(--ink-3); }
+
+  /* ---------- section + display heading ---------- */
+
+  main { position: relative; z-index: 2; }
+
+  .sec { padding-block: clamp(4rem, 11vh, 8rem) 0; }
+  .sec:last-of-type { padding-bottom: clamp(4rem, 11vh, 7rem); }
+
+  /* left-offset panels leave a lane on the left so the filament trunk
+     stays visible beside them; right-offset panels clear the left entirely */
+  .sec-inner { max-width: var(--panelw); }
+  .offset-r .sec-inner { margin-left: auto; margin-right: 0; }
+  .offset-l .sec-inner { margin-right: auto; margin-left: clamp(30px, 4vw, 70px); }
+
+  .disp-h {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 3.8vw, 2.9rem);
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 1.4rem;
+  }
+  .disp-h .gold { color: var(--accent); }
+
+  /* ---------- terminal panel ---------- */
+
+  .panel {
+    background: var(--surf);
+    border: 1px solid var(--hair-2);
+    border-radius: var(--r-tile);
+    overflow: hidden;
+  }
+  .panel-head {
+    background: var(--surf-head);
+    border-bottom: 1px solid var(--hair-2);
+    padding: 0.55rem 1.1rem;
+  }
+  .ph-path {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+    color: var(--ink-3);
+  }
+  .ph-path b { color: var(--accent); font-weight: 500; }
+  .panel-body {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    padding: 1.4rem clamp(1.1rem, 3vw, 1.9rem) 1.7rem;
+  }
+  .out { margin-top: 1rem; }
+  .intro { margin-bottom: 1.4rem; }
+
+  /* manifeste : markdown-ish cat */
+  .md { display: flex; flex-direction: column; gap: 1.2rem; max-width: 66ch; }
+  .md .h { color: var(--bone); font-weight: 700; }
+  .md .tok { color: var(--ink-3); }
+  .md .quote { color: var(--accent); font-weight: 600; }
+  .md ul { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .md ul li { color: var(--ink-2); }
+  .md ul .term { color: var(--accent); font-weight: 600; }
+
+  /* projets : aligned 2-col ls */
+  .plist { display: grid; gap: 1.9rem; }
+  .prow { display: grid; grid-template-columns: 22ch 1fr; column-gap: 2.5ch; align-items: baseline; }
+  .pname { color: var(--accent); font-weight: 600; overflow-wrap: anywhere; }
+  .pbody { color: var(--ink-2); }
+  .pbody strong { display: block; color: var(--bone); font-weight: 700; }
+
+  /* outils : box-drawing tree */
+  .tree { display: flex; flex-direction: column; gap: 0.65rem; }
+  .troot { color: var(--bone); font-weight: 700; }
+  .trow { display: grid; grid-template-columns: 26ch 1fr; column-gap: 2ch; align-items: baseline; }
+  .tg { color: var(--ink-3); }
+  .tname { color: var(--accent); font-weight: 600; white-space: pre; }
+  .tdesc { color: var(--ink-2); }
+  .tsum { margin-top: 1.3rem; color: var(--ink-3); }
+
+  /* ecrits : dotted leader + right-aligned dates */
+  .flist { display: grid; gap: 2.1rem; }
+  .fline { display: flex; align-items: baseline; gap: 1ch; min-width: 0; }
+  .fdir { color: var(--ink-3); }
+  .fname { color: var(--accent); font-weight: 600; overflow-wrap: anywhere; }
+  .lead { flex: 1; min-width: 3ch; border-bottom: 1px dotted var(--hair); transform: translateY(-0.3em); }
+  .fdate { color: var(--ink-2); }
+  .ftitle { color: var(--bone); font-weight: 700; margin-top: 0.3rem; }
+  .fhook { max-width: 58ch; }
+
+  /* nourritures : cat -n bibliography + empty dirs */
+  .books { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+  .books li { color: var(--ink-2); }
+  .books .n { display: inline-block; width: 4ch; text-align: right; margin-right: 2.5ch; color: var(--ink-3); }
+  .books .a { color: var(--ink-2); }
+  .books em { color: var(--bone); font-style: italic; }
+  .lsdirs { display: flex; flex-direction: column; gap: 0.2rem; }
+  .dhead { color: var(--bone); font-weight: 600; margin-top: 1.1rem; }
+  .dhead:first-child { margin-top: 0; }
+
+  /* ---------- footer ---------- */
+
+  .site-foot {
+    position: relative;
+    z-index: 2;
+    margin-top: clamp(4rem, 11vh, 8rem);
+  }
+  .foot-panel .panel-body { display: flex; flex-direction: column; gap: 2.2rem; }
+  .echoline { max-width: 64ch; color: var(--bone); }
+  .links { display: flex; flex-direction: column; gap: 0.45rem; }
+  .lrow { display: flex; gap: 2.5ch; align-items: baseline; overflow-wrap: anywhere; }
+  .perm { color: var(--ink-3); white-space: pre; }
+  .lrow a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .lrow a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+  .lrow .tgt { color: var(--ink-2); font-weight: 400; }
+  .total { color: var(--ink-3); }
+
+  /* ---------- switcher ---------- */
+
+  .switcher {
+    position: fixed;
+    right: 1rem; bottom: 1rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    background: rgba(18, 16, 13, 0.86);
+    border: 1px solid var(--hair);
+    border-radius: var(--r-pill);
+    padding: 0.42rem 0.85rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .sw-name {
+    color: var(--ink-3);
+    padding-right: 0.55rem;
+    border-right: 1px solid var(--hair);
+  }
+  .switcher a {
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 0.1rem 0.42rem;
+    border-radius: var(--r-pill);
+  }
+  .switcher a:hover { color: var(--bone); }
+  .switcher a.on { color: var(--bg); background: var(--accent); font-weight: 700; }
+  .switcher .dot { color: var(--ink-3); }
+
+  /* ---------- motion (all gated) ---------- */
+
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+
+    html.anim .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 0.6, 0.2, 1);
+    }
+    html.anim .reveal.in { opacity: 1; transform: none; }
+
+    .wordmark { transition: transform 0.45s cubic-bezier(0.6, 0, 0.2, 1); }
+    .wordmark:hover { transform: scaleX(-1); }
+
+    .cta-chip, .site-nav a, .lrow a, .switcher a { transition: color 0.2s ease, background-color 0.2s ease; }
+
+    /* typing gates: only meaningful when JS armed the sequence */
+    html.anim.armed [data-step="fade"] { opacity: 0; transform: translateY(5px); }
+    html.anim.armed [data-step="fade"].on { opacity: 1; transform: none; transition: opacity 0.55s ease, transform 0.55s ease; }
+    html.anim.armed .cmd-text { visibility: hidden; }
+    html.anim.armed .cmdline.on .cmd-text,
+    html.anim.armed .cmdline.typing .cmd-text,
+    html.anim.armed .cmdline.done .cmd-text { visibility: visible; }
+    html.anim .caret { display: inline-block; opacity: 0.4; }
+    html.anim .cmdline.typing .caret { opacity: 1; animation: blink 1.05s steps(1) infinite; }
+    html.anim .cmdline.done .caret { display: none; }
+    html.anim .caret-final { animation: blink 1.05s steps(1) infinite; }
+  }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+  /* ---------- responsive ---------- */
+
+  @media (min-width: 768px) {
+    .hero h1 span { display: block; }
+  }
+
+  @media (max-width: 767px) {
+    .site-head {
+      grid-template-columns: auto auto;
+      grid-template-areas:
+        "mark lang"
+        "nav  nav";
+      row-gap: 0.8rem;
+    }
+    .site-nav { justify-content: flex-start; flex-wrap: wrap; gap: 1rem; font-size: 0.88rem; }
+    .hero-copy { padding-bottom: clamp(4.5rem, 12vh, 7rem); }
+
+    .sec-inner { max-width: none; margin: 0; }
+    .panel-body { font-size: 0.9rem; }
+
+    .prow { grid-template-columns: 1fr; row-gap: 0.25rem; }
+    .trow { grid-template-columns: 1fr; row-gap: 0.1rem; }
+    .trow .tdesc { padding-left: 4ch; }
+    .books .n { width: 3ch; margin-right: 1.5ch; }
+    .lrow { gap: 1.5ch; }
+    .perm { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#manifeste">aller au contenu</a>
+
+<svg class="fila" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+  <path class="trunk"></path>
+  <g class="br"></g>
+</svg>
+
+<header class="site-head">
+  <a class="wordmark" href="#" aria-label="wmmw.sh, retour en haut">wmmw.sh</a>
+  <nav class="site-nav" aria-label="Sections">
+    <a href="#projets">Projets</a>
+    <a href="#outils">Outils</a>
+    <a href="#ecrits">Écrits</a>
+    <a href="#nourritures">Nourritures</a>
+  </nav>
+  <div class="lang" aria-label="Langues, français actif">
+    <span class="on">FR</span><span aria-hidden="true">·</span><span>EN</span><span aria-hidden="true">·</span><span>ES</span>
+  </div>
+</header>
+
+<section class="hero">
+  <canvas id="sim" aria-hidden="true"></canvas>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <h1><span>La richesse <em>s'échange</em>.</span> <span>Elle ne s'empile pas.</span></h1>
+    <p class="hero-sub">William. Physicien de formation, tisseur de réseaux par nature. Je fais circuler le code, le savoir et la valeur.</p>
+    <p class="hero-cmd"><span class="ps"><b>asi0@wmmw</b>:~$</span> <a class="cta-chip" href="#manifeste">./lire-manifeste.sh</a></p>
+  </div>
+</section>
+
+<main>
+
+  <section id="manifeste" class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">La forêt n'a pas besoin d'un arbre de plus. <span class="gold">Elle a besoin de mycélium.</span></h2>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~/manifeste</span></div>
+          <div class="panel-body">
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ cat manifeste.md"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">cat manifeste.md</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out md" data-step="fade">
+              <p class="h"><span class="tok"># </span>Richesse mycélique</p>
+              <p>Le mycélium ne discrimine pas entre les nutriments. Il transporte ce dont la forêt a besoin. La richesse mycélique, c'est apporter des ressources aux autres comme si ta vie en dépendait, sans exiger de retour. Le retour vient toujours, sous une forme qu'on n'attendait pas.</p>
+              <p class="quote"><span class="tok">&gt; </span>La forêt n'a pas besoin d'un arbre de plus. Elle a besoin de mycélium.</p>
+              <p class="h"><span class="tok">## </span>Les cinq dimensions</p>
+              <ul>
+                <li><span class="tok">- **</span><span class="term">Financière</span><span class="tok">**</span> : des liquidités pour soutenir le vivant.</li>
+                <li><span class="tok">- **</span><span class="term">Relationnelle</span><span class="tok">**</span> : la confiance, tissée lien par lien.</li>
+                <li><span class="tok">- **</span><span class="term">Intellectuelle</span><span class="tok">**</span> : le savoir qui circule dans le réseau.</li>
+                <li><span class="tok">- **</span><span class="term">Expérientielle</span><span class="tok">**</span> : les aventures que la forêt produit.</li>
+                <li><span class="tok">- **</span><span class="term">Émotionnelle</span><span class="tok">**</span> : ce que le sol nourrit en silence.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projets" class="sec offset-r" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">Projets</h2>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~/projets</span></div>
+          <div class="panel-body">
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ ls projets/"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">ls projets/</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out" data-step="fade">
+              <p class="c intro"># Les arbres que le réseau nourrit.</p>
+              <div class="plist">
+                <div class="prow">
+                  <span class="pname">recherche-ouverte/</span>
+                  <p class="pbody"><strong>Recherche ouverte</strong> Thèse de doctorat en physique. Un algorithme kinetic Monte Carlo quasi-O(1), 420 fois plus rapide. Publication en préparation.</p>
+                </div>
+                <div class="prow">
+                  <span class="pname">decouvre-bitcoin/</span>
+                  <p class="pbody"><strong>Découvre Bitcoin &amp; Plan B Network</strong> Éducation Bitcoin libre et open-source, du contenu francophone à l'académie internationale.</p>
+                </div>
+                <div class="prow">
+                  <span class="pname">alysis.cat/</span>
+                  <p class="pbody"><strong>alysis.cat</strong> Des sites artisanaux pour les artisans. Le web fait main, au service du fait main.</p>
+                </div>
+                <div class="prow">
+                  <span class="pname">unfocus-art/</span>
+                  <p class="pbody"><strong>unfocus-art</strong> Faire éclore l'œuvre de Moris, artiste émergente. À paraître : Dédale des Décors Dansants.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="outils" class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">Outils &amp; repos</h2>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~/outils</span></div>
+          <div class="panel-body">
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ tree outils/"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">tree outils/</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out" data-step="fade">
+              <p class="c intro"># Des outils libres, comme des spores : prenez, semez.</p>
+              <div class="tree">
+                <p class="troot">outils/</p>
+                <div class="trow"><span class="tname"><span class="tg">├── </span>lazyagent</span><span class="tdesc">TUI façon lazygit pour surveiller ses agents IA dans tmux, en local comme en ssh.</span></div>
+                <div class="trow"><span class="tname"><span class="tg">├── </span>dicton</span><span class="tdesc">Dictée vocale française sub-seconde. Whisper turbo, nettoyage LLM.</span></div>
+                <div class="trow"><span class="tname"><span class="tg">├── </span>don-popote</span><span class="tdesc">Assistant de cuisine. En bêta.</span></div>
+                <div class="trow"><span class="tname"><span class="tg">├── </span>mindful-navigation</span><span class="tdesc">Extension navigateur : une pause d'intention avant les sites distrayants.</span></div>
+                <div class="trow"><span class="tname"><span class="tg">└── </span>agentic-cloud</span><span class="tdesc">CLI multi-Nextcloud au-dessus de rclone. Montages VFS, partages publics.</span></div>
+              </div>
+              <p class="tsum">5 directories, 0 files</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ecrits" class="sec offset-r" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">Écrits</h2>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~/ecrits</span></div>
+          <div class="panel-body">
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ ls ecrits/*.md"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">ls ecrits/*.md</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out" data-step="fade">
+              <p class="c intro"># Des signaux envoyés dans le réseau.</p>
+              <div class="flist">
+                <div class="frow">
+                  <p class="fline"><span class="fdir">ecrits/</span><span class="fname">discuter-avec-silicium.md</span><span class="lead" aria-hidden="true"></span><span class="fdate">2026</span></p>
+                  <p class="ftitle">Discuter avec Silicium</p>
+                  <p class="fhook c">On peut parler à la matière maintenant, elle répond, et tu trouves ça normal ?</p>
+                </div>
+                <div class="frow">
+                  <p class="fline"><span class="fdir">ecrits/</span><span class="fname">ce-rien-qui-peut-tout.md</span><span class="lead" aria-hidden="true"></span><span class="fdate">2026</span></p>
+                  <p class="ftitle">Ce Rien Qui Peut Tout</p>
+                  <p class="fhook c">L'origine d'un nom. Le paradoxe où le vide contient tout, entre mathématiques, physique quantique et sagesses anciennes.</p>
+                </div>
+                <div class="frow">
+                  <p class="fline"><span class="fdir">ecrits/</span><span class="fname">estimateur-de-pareto.md</span><span class="lead" aria-hidden="true"></span><span class="fdate">2026</span></p>
+                  <p class="ftitle">L'estimateur de Pareto</p>
+                  <p class="fhook c">Pousser la logique de Pareto jusqu'au bout pour en faire un outil d'estimation universel.</p>
+                </div>
+                <div class="frow">
+                  <p class="fline"><span class="fdir">ecrits/</span><span class="fname">invitation.md</span><span class="lead" aria-hidden="true"></span><span class="fdate">2026</span></p>
+                  <p class="ftitle">L'invitation</p>
+                  <p class="fhook c">Un point d'entrée pour me découvrir.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="nourritures" class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">Nourritures</h2>
+        <div class="panel reveal">
+          <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~/nourritures</span></div>
+          <div class="panel-body">
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ cat -n nourritures/livres.txt"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">cat -n nourritures/livres.txt</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out" data-step="fade">
+              <p class="c intro"># Ce qui me nourrit. Le sol d'où tout pousse.</p>
+              <ol class="books">
+                <li><span class="n" aria-hidden="true">1</span><span class="a">Donna Haraway,</span> <em>Staying with the Trouble</em></li>
+                <li><span class="n" aria-hidden="true">2</span><span class="a">Ken Wilber,</span> <em>Integral Psychology</em></li>
+                <li><span class="n" aria-hidden="true">3</span><span class="a">Sönke Ahrens,</span> <em>How to Take Smart Notes</em></li>
+                <li><span class="n" aria-hidden="true">4</span><span class="a">Carlo Rovelli,</span> <em>L'Ordre du temps</em></li>
+                <li><span class="n" aria-hidden="true">5</span><span class="a">Hunt &amp; Thomas,</span> <em>The Pragmatic Programmer</em></li>
+                <li><span class="n" aria-hidden="true">6</span><span class="a">Laozi,</span> <em>Tao Te King</em></li>
+              </ol>
+            </div>
+            <p class="cmdline" style="margin-top:2.4rem" data-step="type" aria-label="asi0@wmmw:~$ ls nourritures/films/ nourritures/videos/"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">ls nourritures/films/ nourritures/videos/</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out lsdirs" data-step="fade">
+              <p class="dhead">nourritures/films/:</p>
+              <p class="c"># vide pour le moment. bientôt.</p>
+              <p class="dhead">nourritures/videos/:</p>
+              <p class="c"># vide pour le moment. bientôt.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot" data-block>
+  <div class="wrap">
+    <div class="sec-inner">
+      <div class="panel foot-panel">
+        <div class="panel-head"><span class="ph-path"><b>asi0@wmmw</b>:~</span></div>
+        <div class="panel-body">
+          <div>
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ echo $WMMW"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">echo "$WMMW"</span><span class="caret" aria-hidden="true"></span></p>
+            <p class="out echoline" data-step="fade">wmmw.sh : WilliaM Mycelic Wealth. Un palindrome. Ce qui sort du réseau y revient.</p>
+          </div>
+          <div>
+            <p class="cmdline" data-step="type" aria-label="asi0@wmmw:~$ ls -l liens/"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="cmd-text">ls -l liens/</span><span class="caret" aria-hidden="true"></span></p>
+            <div class="out links" data-step="fade">
+              <p class="total">total 0</p>
+              <p class="lrow"><span class="perm">lrwxrwxrwx</span><a href="https://github.com/Asi0Flammeus" rel="me">github <span class="tgt">-&gt; github.com/Asi0Flammeus</span></a></p>
+              <p class="lrow"><span class="perm">lrwxrwxrwx</span><a href="#">ecrits <span class="tgt">-&gt; flux rss, bientôt</span></a></p>
+              <p class="lrow"><span class="perm">lrwxrwxrwx</span><a href="#">contact <span class="tgt">-&gt; courriel, bientôt</span></a></p>
+            </div>
+          </div>
+          <p class="cmdline" data-step="fade"><span class="ps"><b>asi0@wmmw</b>:~$</span> <span class="caret-final" aria-hidden="true"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<nav class="switcher" aria-label="Maquettes">
+  <span class="sw-name">hybride</span>
+  <a href="a-sous-bois.html" title="Maquette A : sous-bois">A</a><span class="dot" aria-hidden="true">·</span><a href="b-shell.html" title="Maquette B : shell">B</a><span class="dot" aria-hidden="true">·</span><a href="c-reseau-vivant.html" title="Maquette C : réseau vivant">C</a><span class="dot" aria-hidden="true">·</span><a href="d-hybride.html" class="on" aria-current="page" title="Maquette D : hybride">D</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  var docEl = document.documentElement;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var anim = docEl.classList.contains('anim');
+
+  /* ============================================================
+     1. gentle fade-up reveals
+     ============================================================ */
+  if (anim && 'IntersectionObserver' in window) {
+    var ro = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) {
+          entries[i].target.classList.add('in');
+          ro.unobserve(entries[i].target);
+        }
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    var revs = document.querySelectorAll('.reveal');
+    for (var r = 0; r < revs.length; r++) ro.observe(revs[r]);
+  }
+
+  /* ============================================================
+     2. physarum simulation (Jones model, CPU) : verbatim from C
+        Trail field: Float32Array at low internal resolution,
+        CSS-upscaled. Warm umber-to-gold LUT. Pauses when hidden
+        or offscreen; reduced-motion settles to a static frame.
+     ============================================================ */
+  (function () {
+    var canvas = document.getElementById('sim');
+    var hero = canvas.parentElement;
+    var ctx = canvas.getContext('2d', { alpha: true });
+
+    var SD = 7.5;        /* sensor distance, cells */
+    var SA = 0.4;        /* sensor angle, rad */
+    var TA = 0.45;       /* turn angle, rad */
+    var SPEED = 1.0;     /* cells per step */
+    var DEPOSIT = 0.15;
+    var EVAP = 0.94;
+    var JIT = 0.12;      /* heading jitter keeps the network alive long-run */
+    var CAP = 6;         /* trail ceiling, prevents runaway trunks */
+    var KNEE = 0.8;      /* soft-knee tone mapping: n = v / (v + KNEE) */
+    var cosSA = Math.cos(SA), sinSA = Math.sin(SA);
+    var cosTA = Math.cos(TA), sinTA = Math.sin(TA);
+    var TAU = Math.PI * 2;
+
+    var LUT = (function () {
+      var stops = [
+        [0.00, 18, 16, 13, 0],
+        [0.05, 31, 23, 14, 0],
+        [0.16, 47, 33, 18, 110],
+        [0.35, 107, 74, 30, 185],
+        [0.55, 168, 120, 48, 235],
+        [0.78, 217, 162, 74, 255],
+        [1.00, 236, 203, 127, 255]
+      ];
+      var lut = new Uint32Array(256);
+      for (var i = 0; i < 256; i++) {
+        var t = i / 255, s0 = stops[0], s1 = stops[stops.length - 1];
+        for (var s = 0; s < stops.length - 1; s++) {
+          if (t >= stops[s][0] && t <= stops[s + 1][0]) { s0 = stops[s]; s1 = stops[s + 1]; break; }
+        }
+        var f = s1[0] === s0[0] ? 0 : (t - s0[0]) / (s1[0] - s0[0]);
+        var rr = (s0[1] + (s1[1] - s0[1]) * f) | 0;
+        var gg = (s0[2] + (s1[2] - s0[2]) * f) | 0;
+        var bb = (s0[3] + (s1[3] - s0[3]) * f) | 0;
+        var aa = (s0[4] + (s1[4] - s0[4]) * f) | 0;
+        lut[i] = (aa << 24) | (bb << 16) | (gg << 8) | rr;
+      }
+      return lut;
+    })();
+
+    var W, H, CELLS, N, RESPAWN, trail, tmp, ag, img, buf32;
+
+    function init() {
+      var vw = hero.clientWidth || window.innerWidth;
+      var vh = hero.clientHeight || window.innerHeight;
+      var aspect = vw / Math.max(1, vh);
+      if (aspect >= 1) { W = 320; H = Math.max(110, Math.round(320 / aspect)); }
+      else { H = 300; W = Math.max(120, Math.round(300 * aspect)); }
+      canvas.width = W;
+      canvas.height = H;
+      CELLS = W * H;
+      trail = new Float32Array(CELLS);
+      tmp = new Float32Array(CELLS);
+      img = ctx.createImageData(W, H);
+      buf32 = new Uint32Array(img.data.buffer);
+      N = Math.min(12000, Math.max(6000, Math.round(CELLS * 0.18)));
+      RESPAWN = Math.max(1, (N * 0.002) | 0);
+      ag = new Float32Array(N * 3);
+      seed();
+    }
+
+    function seed() {
+      var cx = W * 0.62, cy = H * 0.46, R = Math.min(W, H) * 0.32;
+      var nRing = Math.floor(N * 0.6);
+      var k = 0, i, a, rr;
+      for (i = 0; i < nRing; i++) {
+        a = Math.random() * TAU;
+        rr = R * (0.92 + Math.random() * 0.16);
+        ag[k++] = (cx + Math.cos(a) * rr + W) % W;
+        ag[k++] = (cy + Math.sin(a) * rr + H) % H;
+        ag[k++] = a + Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+      }
+      var c1x = W * 0.25, c1y = H * 0.72, c2x = W * 0.86, c2y = H * 0.24;
+      var cr = Math.min(W, H) * 0.08;
+      for (i = nRing; i < N; i++) {
+        var even = (i & 1) === 0;
+        a = Math.random() * TAU;
+        rr = cr * Math.sqrt(Math.random());
+        ag[k++] = ((even ? c1x : c2x) + Math.cos(a) * rr + W) % W;
+        ag[k++] = ((even ? c1y : c2y) + Math.sin(a) * rr + H) % H;
+        ag[k++] = Math.random() * TAU;
+      }
+    }
+
+    function sense(sx, sy) {
+      var xi = sx | 0, yi = sy | 0;
+      if (xi < 0) xi += W; else if (xi >= W) xi -= W;
+      if (yi < 0) yi += H; else if (yi >= H) yi -= H;
+      return trail[yi * W + xi];
+    }
+
+    function step() {
+      var i, j, x, y, h, ch, sh, f, l, r, d, s, c2, s2, ti, nv;
+      for (i = 0; i < N; i++) {
+        j = i * 3;
+        x = ag[j]; y = ag[j + 1];
+        h = ag[j + 2] + (Math.random() - 0.5) * JIT;
+        ch = Math.cos(h); sh = Math.sin(h);
+        f = sense(x + ch * SD, y + sh * SD);
+        l = sense(x + (ch * cosSA + sh * sinSA) * SD, y + (sh * cosSA - ch * sinSA) * SD);
+        r = sense(x + (ch * cosSA - sh * sinSA) * SD, y + (sh * cosSA + ch * sinSA) * SD);
+        if (f >= l && f >= r) d = 0;
+        else if (l > f && r > f) d = Math.random() < 0.5 ? -TA : TA;
+        else if (l > r) d = -TA;
+        else d = TA;
+        if (d !== 0) {
+          s = d > 0 ? sinTA : -sinTA;
+          c2 = ch * cosTA - sh * s;
+          s2 = sh * cosTA + ch * s;
+          ch = c2; sh = s2; h += d;
+        }
+        x += ch * SPEED; y += sh * SPEED;
+        if (x < 0) x += W; else if (x >= W) x -= W;
+        if (y < 0) y += H; else if (y >= H) y -= H;
+        ag[j] = x; ag[j + 1] = y; ag[j + 2] = h;
+        ti = (y | 0) * W + (x | 0);
+        nv = trail[ti] + DEPOSIT;
+        trail[ti] = nv > CAP ? CAP : nv;
+      }
+      for (i = 0; i < RESPAWN; i++) {
+        j = ((Math.random() * N) | 0) * 3;
+        ag[j] = Math.random() * W;
+        ag[j + 1] = Math.random() * H;
+        ag[j + 2] = Math.random() * TAU;
+      }
+      var E9 = EVAP / 9, yy, xx, y0, y1, y2, x0, x2;
+      for (yy = 0; yy < H; yy++) {
+        y0 = ((yy - 1 + H) % H) * W; y1 = yy * W; y2 = ((yy + 1) % H) * W;
+        for (xx = 0; xx < W; xx++) {
+          x0 = xx === 0 ? W - 1 : xx - 1;
+          x2 = xx === W - 1 ? 0 : xx + 1;
+          tmp[y1 + xx] = (trail[y0 + x0] + trail[y0 + xx] + trail[y0 + x2]
+            + trail[y1 + x0] + trail[y1 + xx] + trail[y1 + x2]
+            + trail[y2 + x0] + trail[y2 + xx] + trail[y2 + x2]) * E9;
+        }
+      }
+      var t = trail; trail = tmp; tmp = t;
+    }
+
+    function render() {
+      for (var i = 0; i < CELLS; i++) {
+        var v = trail[i];
+        buf32[i] = LUT[(v / (v + KNEE) * 255) | 0];
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+
+    var rafId = 0, last = 0, running = false, heroVisible = true;
+
+    function frame(ts) {
+      rafId = requestAnimationFrame(frame);
+      if (ts - last < 29) return;
+      last = ts;
+      step();
+      render();
+    }
+    function start() {
+      if (running || reduced) return;
+      running = true;
+      last = 0;
+      rafId = requestAnimationFrame(frame);
+    }
+    function stop() {
+      if (!running) return;
+      running = false;
+      cancelAnimationFrame(rafId);
+    }
+    function update() {
+      if (!document.hidden && heroVisible) start(); else stop();
+    }
+    function freezeFrame() {
+      for (var s = 0; s < 300; s++) step();
+      render();
+    }
+
+    init();
+
+    if (reduced) {
+      freezeFrame();
+    } else {
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          heroVisible = entries[0].isIntersecting;
+          update();
+        }, { threshold: 0, rootMargin: '120px 0px' });
+        io.observe(canvas);
+      }
+      document.addEventListener('visibilitychange', update);
+      update();
+    }
+
+    var rt;
+    window.addEventListener('resize', function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        var vw = hero.clientWidth || window.innerWidth;
+        var vh = hero.clientHeight || window.innerHeight;
+        var a = vw / Math.max(1, vh), cur = W / H;
+        if (Math.abs(a - cur) / cur > 0.25) {
+          init();
+          if (reduced) freezeFrame();
+        }
+      }, 300);
+    });
+  })();
+
+  /* ============================================================
+     3. typed commands per panel (borrowed from B)
+        Command types once when its block enters the viewport;
+        output fades in after. Reduced / no-JS : fully rendered.
+     ============================================================ */
+  (function () {
+    var blocks = [].slice.call(document.querySelectorAll('[data-block]'));
+
+    function showAll(b) {
+      [].slice.call(b.querySelectorAll('[data-step]')).forEach(function (el) {
+        el.classList.add('on', 'done');
+      });
+    }
+
+    if (anim && 'IntersectionObserver' in window) {
+      try {
+        blocks.forEach(function (b) {
+          [].slice.call(b.querySelectorAll('[data-step="type"] .cmd-text')).forEach(function (s) {
+            s.dataset.full = s.textContent;
+            s.textContent = '';
+          });
+        });
+        docEl.classList.add('armed');
+
+        var runSeq = function (block) {
+          var steps = [].slice.call(block.querySelectorAll('[data-step]'));
+          var i = 0;
+          var next = function () {
+            if (i >= steps.length) return;
+            var el = steps[i++];
+            if (el.getAttribute('data-step') === 'type') {
+              el.classList.add('typing');
+              var span = el.querySelector('.cmd-text');
+              var full = (span && span.dataset.full) || '';
+              var j = 0;
+              var tick = function () {
+                if (j < full.length) {
+                  span.textContent = full.slice(0, ++j);
+                  setTimeout(tick, 24 + Math.random() * 14);
+                } else {
+                  el.classList.remove('typing');
+                  el.classList.add('done');
+                  setTimeout(next, 170);
+                }
+              };
+              tick();
+            } else {
+              el.classList.add('on');
+              setTimeout(next, 380);
+            }
+          };
+          next();
+        };
+
+        var tio = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) {
+              tio.unobserve(e.target);
+              runSeq(e.target);
+            }
+          });
+        }, { threshold: 0.05, rootMargin: '0px 0px -10% 0px' });
+        blocks.forEach(function (b) { tio.observe(b); });
+      } catch (err) {
+        docEl.classList.remove('armed');
+        blocks.forEach(showAll);
+      }
+    } else if (anim) {
+      blocks.forEach(showAll);
+    }
+    /* no anim : markup is already the rendered state, nothing to do */
+  })();
+
+  /* ============================================================
+     4. scroll-grown mycelium filament (the signature)
+        Full-document SVG. Organic seeded main path grows downward
+        as the tip tracks the viewport middle; hyphae branch toward
+        each panel header. Primary: CSS scroll() timeline. Fallback
+        (Firefox / Zen): visibility-gated rAF reading scrollY, only
+        writing when the value changed, tip smoothed with a lerp.
+        Reduced motion: fully drawn, static.
+     ============================================================ */
+  (function () {
+    var svg = document.querySelector('.fila');
+    if (!svg) return;
+    var trunk = svg.querySelector('.trunk');
+    var brg = svg.querySelector('.br');
+    var SVGNS = 'http://www.w3.org/2000/svg';
+
+    var supportsTL = false;
+    try { supportsTL = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()')); } catch (e) {}
+
+    /* deterministic RNG so the organic path is stable across frames */
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        var t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function catmull(pts) {
+      if (pts.length < 2) return '';
+      var d = 'M' + pts[0].x.toFixed(1) + ',' + pts[0].y.toFixed(1);
+      for (var i = 0; i < pts.length - 1; i++) {
+        var p0 = pts[i - 1] || pts[i];
+        var p1 = pts[i];
+        var p2 = pts[i + 1];
+        var p3 = pts[i + 2] || p2;
+        var c1x = p1.x + (p2.x - p0.x) / 6;
+        var c1y = p1.y + (p2.y - p0.y) / 6;
+        var c2x = p2.x - (p3.x - p1.x) / 6;
+        var c2y = p2.y - (p3.y - p1.y) / 6;
+        d += 'C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' +
+             c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' +
+             p2.x.toFixed(1) + ',' + p2.y.toFixed(1);
+      }
+      return d;
+    }
+
+    var vh, docH, startY, endY, trunkPts, branches = [], rafF = 0, lastSy = -1;
+
+    function trunkXAt(y) {
+      /* trunkPts is monotonic in y : linear-interpolate the x */
+      var p = trunkPts;
+      if (y <= p[0].y) return p[0].x;
+      if (y >= p[p.length - 1].y) return p[p.length - 1].x;
+      for (var i = 0; i < p.length - 1; i++) {
+        if (y >= p[i].y && y <= p[i + 1].y) {
+          var f = (y - p[i].y) / (p[i + 1].y - p[i].y || 1);
+          return p[i].x + (p[i + 1].x - p[i].x) * f;
+        }
+      }
+      return p[p.length - 1].x;
+    }
+
+    function build() {
+      stopRAF();
+      vh = window.innerHeight;
+      var W = window.innerWidth;
+      var mobile = W < 768;
+      var scrollY = window.pageYOffset || 0;
+
+      var hero = document.querySelector('.hero');
+      var footer = document.querySelector('.site-foot');
+      var heroRect = hero.getBoundingClientRect();
+      var footRect = footer.getBoundingClientRect();
+      startY = heroRect.bottom + scrollY - vh * 0.06;
+      endY = footRect.top + scrollY + Math.min(footRect.height * 0.5, 90);
+      if (endY <= startY + 40) endY = startY + 400;
+
+      /* collapse the layer before measuring so it never inflates scrollHeight */
+      svg.style.height = '0px';
+      docH = Math.max(document.documentElement.scrollHeight, endY + 40);
+
+      /* size the layer to the whole document */
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + docH);
+      svg.setAttribute('width', W);
+      svg.setAttribute('height', docH);
+      svg.style.height = docH + 'px';
+
+      /* ---- main trunk : seeded organic meander down a left lane ---- */
+      var rnd = mulberry32(0x5eed21 ^ (W & 0xffff));
+      var laneX = mobile ? Math.max(11, W * 0.04) : Math.max(20, Math.min(44, W * 0.03));
+      var amp = mobile ? 6 : Math.min(22, W * 0.018);
+      var span = endY - startY;
+      var segs = Math.max(8, Math.round(span / 130));
+      trunkPts = [];
+      var phase = rnd() * Math.PI * 2;
+      for (var i = 0; i <= segs; i++) {
+        var t = i / segs;
+        var y = startY + span * t;
+        var wob = Math.sin(t * Math.PI * 2.6 + phase) * amp
+                + Math.sin(t * Math.PI * 6.1 + phase * 1.7) * amp * 0.35;
+        var jitter = (rnd() - 0.5) * amp * 0.5;
+        var ease = i === 0 ? 0 : 1; /* anchor the very top on the lane */
+        trunkPts.push({ x: laneX + (wob + jitter) * ease, y: y });
+      }
+      trunk.setAttribute('d', catmull(trunkPts));
+      var tlen = trunk.getTotalLength();
+
+      /* ---- branches toward each panel header ---- */
+      while (brg.firstChild) brg.removeChild(brg.firstChild);
+      branches = [];
+      var heads = [].slice.call(document.querySelectorAll('main .panel-head, .site-foot .panel-head'));
+      heads.forEach(function (head, idx) {
+        var hr = head.getBoundingClientRect();
+        var attachY = hr.top + scrollY + hr.height * 0.5;
+        if (attachY < startY + 20 || attachY > endY) return;
+        var sx = trunkXAt(attachY), sy = attachY;
+        var tx = mobile ? Math.min(hr.left + scrollLeftSafe() + 40, W - 12)
+                        : hr.left + 34;
+        var ty = attachY;
+        var dx = tx - sx, dy = ty - sy;
+        if (Math.abs(dx) < 10) return;
+        var br = mulberry32(0xa11ce + idx * 2654435761);
+        var up = br() < 0.5 ? -1 : 1;
+        var c1x = sx + dx * 0.35, c1y = sy + up * (12 + br() * 26);
+        var c2x = sx + dx * 0.72, c2y = ty - up * (6 + br() * 20);
+        var d = 'M' + sx.toFixed(1) + ',' + sy.toFixed(1) +
+                'C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' +
+                c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' +
+                tx.toFixed(1) + ',' + ty.toFixed(1);
+        /* 1 to 2 sub-branchlets sprouting from along the hypha */
+        var nb = 1 + (br() < 0.6 ? 1 : 0);
+        for (var b = 0; b < nb; b++) {
+          var f = 0.4 + b * 0.28 + br() * 0.1;
+          var mx = sx + dx * f, my = sy + dy * f;
+          var len = (mobile ? 16 : 30) + br() * (mobile ? 14 : 34);
+          var ang = (br() < 0.5 ? -1 : 1) * (0.5 + br() * 0.7);
+          var ex = mx + Math.cos(ang) * len * (dx > 0 ? 1 : -1);
+          var ey = my + Math.sin(ang) * len;
+          var mcx = mx + (ex - mx) * 0.5 + (br() - 0.5) * 18;
+          var mcy = my + (ey - my) * 0.5 + (br() - 0.5) * 18;
+          d += ' M' + mx.toFixed(1) + ',' + my.toFixed(1) +
+               'Q' + mcx.toFixed(1) + ',' + mcy.toFixed(1) + ' ' +
+               ex.toFixed(1) + ',' + ey.toFixed(1);
+        }
+        var path = document.createElementNS(SVGNS, 'path');
+        path.setAttribute('d', d);
+        brg.appendChild(path);
+        var blen = path.getTotalLength();
+        path.style.strokeDasharray = blen;
+        branches.push({ el: path, len: blen, y: attachY, head: head, grown: false });
+      });
+
+      /* ---- drive the growth ---- */
+      trunk.style.strokeDasharray = tlen;
+      svg.style.setProperty('--len', tlen);
+
+      if (reduced) {
+        /* fully drawn, static */
+        svg.classList.remove('tl');
+        trunk.style.strokeDashoffset = 0;
+        branches.forEach(function (b) { b.el.style.strokeDashoffset = 0; b.grown = true; });
+        return;
+      }
+
+      if (supportsTL) {
+        /* CSS scroll timeline owns the trunk; branches revealed by IO */
+        var scrollable = Math.max(1, docH - vh);
+        var r0 = clamp01((startY - vh * 0.5) / scrollable) * 100;
+        var r1 = clamp01((endY - vh * 0.5) / scrollable) * 100;
+        svg.style.setProperty('--r0', r0.toFixed(2) + '%');
+        svg.style.setProperty('--r1', r1.toFixed(2) + '%');
+        trunk.style.strokeDashoffset = tlen; /* hidden before range */
+        svg.classList.add('tl');
+        branches.forEach(function (b) { b.el.style.strokeDashoffset = b.len; });
+        armBranchObserver();
+      } else {
+        /* rAF fallback : visibility-gated, writes only on change */
+        svg.classList.remove('tl');
+        trunk.style.strokeDashoffset = tlen;
+        branches.forEach(function (b) { b.el.style.strokeDashoffset = b.len; });
+        curOff = tlen;
+        startRAF();
+      }
+    }
+
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+    function scrollLeftSafe() { return window.pageXOffset || 0; }
+
+    /* branch reveal for the CSS-timeline path : trip near viewport middle */
+    var brancObs = null;
+    function armBranchObserver() {
+      if (!('IntersectionObserver' in window)) {
+        branches.forEach(function (b) { b.el.style.strokeDashoffset = 0; b.grown = true; });
+        return;
+      }
+      if (brancObs) brancObs.disconnect();
+      brancObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          for (var i = 0; i < branches.length; i++) {
+            if (branches[i].head === e.target && !branches[i].grown) {
+              branches[i].grown = true;
+              branches[i].el.style.strokeDashoffset = 0;
+              brancObs.unobserve(e.target);
+            }
+          }
+        });
+      }, { rootMargin: '-42% 0px -42% 0px', threshold: 0 });
+      branches.forEach(function (b) { brancObs.observe(b.head); });
+    }
+
+    /* rAF fallback loop */
+    var tlenCache = 0, curOff = 0, running = false;
+    function tick() {
+      if (!running) return;
+      rafF = requestAnimationFrame(tick);
+      var sy = window.pageYOffset || 0;
+      var settling = Math.abs(curOff - targetOff()) > 0.4;
+      if (sy === lastSy && !settling) return;
+      lastSy = sy;
+      var tOff = targetOff();
+      curOff += (tOff - curOff) * 0.14;
+      if (Math.abs(curOff - tOff) < 0.4) curOff = tOff;
+      trunk.style.strokeDashoffset = curOff;
+      var tlen = parseFloat(svg.style.getPropertyValue('--len')) || 1;
+      var tipY = startY + (endY - startY) * (1 - curOff / tlen);
+      for (var i = 0; i < branches.length; i++) {
+        if (!branches[i].grown && tipY >= branches[i].y) {
+          branches[i].grown = true;
+          branches[i].el.style.strokeDashoffset = 0;
+        }
+      }
+    }
+    function targetOff() {
+      var sy = window.pageYOffset || 0;
+      var tlen = parseFloat(svg.style.getPropertyValue('--len')) || 1;
+      var mid = sy + vh * 0.5;
+      var p = clamp01((mid - startY) / (endY - startY || 1));
+      return tlen * (1 - p);
+    }
+    function startRAF() {
+      if (running || reduced || supportsTL || document.hidden) return;
+      running = true;
+      lastSy = -1;
+      rafF = requestAnimationFrame(tick);
+    }
+    function stopRAF() {
+      running = false;
+      if (rafF) { cancelAnimationFrame(rafF); rafF = 0; }
+    }
+
+    if (!reduced && !supportsTL) {
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stopRAF(); else startRAF();
+      });
+    }
+
+    /* build after layout + fonts settle; rebuild on debounced resize */
+    function schedule() { requestAnimationFrame(build); }
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { schedule(); });
+    }
+
+    var rrt;
+    window.addEventListener('resize', function () {
+      clearTimeout(rrt);
+      rrt = setTimeout(build, 220);
+    });
+  })();
+
+})();
+</script>
+
+</body>
+</html>
