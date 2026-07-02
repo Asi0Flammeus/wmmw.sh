@@ -1,0 +1,40 @@
+/* wmmw.sh design tokens (design of record: mockup D "hybride") */
+:root {
+  /* palette: dark, locked */
+  --bg: #12100d;
+  --bg-tile: #191510;
+  --surf: #1a1712;
+  --surf-head: #16130f;
+  --bone: #e8e2d5;
+  --ink-2: #b6ae9e;
+  --ink-3: #8d8472;
+  --accent: #d9a24a;
+  --accent-2: #e4b262;
+  --accent-soft: rgba(217, 162, 74, 0.12);
+  --hair: rgba(232, 226, 213, 0.14);
+  --hair-2: rgba(232, 226, 213, 0.12);
+
+  /* layout */
+  --pad: clamp(1.25rem, 5vw, 3rem);
+  --maxw: 1200px;
+  --panelw: 880px;
+
+  /* radii: one system */
+  --r-tile: 10px;
+  --r-pill: 999px;
+
+  /* spacing scale (4px base) */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
+
+  /* type */
+  --disp: "Space Grotesk Variable", "Space Grotesk", sans-serif;
+  --body: "Instrument Sans Variable", "Instrument Sans", sans-serif;
+  --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+}
