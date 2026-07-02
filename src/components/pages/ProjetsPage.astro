@@ -1,0 +1,114 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import TerminalPanel from "@components/TerminalPanel.astro";
+import TermCmd from "@components/TermCmd.astro";
+import { type Locale, t } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+/** Directory-style names carry a trailing slash; strip it for the panel path. */
+const dirName = (name: string) => name.replace(/\/$/, "");
+---
+
+<BaseLayout
+  locale={locale}
+  title={dict.projets.heading}
+  description={dict.meta.projets}
+  path="/projets"
+>
+  <section class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h1 class="disp-h reveal">{dict.projets.heading}</h1>
+        <p class="intro-comment reveal">{dict.projets.intro}</p>
+      </div>
+    </div>
+  </section>
+
+  {
+    projects.map((project, i) => (
+      <section class:list={["sec", i % 2 === 0 ? "offset-r" : "offset-l"]} data-block>
+        <div class="wrap">
+          <div class="sec-inner">
+            <TerminalPanel path={`~/projets/${dirName(project.data.name)}`} class="reveal">
+              <TermCmd command="cat about.md" />
+              <div class="out" data-step="fade">
+                <p class="pbody">
+                  <strong>{project.data.title}</strong>
+                  {project.data.blurb[locale]}
+                </p>
+                <p class="pmeta">
+                  <span class="badge">{project.data.status}</span>
+                </p>
+                {project.data.url && (
+                  <p class="plink">
+                    <a href={project.data.url} rel="noopener">
+                      {`-> ${project.data.url}`}
+                    </a>
+                  </p>
+                )}
+              </div>
+            </TerminalPanel>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+</BaseLayout>
+
+<style>
+  .intro-comment {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--ink-3);
+    margin-top: -1.4rem;
+  }
+
+  .pbody {
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+  .pbody strong {
+    display: block;
+    color: var(--bone);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .pmeta {
+    margin-top: 1.1rem;
+  }
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    padding: 0.18rem 0.75rem;
+    border-radius: var(--r-pill);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .plink {
+    margin-top: 1rem;
+    overflow-wrap: anywhere;
+  }
+  .plink a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .plink a:hover {
+    color: var(--accent-2);
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,562 @@
+---
+import { getCollection } from "astro:content";
+import { type Locale, t, localePath } from "@i18n/index";
+import { SITE_URL, GITHUB_URL, TERM_USER } from "@lib/site";
+import { publishedWritings, baseSlug } from "@lib/writings";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Hero from "@components/Hero.astro";
+import TerminalPanel from "@components/TerminalPanel.astro";
+import TermCmd from "@components/TermCmd.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const chrome = t(locale);
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const tools = (await getCollection("tools")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const livres = (await getCollection("nourritures"))
+  .filter((n) => n.data.type === "livre")
+  .sort((a, b) => a.data.order - b.data.order);
+const writings = (await publishedWritings(locale)).slice(0, 3);
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "William",
+  alternateName: "asi0",
+  url: SITE_URL,
+  sameAs: [GITHUB_URL],
+};
+
+/**
+ * Home-only manifeste teaser. This prose is home-page content (not chrome and
+ * not a reusable collection field), so it lives here as a local per-locale
+ * dictionary. FR is verbatim from the design of record (mockup D); EN and ES
+ * are faithful translations. No em or en dashes anywhere.
+ */
+type Teaser = {
+  title: string;
+  body: string;
+  quote: string;
+  dimsHeading: string;
+  dims: { term: string; desc: string }[];
+};
+
+const teaser: Record<Locale, Teaser> = {
+  fr: {
+    title: "Richesse mycélique",
+    body: "Le mycélium ne discrimine pas entre les nutriments. Il transporte ce dont la forêt a besoin. La richesse mycélique, c'est apporter des ressources aux autres comme si ta vie en dépendait, sans exiger de retour. Le retour vient toujours, sous une forme qu'on n'attendait pas.",
+    quote:
+      "La forêt n'a pas besoin d'un arbre de plus. Elle a besoin de mycélium.",
+    dimsHeading: "Les cinq dimensions",
+    dims: [
+      { term: "Financière", desc: "des liquidités pour soutenir le vivant." },
+      { term: "Relationnelle", desc: "la confiance, tissée lien par lien." },
+      { term: "Intellectuelle", desc: "le savoir qui circule dans le réseau." },
+      { term: "Expérientielle", desc: "les aventures que la forêt produit." },
+      { term: "Émotionnelle", desc: "ce que le sol nourrit en silence." },
+    ],
+  },
+  en: {
+    title: "Mycelial wealth",
+    body: "The mycelium does not discriminate between nutrients. It carries whatever the forest needs. Mycelial wealth means bringing resources to others as if your life depended on it, without demanding anything back. The return always comes, in a form you did not expect.",
+    quote: "The forest does not need one more tree. It needs mycelium.",
+    dimsHeading: "The five dimensions",
+    dims: [
+      { term: "Financial", desc: "liquidity to sustain the living." },
+      { term: "Relational", desc: "trust, woven link by link." },
+      { term: "Intellectual", desc: "knowledge that flows through the network." },
+      { term: "Experiential", desc: "the adventures the forest produces." },
+      { term: "Emotional", desc: "what the soil nourishes in silence." },
+    ],
+  },
+  es: {
+    title: "Riqueza micelial",
+    body: "El micelio no discrimina entre los nutrientes. Transporta lo que el bosque necesita. La riqueza micelial consiste en aportar recursos a los demás como si tu vida dependiera de ello, sin exigir nada a cambio. El retorno siempre llega, en una forma que no esperabas.",
+    quote: "El bosque no necesita un árbol más. Necesita micelio.",
+    dimsHeading: "Las cinco dimensiones",
+    dims: [
+      { term: "Financiera", desc: "liquidez para sostener lo vivo." },
+      { term: "Relacional", desc: "la confianza, tejida enlace a enlace." },
+      { term: "Intelectual", desc: "el saber que circula por la red." },
+      { term: "Experiencial", desc: "las aventuras que el bosque produce." },
+      { term: "Emocional", desc: "lo que el suelo nutre en silencio." },
+    ],
+  },
+};
+const tz = teaser[locale];
+---
+
+<BaseLayout
+  locale={locale}
+  title="wmmw.sh"
+  description={chrome.meta.home}
+  path="/"
+  hero={true}
+  jsonLd={jsonLd}
+>
+  <Hero locale={locale} />
+
+  <section class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">
+          {chrome.manifeste.heading}{" "}
+          <span class="gold">{chrome.manifeste.headingGold}</span>
+        </h2>
+        <TerminalPanel path="~/manifeste" class="reveal">
+          <TermCmd command={chrome.manifeste.cmd} />
+          <div class="out md" data-step="fade">
+            <p class="h"><span class="tok"># </span>{tz.title}</p>
+            <p>{tz.body}</p>
+            <p class="quote"><span class="tok">&gt; </span>{tz.quote}</p>
+            <p class="h"><span class="tok">## </span>{tz.dimsHeading}</p>
+            <ul>
+              {
+                tz.dims.map((d) => (
+                  <li>
+                    <span class="tok">- **</span>
+                    <span class="term">{d.term}</span>
+                    <span class="tok">**</span> : {d.desc}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <p class="cmdline chipline" data-step="fade">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
+            <a class="cta-chip" href={localePath(locale, "/manifeste")}>
+              {chrome.manifeste.readMore}
+            </a>
+          </p>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec offset-r" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">{chrome.projets.heading}</h2>
+        <TerminalPanel path="~/projets" class="reveal">
+          <TermCmd command={chrome.projets.cmd} />
+          <div class="out" data-step="fade">
+            <p class="c intro">{chrome.projets.intro}</p>
+            <div class="plist">
+              {
+                projects.map((p) => (
+                  <div class="prow">
+                    <span class="pname">{p.data.name}</span>
+                    <p class="pbody">
+                      <strong>
+                        {p.data.url ? (
+                          <a href={p.data.url}>{p.data.title}</a>
+                        ) : (
+                          p.data.title
+                        )}
+                      </strong>{" "}
+                      {p.data.blurb[locale]}
+                    </p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+          <p class="cmdline morelink" data-step="fade">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
+            <a href={localePath(locale, "/projets")}>{chrome.projets.all}</a>
+          </p>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">{chrome.outils.heading}</h2>
+        <TerminalPanel path="~/outils" class="reveal">
+          <TermCmd command={chrome.outils.cmd} />
+          <div class="out" data-step="fade">
+            <p class="c intro">{chrome.outils.intro}</p>
+            <div class="tree">
+              <p class="troot">outils/</p>
+              {
+                tools.map((tool, i) => {
+                  const glyph = i === tools.length - 1 ? "└── " : "├── ";
+                  const href = tool.data.repo ?? tool.data.url;
+                  return (
+                    <div class="trow">
+                      <span class="tname">
+                        <span class="tg">{glyph}</span>
+                        {href ? (
+                          <a href={href}>{tool.data.name}</a>
+                        ) : (
+                          tool.data.name
+                        )}
+                      </span>
+                      <span class="tdesc">{tool.data.blurb[locale]}</span>
+                    </div>
+                  );
+                })
+              }
+            </div>
+            <p class="tsum">{chrome.outils.treeSummary(tools.length)}</p>
+          </div>
+          <p class="cmdline morelink" data-step="fade">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
+            <a href={localePath(locale, "/outils")}>{chrome.outils.all}</a>
+          </p>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec offset-r" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">{chrome.ecrits.heading}</h2>
+        <TerminalPanel path="~/ecrits" class="reveal">
+          <TermCmd command={chrome.ecrits.cmd} />
+          <div class="out" data-step="fade">
+            <p class="c intro">{chrome.ecrits.intro}</p>
+            <div class="flist">
+              {
+                writings.map((entry) => {
+                  const slug = baseSlug(entry);
+                  return (
+                    <a
+                      class="frow"
+                      href={localePath(locale, `/ecrits/${slug}`)}
+                    >
+                      <p class="fline">
+                        <span class="fdir">ecrits/</span>
+                        <span class="fname">{slug}.md</span>
+                        <span class="lead" aria-hidden="true" />
+                        <span class="fdate">
+                          {entry.data.publishedAt.getFullYear()}
+                        </span>
+                      </p>
+                      <p class="ftitle">{entry.data.title}</p>
+                      <p class="fhook c">{entry.data.description}</p>
+                    </a>
+                  );
+                })
+              }
+            </div>
+          </div>
+          <p class="cmdline morelink" data-step="fade">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
+            <a href={localePath(locale, "/ecrits")}>{chrome.ecrits.all}</a>
+          </p>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h2 class="disp-h reveal">{chrome.nourritures.heading}</h2>
+        <TerminalPanel path="~/nourritures" class="reveal">
+          <TermCmd command={chrome.nourritures.cmdBooks} />
+          <div class="out" data-step="fade">
+            <p class="c intro">{chrome.nourritures.intro}</p>
+            <ol class="books">
+              {
+                livres.map((book, i) => (
+                  <li>
+                    <span class="n" aria-hidden="true">{i + 1}</span>
+                    <span class="a">{book.data.author},</span>{" "}
+                    <em>{book.data.title}</em>
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+          <div class="dir-listing">
+            <TermCmd command={chrome.nourritures.cmdDirs} />
+            <div class="out lsdirs" data-step="fade">
+              <p class="dhead">nourritures/films/:</p>
+              <p class="c">{chrome.nourritures.empty}</p>
+              <p class="dhead">nourritures/videos/:</p>
+              <p class="c">{chrome.nourritures.empty}</p>
+            </div>
+          </div>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---------- manifeste : markdown-ish cat (ported from mockup D) ---------- */
+  .md {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    max-width: 66ch;
+  }
+  .md .h {
+    color: var(--bone);
+    font-weight: 700;
+  }
+  .md .tok {
+    color: var(--ink-3);
+  }
+  .md .quote {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .md ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .md ul li {
+    color: var(--ink-2);
+  }
+  .md ul .term {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* readMore chip line */
+  .chipline {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.9ch;
+  }
+  .cta-chip {
+    display: inline-block;
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid rgba(217, 162, 74, 0.5);
+    padding: 0.5em 0.95em;
+    border-radius: var(--r-tile);
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .cta-chip:hover,
+  .cta-chip:focus-visible {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  .cta-chip:active {
+    transform: translateY(1px);
+  }
+
+  /* quiet trailing "cd <dir>" links */
+  .morelink {
+    margin-top: 1.8rem;
+  }
+  .morelink a {
+    color: var(--ink-3);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .morelink a:hover,
+  .morelink a:focus-visible {
+    color: var(--accent);
+  }
+
+  /* ---------- projets : aligned 2-col ls ---------- */
+  .plist {
+    display: grid;
+    gap: 1.9rem;
+  }
+  .prow {
+    display: grid;
+    grid-template-columns: 22ch 1fr;
+    column-gap: 2.5ch;
+    align-items: baseline;
+  }
+  .pname {
+    color: var(--accent);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .pbody {
+    color: var(--ink-2);
+  }
+  .pbody strong {
+    display: block;
+    color: var(--bone);
+    font-weight: 700;
+  }
+  .pbody strong a,
+  .tname a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .pbody strong a:hover,
+  .pbody strong a:focus-visible,
+  .tname a:hover,
+  .tname a:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* ---------- outils : box-drawing tree ---------- */
+  .tree {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .troot {
+    color: var(--bone);
+    font-weight: 700;
+  }
+  .trow {
+    display: grid;
+    grid-template-columns: 26ch 1fr;
+    column-gap: 2ch;
+    align-items: baseline;
+  }
+  .tg {
+    color: var(--ink-3);
+  }
+  .tname {
+    color: var(--accent);
+    font-weight: 600;
+    white-space: pre;
+  }
+  .tdesc {
+    color: var(--ink-2);
+  }
+  .tsum {
+    margin-top: 1.3rem;
+    color: var(--ink-3);
+  }
+
+  /* ---------- ecrits : dotted leader + right-aligned dates ---------- */
+  .flist {
+    display: grid;
+    gap: 2.1rem;
+  }
+  .frow {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .frow:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+  .fline {
+    display: flex;
+    align-items: baseline;
+    gap: 1ch;
+    min-width: 0;
+  }
+  .fdir {
+    color: var(--ink-3);
+  }
+  .fname {
+    color: var(--accent);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .lead {
+    flex: 1;
+    min-width: 3ch;
+    border-bottom: 1px dotted var(--hair);
+    transform: translateY(-0.3em);
+  }
+  .fdate {
+    color: var(--ink-2);
+  }
+  .ftitle {
+    color: var(--bone);
+    font-weight: 700;
+    margin-top: 0.3rem;
+    transition: color 0.2s ease;
+  }
+  .frow:hover .ftitle,
+  .frow:focus-visible .ftitle {
+    color: var(--accent);
+  }
+  .fhook {
+    max-width: 58ch;
+  }
+
+  /* ---------- nourritures : cat -n bibliography + empty dirs ---------- */
+  .books {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .books li {
+    color: var(--ink-2);
+  }
+  .books .n {
+    display: inline-block;
+    width: 4ch;
+    text-align: right;
+    margin-right: 2.5ch;
+    color: var(--ink-3);
+  }
+  .books .a {
+    color: var(--ink-2);
+  }
+  .books em {
+    color: var(--bone);
+    font-style: italic;
+  }
+  .dir-listing {
+    margin-top: 2.4rem;
+  }
+  .lsdirs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .dhead {
+    color: var(--bone);
+    font-weight: 600;
+    margin-top: 1.1rem;
+  }
+  .dhead:first-child {
+    margin-top: 0;
+  }
+
+  /* ---------- single-column collapse ---------- */
+  @media (max-width: 767px) {
+    .prow {
+      grid-template-columns: 1fr;
+      row-gap: 0.25rem;
+    }
+    .trow {
+      grid-template-columns: 1fr;
+      row-gap: 0.1rem;
+    }
+    .trow .tdesc {
+      padding-left: 4ch;
+    }
+    .books .n {
+      width: 3ch;
+      margin-right: 1.5ch;
+    }
+  }
+</style>

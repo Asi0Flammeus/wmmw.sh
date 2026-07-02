@@ -1,0 +1,12 @@
+---
+import OutilsPage from "@components/pages/OutilsPage.astro";
+import type { Locale } from "@i18n/index";
+
+export function getStaticPaths() {
+  return ["en", "es"].map((lang) => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+---
+
+<OutilsPage locale={locale} />

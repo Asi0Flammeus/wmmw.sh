@@ -1,0 +1,57 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import TerminalPanel from "@components/TerminalPanel.astro";
+import { t } from "@i18n/index";
+import { TERM_USER } from "@lib/site";
+
+/* Astro emits a single /404.html; chrome is FR only, no [lang] variants. */
+const locale = "fr" as const;
+const dict = t(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  title="404"
+  description={dict.meta.notFound}
+  path="/404"
+>
+  <section class="sec offset-l" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <TerminalPanel path="~" class="reveal">
+          <p class="cmdline">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>
+            {" "}cat <span id="nf-path">404</span>
+          </p>
+          <p class="out">{dict.notFound.output}</p>
+          <p class="cmdline endline">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>
+            {" "}<a class="cd" href="/">{dict.notFound.hint}</a>
+          </p>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  /* Fill the requested path client-side. textContent only: the pathname is
+     attacker-influenced, so never assign it via innerHTML. */
+  (function () {
+    var el = document.getElementById("nf-path");
+    if (el) el.textContent = window.location.pathname;
+  })();
+</script>
+
+<style>
+  .endline {
+    margin-top: 1.4rem;
+  }
+  .endline .cd {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .endline .cd:hover {
+    text-decoration: underline;
+  }
+</style>

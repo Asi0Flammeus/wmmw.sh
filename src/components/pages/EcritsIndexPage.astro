@@ -1,0 +1,107 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import TerminalPanel from "@components/TerminalPanel.astro";
+import TermCmd from "@components/TermCmd.astro";
+import { type Locale, t, localePath, isoDate } from "@i18n/index";
+import { publishedWritings, baseSlug } from "@lib/writings";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
+const entries = await publishedWritings(locale);
+---
+
+<BaseLayout
+  locale={locale}
+  title={dict.ecrits.heading}
+  description={dict.meta.ecrits}
+  path="/ecrits"
+>
+  <section class="sec offset-r" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <h1 class="disp-h reveal">{dict.ecrits.heading}</h1>
+        <TerminalPanel path="~/ecrits" class="reveal">
+          <TermCmd command={dict.ecrits.cmd} />
+          <div class="out" data-step="fade">
+            <p class="c intro">{dict.ecrits.intro}</p>
+            <div class="flist">
+              {
+                entries.map((entry) => {
+                  const slug = baseSlug(entry);
+                  return (
+                    <a class="frow" href={localePath(locale, `/ecrits/${slug}`)}>
+                      <span class="fline">
+                        <span class="fdir">ecrits/</span><span class="fname">{slug}.md</span><span class="lead" aria-hidden="true" /><span class="fdate">{isoDate(entry.data.publishedAt)}</span>
+                      </span>
+                      <span class="ftitle">{entry.data.title}</span>
+                      <span class="fhook c">{entry.data.description}</span>
+                    </a>
+                  );
+                })
+              }
+            </div>
+          </div>
+        </TerminalPanel>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ecrits index: dotted-leader TOC (ported from mockup D) */
+  .flist {
+    display: grid;
+    gap: 2.1rem;
+  }
+  .frow {
+    display: grid;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--r-tile);
+  }
+  .fline {
+    display: flex;
+    align-items: baseline;
+    gap: 1ch;
+    min-width: 0;
+  }
+  .fdir {
+    color: var(--ink-3);
+  }
+  .fname {
+    color: var(--accent);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .lead {
+    flex: 1;
+    min-width: 3ch;
+    border-bottom: 1px dotted var(--hair);
+    transform: translateY(-0.3em);
+  }
+  .fdate {
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .ftitle {
+    color: var(--bone);
+    font-weight: 700;
+    margin-top: 0.3rem;
+  }
+  .fhook {
+    max-width: 58ch;
+  }
+  .frow:hover .fname,
+  .frow:focus-visible .fname {
+    text-decoration: underline;
+  }
+  .frow:hover .ftitle,
+  .frow:focus-visible .ftitle {
+    color: var(--accent-2);
+  }
+</style>

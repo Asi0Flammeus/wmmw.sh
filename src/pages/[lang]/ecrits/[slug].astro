@@ -1,0 +1,25 @@
+---
+import EcritPostPage from "@components/pages/EcritPostPage.astro";
+import { publishedWritings, baseSlug, type Writing } from "@lib/writings";
+import type { Locale } from "@i18n/index";
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of ["en", "es"] as const) {
+    const entries = await publishedWritings(lang);
+    for (const entry of entries) {
+      paths.push({ params: { lang, slug: baseSlug(entry) }, props: { entry } });
+    }
+  }
+  return paths;
+}
+
+interface Props {
+  entry: Writing;
+}
+
+const { entry } = Astro.props;
+const locale = Astro.params.lang as Locale;
+---
+
+<EcritPostPage locale={locale} entry={entry} />
