@@ -14,6 +14,10 @@
  *     guide (trunk + pouring branches to each [data-block] panel header). Growth
  *     is scroll-gated (frontier ~ viewport middle, smoothed) so the channels are
  *     revealed little by little. No scroll listener: the rAF loop reads scrollY.
+ *     Terminal coupling: each branch's target `.panel` is marked
+ *     `data-myc-claim`; when the branch tip arrives the panel receives a
+ *     `myc:reach` CustomEvent and term-type.ts starts its typing sequence -
+ *     the terminal wakes BECAUSE the organism touched it, not on its own.
  *
  * The two read as ONE organism: the trunk seams into the hero bottom and both
  * render through the same LUT. The bloom feeds the channels (the trunk's source
@@ -180,6 +184,10 @@ const SPR_SIZE = 40; // sprite bitmap size, px
 const MAX_RIBBON_AGENTS = 1800;
 const MAX_TRUNK_AGENTS = 1200;
 const STEP_MS = 30; // ~33fps step cap (breathing is slow)
+/* branch tip -> terminal activation: fire "myc:reach" on the target panel
+   when the branch frontier is this many arc cells short of the header (the
+   feathered tip is visually brushing the panel by then) */
+const REACH_CELLS = 6;
 
 const TAU = Math.PI * 2;
 const cosSA = Math.cos(SA);
@@ -206,6 +214,8 @@ interface Ribbon {
   active: boolean;
   frontier: number;
   wob: Float32Array; // per-arc radius modulation (organic width variation)
+  panel: HTMLElement | null; // terminal panel this branch pours into (null for trunk)
+  reached: boolean; // "myc:reach" already dispatched on `panel`
 }
 
 interface Pt {
@@ -223,6 +233,7 @@ interface BranchDef {
   tx: number;
   ty: number;
   anchorY: number;
+  panel: HTMLElement | null;
 }
 
 /* ================= pure helpers (allocation-free in the frame path) ================= */
@@ -452,6 +463,8 @@ function blankRibbon(len: number, wid: number, latScale: number): Ribbon {
     active: false,
     frontier: 0,
     wob: new Float32Array(len),
+    panel: null,
+    reached: false,
   };
 }
 
@@ -839,7 +852,11 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     // advance the trunk frontier from scroll (cheap; always) + branch waking
     const trunk = ribbons[0];
     if (trunk) {
-      const tipY = sy + vh * 0.5;
+      // tip at 62% vh (not 50%): panels visible in the upper viewport at page
+      // load get colonized immediately instead of waiting out the term-type
+      // grace deadline; on slow scroll the branch still lands just before the
+      // panel crosses the old IO reveal line (~72% vh)
+      const tipY = sy + vh * 0.62;
       const tgt = arcIndexAtY(trunk.cy, trunk.len, tipY);
       trunk.frontier += (tgt - trunk.frontier) * FRONT_LERP;
       const tf = trunk.frontier;
@@ -872,6 +889,12 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       if (!r.isTrunk) {
         const tg = r.len - 1;
         r.frontier += (tg - r.frontier) * BR_FRONT_LERP;
+        // the pouring tip touches the header: wake the terminal (term-type
+        // listens for "myc:reach" on panels marked data-myc-claim)
+        if (!r.reached && r.frontier >= tg - REACH_CELLS) {
+          r.reached = true;
+          if (r.panel) r.panel.dispatchEvent(new CustomEvent("myc:reach"));
+        }
       }
       if (!visible) continue;
       stepRibbon(r);
@@ -931,6 +954,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     r.isTrunk = false;
     r.active = false;
     r.anchorS = arcIndexAtY(trunk.cy, trunk.len, def.anchorY);
+    r.panel = def.panel;
     return r;
   }
 
@@ -957,6 +981,12 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     const mobile = W < 768;
     const scrollY = window.pageYOffset || 0;
     const scrollX = window.pageXOffset || 0;
+
+    // claims are re-derived from the fresh branch domain below; a rebuild may
+    // legitimately drop a branch, so stale marks must not gate typing forever
+    document.querySelectorAll<HTMLElement>("[data-myc-claim]").forEach((el) => {
+      delete el.dataset.mycClaim;
+    });
 
     const hero = document.querySelector<HTMLElement>(".hero");
     const heroFull = !!document.querySelector(".hero.full");
@@ -1094,7 +1124,18 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       const path = document.createElementNS(SVGNS, "path");
       path.setAttribute("d", d);
       brg!.appendChild(path);
-      defs.push({ sx, sy, c1x, c1y, c2x, c2y, tx, ty, anchorY: sy });
+      defs.push({
+        sx,
+        sy,
+        c1x,
+        c1y,
+        c2x,
+        c2y,
+        tx,
+        ty,
+        anchorY: sy,
+        panel: head.closest<HTMLElement>(".panel"),
+      });
     }
 
     // hero guide follows the variant: full spills softer, band stays tight
@@ -1129,6 +1170,8 @@ export function mountMycelium(root: HTMLElement): Mycelium {
         for (let i = 0; i < nBr; i++) {
           const rib = makeBranchRibbon(defs[i]!, trunk);
           seedRibbonAgents(rib, per);
+          // claim: this panel's typing now waits for the branch tip
+          if (rib.panel) rib.panel.dataset.mycClaim = "1";
           next.push(rib);
         }
       }

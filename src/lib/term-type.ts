@@ -11,6 +11,11 @@
  *  - No `html.anim`  -> no-op. Markup already carries the final visible state.
  *  - `html.anim`, no IntersectionObserver -> reveal everything immediately.
  *  - `html.anim` + IO -> arm (`html.armed`) and reveal blocks on intersection.
+ *  - Mycelium-claimed panels (`data-myc-claim`, set by mycelium.ts when a
+ *    filament branch pours into the panel) wait for the organism instead: the
+ *    branch tip dispatches `myc:reach` on the panel and THAT starts the
+ *    sequence, so the terminal visibly wakes when the filament touches it.
+ *    Viewport entry only arms a safety deadline in case the sim is stalled.
  */
 /** Active observer from the last run; disconnected before each re-init (SPA swaps). */
 let activeObserver: IntersectionObserver | null = null;
@@ -47,6 +52,14 @@ export function initTermTyping(): void {
 
     const CMD_TO_OUT = 240; // command block shown -> its output prints
     const OUT_TO_NEXT = 460; // output shown -> next command appears
+    const REACH_GRACE = 3800; // claimed panel: max wait after viewport entry
+
+    const start = (panel: HTMLElement): void => {
+      // idempotent across the reach event, the grace deadline and re-inits
+      if (panel.dataset.termStarted === "1") return;
+      panel.dataset.termStarted = "1";
+      runSeq(panel);
+    };
 
     const runSeq = (panel: HTMLElement): void => {
       const steps = Array.prototype.slice.call(
@@ -77,7 +90,14 @@ export function initTermTyping(): void {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
           io.unobserve(e.target);
-          runSeq(e.target as HTMLElement);
+          const panel = e.target as HTMLElement;
+          // filament-claimed panels wake on "myc:reach"; viewport entry only
+          // guarantees typing eventually happens should the organism stall
+          if (panel.dataset.mycClaim === "1") {
+            setTimeout(() => start(panel), REACH_GRACE);
+          } else {
+            start(panel);
+          }
           if (--remaining <= 0) {
             io.disconnect();
             activeObserver = null;
@@ -87,7 +107,10 @@ export function initTermTyping(): void {
       { threshold: 0.05, rootMargin: "0px 0px -28% 0px" },
     );
     activeObserver = io;
-    panels.forEach((panel) => io.observe(panel));
+    panels.forEach((panel) => {
+      panel.addEventListener("myc:reach", () => start(panel), { once: true });
+      io.observe(panel);
+    });
   } catch {
     docEl.classList.remove("armed");
     panels.forEach(showAll);
