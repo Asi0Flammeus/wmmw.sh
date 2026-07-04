@@ -9,7 +9,7 @@
  * FIELD (pre-deposited attractant), authored at build():
  *
  *  - hero zone: a soft meandering left lane + a funnel toward the trunk mouth
- *    (wide rightward spill on the home `full` hero, tight on `band` heroes);
+ *    (same 100dvh hero and rightward spill on every page);
  *  - below the hero: a narrow guide tube along a seeded organic trunk path
  *    down the left margin, with branch tubes pouring into each terminal
  *    panel header.
@@ -104,6 +104,10 @@ const GW_SENSE = 1.5; // guide weight when sensing
 
 const BAND_MARGIN = 280; // px processed above/below the viewport
 const TIP_VH = 0.62; // growth tip line as a fraction of viewport height
+const SPILL = 0.6; // hero lane rightward spill (fraction of grid width)
+/* near the end of the page the tip line eases down to the viewport bottom so
+   the trunk completes into the footer while it is being read, not after */
+const TIP_EASE_FROM = 0.72; // scroll progress where the easing starts
 const FRONT_LERP = 0.09; // frontier smoothing per step
 const FEATHER_ROWS = 10; // rows over which the growth tip fades in
 const STEP_MS = 30; // ~33fps step cap (breathing is slow)
@@ -257,7 +261,6 @@ export function mountMycelium(root: HTMLElement): Mycelium {
   let vh = window.innerHeight; // px
   let hTopRow = 0;
   let hBotRow = 0;
-  let heroFullV = true;
   let endRow = 0;
   let frontier = 0; // float row; monotonic per page
   let lastPath = "";
@@ -425,8 +428,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       const n = Math.max(1, (nAg * HERO_RESPAWN_FRAC) | 0);
       for (let k = 0; k < n; k++) {
         const j = ((Math.random() * nAg) | 0) * 3;
-        // band heroes stay left-confined; full heroes may spill wide
-        ag[j] = 3 + Math.random() * Math.random() * ((heroFullV ? gw : gw * 0.5) - 6);
+        ag[j] = 3 + Math.random() * Math.random() * (gw - 6);
         ag[j + 1] = hTopRow + Math.random() * (hBotRow - hTopRow);
         ag[j + 2] = Math.random() * TAU;
       }
@@ -540,8 +542,15 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     if (r1 - r0 > bandMaxRows) r1 = r0 + bandMaxRows;
     if (r1 <= r0) return;
 
-    // growth tip chases the scroll (62% vh), never retreats within a page
-    let tgt = (sy + vh * TIP_VH) / CELL;
+    // growth tip chases the scroll (62% vh), never retreats within a page;
+    // past TIP_EASE_FROM of the scroll range it eases to the viewport bottom
+    const maxSy = docH - vh;
+    const p = maxSy > 1 ? sy / maxSy : 1;
+    let frac = TIP_VH;
+    if (p > TIP_EASE_FROM) {
+      frac = TIP_VH + ((p - TIP_EASE_FROM) / (1 - TIP_EASE_FROM)) * (1.05 - TIP_VH);
+    }
+    let tgt = (sy + vh * frac) / CELL;
     if (tgt < hBotRow) tgt = hBotRow;
     if (tgt > endRow) tgt = endRow;
     if (tgt > frontier) frontier += (tgt - frontier) * FRONT_LERP;
@@ -570,21 +579,19 @@ export function mountMycelium(root: HTMLElement): Mycelium {
   /* ---- construction (cold path) ---- */
 
   /** Soft meandering hero lane + funnel into the trunk mouth, written into
-   *  `guide` rows [hTopRow, hBotRow). Band heroes are confined leftward. */
-  function buildHeroGuide(spill: number, mouthX: number): void {
+   *  `guide` rows [hTopRow, hBotRow). */
+  function buildHeroGuide(mouthX: number): void {
     const rows = hBotRow - hTopRow;
     if (rows <= 0) return;
     const xc0 = gw * 0.11;
     const sigL = gw * 0.05;
-    const sigR = gw * spill;
+    const sigR = gw * SPILL;
     const twoSigL2 = 2 * sigL * sigL;
     const twoSigR2 = 2 * sigR * sigR;
     const fsx = gw * 0.1;
     const fsy = rows * 0.34;
     const twoFsx2 = 2 * fsx * fsx;
     const twoFsy2 = 2 * fsy * fsy;
-    const confineStart = 0.46;
-    const confineEnd = 0.62;
     for (let y = hTopRow; y < hBotRow; y++) {
       const ry = y - hTopRow;
       const xc = xc0 + Math.sin(ry * 0.05) * gw * 0.03 + Math.sin(ry * 0.017 + 1.3) * gw * 0.02;
@@ -597,18 +604,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
         const band = Math.exp(-(dx * dx) / twoS2);
         const dxF = x - mouthX;
         const funnel = Math.exp(-(dxF * dxF) / twoFsx2 - (dyF * dyF) / twoFsy2);
-        let g = (band * 0.75 + funnel * 0.9) * edge;
-        if (!heroFullV) {
-          const fr = x / gw;
-          const c =
-            fr <= confineStart
-              ? 1
-              : fr >= confineEnd
-                ? 0
-                : 1 - (fr - confineStart) / (confineEnd - confineStart);
-          g *= c * c;
-        }
-        guide[y * gw + x] = g;
+        guide[y * gw + x] = (band * 0.75 + funnel * 0.9) * edge;
       }
     }
   }
@@ -695,7 +691,6 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     });
 
     const hero = document.querySelector<HTMLElement>(".hero");
-    heroFullV = !!document.querySelector(".hero.full");
     const footer = document.querySelector(".site-foot") || document.querySelector("footer");
 
     let heroTop = 0;
@@ -869,28 +864,19 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       const newRows = newHBot - newHTop;
       if (oldRows > 2 && newRows > 2 && oldGw > 0) {
         const copyRows = Math.min(oldRows, newRows);
-        const confine = !heroFullV;
         for (let y = 0; y < copyRows; y++) {
           const srcRow = (oldHTop + y) * oldGw;
           const dst = (newHTop + y) * newGw;
           for (let x = 0; x < newGw; x++) {
             const sxC =
               oldGw === newGw ? x : clampInt(((x / newGw) * oldGw) | 0, 0, oldGw - 1);
-            let v = oldTrail[srcRow + sxC]! * 0.85;
-            if (confine) {
-              const fr = x / newGw;
-              const c = fr <= 0.46 ? 1 : fr >= 0.62 ? 0 : 1 - (fr - 0.46) / 0.16;
-              v *= c * c;
-            }
-            trail[dst + x] = v;
+            trail[dst + x] = oldTrail[srcRow + sxC]! * 0.85;
           }
         }
         // carry agents 1:1 where they land inside the new hero; refold the rest
         for (let i = 0; i < nAg; i++) {
           const j = i * 3;
-          let axc = clampInt((ag[j]! / oldGw) * newGw, 1, newGw - 2);
-          if (confine && axc > newGw * 0.6) axc = 1 + Math.random() * newGw * 0.45;
-          ag[j] = axc;
+          ag[j] = clampInt((ag[j]! / oldGw) * newGw, 1, newGw - 2);
           const oy = ag[j + 1]! - oldHTop + newHTop;
           ag[j + 1] =
             oy >= newHTop + 1 && oy < newHBot - 1
@@ -930,7 +916,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
 
     // ---- guide field + spine for THIS page ----
     guide = new Float32Array(gw * gh);
-    buildHeroGuide(heroFullV ? 0.6 : 0.34, pts[0]!.x / CELL);
+    buildHeroGuide(pts[0]!.x / CELL);
     const spinePts: number[] = [];
     if (tlen > 1) {
       const steps = Math.max(8, Math.ceil(tlen / CELL));

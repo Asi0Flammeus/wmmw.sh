@@ -62,13 +62,10 @@ const h1aHasEm = emAt >= 0;
     z-index: 5;
     display: flex;
     align-items: flex-end;
+    justify-content: flex-end;
     overflow: hidden;
-  }
-  .hero.full {
+    /* one hero size everywhere; the homepage is the reference */
     min-height: 100dvh;
-  }
-  .hero.band {
-    min-height: clamp(230px, 38dvh, 420px);
   }
   .hero-veil {
     position: absolute;
@@ -81,7 +78,7 @@ const h1aHasEm = emAt >= 0;
      open over the LEFT column (~0-18%) so the unified organism, which is
      left-weighted and exits bottom-left, crosses the hero boundary unwalled.
      The document-level Mycelium canvas shows through from behind. */
-  .hero.full .hero-veil {
+  .hero-veil {
     background:
       radial-gradient(120% 95% at 60% 12%, transparent 55%, rgba(18, 16, 13, 0.5) 100%),
       linear-gradient(
@@ -95,20 +92,8 @@ const h1aHasEm = emAt >= 0;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 18%, #000 44%);
     mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 18%, #000 44%);
   }
-  /* band is short and its bloom stays within the left ~40%: keep the left
-     channel open (mask) and start the fondu proportionally lower. */
-  .hero.band .hero-veil {
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 42%,
-      rgba(18, 16, 13, 0.8) 80%,
-      var(--bg) 93%
-    );
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 18%, #000 42%);
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 18%, #000 42%);
-  }
 
+  /* copy block lives on the RIGHT, away from the left-weighted bloom */
   .hero-copy {
     position: relative;
     z-index: 2;
@@ -116,33 +101,18 @@ const h1aHasEm = emAt >= 0;
     padding-inline: var(--pad);
     padding-bottom: clamp(3.5rem, 9vh, 6rem);
   }
-  /* copy scrim: local darkening behind the text so it stays AA-legible over the
-     bright left-weighted bloom, without flattening the organism elsewhere. */
-  .hero.full .hero-copy::before {
+  /* copy scrim: local darkening behind the text so it stays AA-legible over
+     the bloom's rightward spill, without flattening the organism elsewhere.
+     Reaches further LEFT, toward the incoming mass. */
+  .hero-copy::before {
     content: "";
     position: absolute;
-    inset: -4rem -6rem -2rem -4rem;
+    inset: -4rem -4rem -2rem -6rem;
     z-index: -1;
     background: radial-gradient(
-      85% 90% at 30% 62%,
+      85% 90% at 60% 62%,
       rgba(18, 16, 13, 0.9) 0%,
       rgba(18, 16, 13, 0.55) 55%,
-      transparent 100%
-    );
-  }
-  .hero.band .hero-copy {
-    max-width: var(--maxw);
-    padding-bottom: clamp(1.5rem, 4vh, 2.6rem);
-  }
-  .hero.band .hero-copy::before {
-    content: "";
-    position: absolute;
-    inset: -2rem -4rem -1.5rem -3rem;
-    z-index: -1;
-    background: radial-gradient(
-      80% 100% at 28% 60%,
-      rgba(18, 16, 13, 0.82) 0%,
-      rgba(18, 16, 13, 0.4) 55%,
       transparent 100%
     );
   }
