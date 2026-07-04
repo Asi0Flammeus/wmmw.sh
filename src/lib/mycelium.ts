@@ -1,48 +1,49 @@
 /**
- * Mycelium: one living organism spanning hero + page (spec 2.1 + 2.3, unified).
+ * Mycelium: ONE physarum simulation over the whole document (spec 2.1 + 2.3,
+ * unified; 2026-07-04 rework after user feedback that the previous
+ * two-coupled-fields build - upscaled hero grid + sprite-stamped ribbon -
+ * read as two different organisms glued at the hero seam).
  *
- * A single document-level canvas carries ONE physarum organism. It is not a
- * uniform full-page grid; it has an ACTIVE DOMAIN made of two coupled fields:
+ * Architecture: a single low-res trail grid (CELL px per cell) spans the whole
+ * page. One agent colony lives on it. What differs per page is only the GUIDE
+ * FIELD (pre-deposited attractant), authored at build():
  *
- *  1. HERO BLOOM  - a Jones-model slime-mould sim on a fixed low-res torus grid
- *     (validated params + warm umber->gold LUT, ported from the hero sim). The
- *     colony is weighted LEFT (left-column + bottom-left-funnel attractant) so
- *     the mass gathers toward the trunk mouth; on full (home) heroes it may
- *     spill softly rightward, on band heroes it stays tighter.
- *  2. LEFT RIBBON - below the hero, the filament ribbon machinery: a narrow
- *     rectified trail field down a left lane with a pre-deposited predilection
- *     guide (trunk + pouring branches to each [data-block] panel header). Growth
- *     is scroll-gated (frontier ~ viewport middle, smoothed) so the channels are
- *     revealed little by little. No scroll listener: the rAF loop reads scrollY.
- *     Terminal coupling: each branch's target `.panel` is marked
- *     `data-myc-claim`; when the branch tip arrives the panel receives a
- *     `myc:reach` CustomEvent and term-type.ts starts its typing sequence -
- *     the terminal wakes BECAUSE the organism touched it, not on its own.
+ *  - hero zone: a soft meandering left lane + a funnel toward the trunk mouth
+ *    (wide rightward spill on the home `full` hero, tight on `band` heroes);
+ *  - below the hero: a narrow guide tube along a seeded organic trunk path
+ *    down the left margin, with branch tubes pouring into each terminal
+ *    panel header.
  *
- * The two read as ONE organism: the trunk seams into the hero bottom and both
- * render through the same LUT. The bloom feeds the channels (the trunk's source
- * stream sits under the bloom mass).
+ * Because bloom and filament are THE SAME grid, agents literally stream from
+ * the hero mass into the trunk: one texture, one grain, no seam, no drawImage
+ * boundary.
  *
- * Rendering: the canvas is document-tall and painted in DOCUMENT coordinates,
- * so scrolling is free (the canvas scrolls with the page); only growth/breathing
- * triggers a redraw, and only the current viewport band is cleared+repainted
- * (grown regions above stay painted). The hero grid is rasterised to an
- * offscreen buffer then drawImage-scaled into the measured hero rect.
+ * Scroll gating: a frontier row (lerped toward scrollY + 62% vh, monotonic per
+ * page) that agents cannot cross - growth is revealed little by little as you
+ * scroll. No scroll listener: the rAF loop reads scrollY. A small share of the
+ * colony re-emerges near the frontier tip each step (biologically: growth at
+ * the hyphal tip) so colonization keeps pace with scrolling.
  *
- * Budget: only active-domain cells are processed (hero grid + ribbon rows near
- * the frontier/viewport); ~30fps step cap; allocation-free hot loop; hero
- * stepping pauses when the hero is scrolled far past, ribbon stepping pauses
- * when its grown span leaves the viewport, everything pauses on document.hidden.
+ * Budget: only the ACTIVE BAND (viewport + margin, in grid rows) is stepped,
+ * diffused and re-rendered each frame; rows outside are frozen (their trail
+ * persists and re-renders when scrolled back). Offscreen hero = frozen for
+ * free. ~30fps step cap; allocation-free hot loop; document.hidden pauses.
  *
- * Lifecycle (Astro ClientRouter): the canvas persists (transition:persist) and
- * the single sim instance stays alive across navigations - the bloom is never
- * interrupted. `rebuild()` (called on astro:page-load) re-measures page height,
- * hero rect and anchors, regrows the below-hero guide domain and resets the
- * frontier, while preserving the hero field. `destroy()` is for hard unload.
+ * Terminal coupling: each branch's target `.panel` is marked `data-myc-claim`;
+ * when real trail mass accumulates at the branch endpoint the panel receives a
+ * `myc:reach` CustomEvent and term-type.ts starts its typing sequence - the
+ * terminal wakes BECAUSE the organism touched it, not on its own.
  *
- * Fallbacks: reduced motion (`html.js` without `html.anim`) settles the bloom
- * with ~300 sync steps drawn once, plus the fully-drawn static SVG trunk/
- * branches (the SVG fallback lives in Mycelium.astro). No-JS mounts nothing.
+ * Lifecycle (Astro ClientRouter): the canvas persists (transition:persist).
+ * On same-page rebuilds (typing reveals grow the document, resizes of height
+ * only) the trail grid is row-copied so nothing restarts. On navigation the
+ * hero-zone trail is resampled into the new hero rect (the bloom never
+ * restarts); below-hero trail is cleared and re-grows along the new page's
+ * guide. `destroy()` is for hard unload.
+ *
+ * Fallbacks: reduced motion (`html.js` without `html.anim`) settles the hero
+ * zone with ~300 sync steps drawn once, plus the fully-drawn static SVG
+ * trunk/branches (in Mycelium.astro). No-JS mounts nothing.
  */
 
 export interface Mycelium {
@@ -63,7 +64,7 @@ const LUT_STOPS: [number, number, number, number, number][] = [
   [1.0, 236, 203, 127, 255],
 ];
 
-/** 256-entry colormap packed 0xAABBGGRR for the hero Uint32 image buffer. */
+/** 256-entry colormap packed 0xAABBGGRR for the Uint32 image buffer. */
 function buildLut(): Uint32Array {
   const lut = new Uint32Array(256);
   for (let i = 0; i < 256; i++) {
@@ -87,161 +88,64 @@ function buildLut(): Uint32Array {
   return lut;
 }
 
-/**
- * Pre-render SPR_COUNT soft radial stamps sampled along the umber->gold ramp.
- * The ribbon is painted by drawing these overlapping (source-over) so the
- * strand reads as one continuous organic filament, never a comb of ticks.
- */
-function buildSprites(): HTMLCanvasElement[] {
-  const sprites: HTMLCanvasElement[] = new Array(SPR_COUNT);
-  for (let k = 0; k < SPR_COUNT; k++) {
-    const t = k / (SPR_COUNT - 1);
-    let s0 = LUT_STOPS[0]!;
-    let s1 = LUT_STOPS[LUT_STOPS.length - 1]!;
-    for (let s = 0; s < LUT_STOPS.length - 1; s++) {
-      if (t >= LUT_STOPS[s]![0] && t <= LUT_STOPS[s + 1]![0]) {
-        s0 = LUT_STOPS[s]!;
-        s1 = LUT_STOPS[s + 1]!;
-        break;
-      }
-    }
-    const f = s1[0] === s0[0] ? 0 : (t - s0[0]) / (s1[0] - s0[0]);
-    const rr = (s0[1] + (s1[1] - s0[1]) * f) | 0;
-    const gg = (s0[2] + (s1[2] - s0[2]) * f) | 0;
-    const bb = (s0[3] + (s1[3] - s0[3]) * f) | 0;
-    const spr = document.createElement("canvas");
-    spr.width = SPR_SIZE;
-    spr.height = SPR_SIZE;
-    const sctx = spr.getContext("2d")!;
-    const c = SPR_SIZE * 0.5;
-    const g = sctx.createRadialGradient(c, c, 0, c, c, c);
-    const col = rr + "," + gg + "," + bb;
-    g.addColorStop(0, "rgba(" + col + ",1)");
-    g.addColorStop(0.4, "rgba(" + col + ",0.62)");
-    g.addColorStop(0.75, "rgba(" + col + ",0.16)");
-    g.addColorStop(1, "rgba(" + col + ",0)");
-    sctx.fillStyle = g;
-    sctx.fillRect(0, 0, SPR_SIZE, SPR_SIZE);
-    sprites[k] = spr;
-  }
-  return sprites;
-}
+/* ================= tuning (validated Jones params, cell units) ================= */
 
-/* ================= hero bloom tuning (validated Jones params) ================= */
+const CELL = 5; // px per grid cell (matches the validated hero density)
+const SD = 7.5; // sensor distance, cells
+const SA = 0.4; // sensor angle
+const TA = 0.45; // turn angle
+const SPEED = 1.0; // cells per step
+const JIT = 0.12;
+const DEPOSIT = 0.15;
+const CAP = 6;
+const EVAP = 0.94;
+const KNEE = 0.8; // soft-knee tone map: n = v / (v + KNEE)
+const GW_SENSE = 1.5; // guide weight when sensing
 
-const H_SD = 7.5; // sensor distance, cells
-const H_SA = 0.4; // sensor angle
-const H_TA = 0.45; // turn angle
-const H_SPEED = 1.0;
-const H_DEPOSIT = 0.15;
-const H_EVAP = 0.94;
-const H_JIT = 0.12;
-const H_CAP = 6;
-const H_KNEE = 0.8; // soft-knee tone map: n = v / (v + KNEE)
-const H_GUIDE_W = 1.7; // weight of the lane/funnel attractant when sensing
-const H_W = 300; // fixed grid width  (persists across navigations)
-const H_H = 176; // fixed grid height
-const H_FREEZE_STEPS = 300; // reduced-motion settle
-const hCosSA = Math.cos(H_SA);
-const hSinSA = Math.sin(H_SA);
-const hCosTA = Math.cos(H_TA);
-const hSinTA = Math.sin(H_TA);
-
-/* ================= ribbon tuning ================= */
-
-const RIB_WID = 21; // trunk lateral cells
-const BR_WID = 13; // branch lateral cells
-const LAT_SCALE = 2.4; // px per lateral cell (~48px, <=64)
-const BR_LAT = 2.2;
-const ARC_STRIDE = 4; // px per trunk arc cell
-const BR_ARC = 6;
-const GUIDE_SIGMA = 2.5;
-const GUIDE_PEAK = 1;
-const GUIDE_WEIGHT = 0.7;
-const SD = 3;
-const SA = 0.5;
-const TA = 0.42;
-const SPEED = 1.05;
-const JIT = 0.22;
-const HCONE = 1.15;
-const DEPOSIT = 0.2;
-const CAP = 4;
-const EVAP = 0.9;
-const FRONT_LERP = 0.09;
-const BR_FRONT_LERP = 0.05;
-const DIFFUSE_MARGIN = 6;
-const KNEE_R = 0.55; // ribbon tone map knee (softer core)
-const REVEAL_FEATHER = 12; // arc cells over which the growth tip fades in
-const MIN_N = 0.05; // skip near-invisible ribbon arc steps
-/* ribbon is stamped as overlapping soft sprites, one per arc step: spacing
-   (ARC_STRIDE / BR_ARC) stays well under 2*R_MIN so stamps fuse (no comb) */
-const R_MIN = 3.4; // min stamp radius, px (>= BR_ARC/2 -> guaranteed overlap)
-const R_SPAN = 5.5; // extra radius at full intensity, px
-const SUM_KNEE = 3.5; // width tone map: wide where the strand is reinforced
-const ALPHA_MAX = 0.82; // cap per-stamp alpha -> soft, never a solid pipe
-const SPR_COUNT = 12; // colour buckets (umber->gold)
-const SPR_SIZE = 40; // sprite bitmap size, px
-const MAX_RIBBON_AGENTS = 1800;
-const MAX_TRUNK_AGENTS = 1200;
+const BAND_MARGIN = 280; // px processed above/below the viewport
+const TIP_VH = 0.62; // growth tip line as a fraction of viewport height
+const FRONT_LERP = 0.09; // frontier smoothing per step
+const FEATHER_ROWS = 10; // rows over which the growth tip fades in
 const STEP_MS = 30; // ~33fps step cap (breathing is slow)
-/* branch tip -> terminal activation: fire "myc:reach" on the target panel
-   when the branch frontier is this many arc cells short of the header (the
-   feathered tip is visually brushing the panel by then) */
-const REACH_CELLS = 6;
+const FREEZE_STEPS = 300; // reduced-motion settle
+
+const AG_CAP = 9000;
+const RESPAWN_FRAC = 0.0015; // colony share re-emerging on the guide per step
+const SCAN_FRAC = 0.06; // agents scanned per step to find frozen ones
+const HERO_RESPAWN_FRAC = 0.002; // hero ambience churn (left-biased)
+const CULL_GUIDE = 0.012; // below-hero: off-network guide threshold
+const CULL_TRAIL = 0.06; // ... and no trail either -> stray
+const CULL_P = 0.04; // stray relocation probability per step
+const TIP_ROWS = 50; // respawn window height above the frontier
+const WALL = 1.5; // repellent border margin, cells (kills wall-hugging)
+const CAP_BELOW = 2.4; // softer deposit cap below the hero: strand, not pipe
+const CROWD_P = 0.02; // overcrowd thinning: saturated-cell squatters move on
+const BELOW_GAIN = 0.55; // render gain below the hero (bright core, no slab)
+const GAIN_FADE = 0.045; // per-row ease from hero gain into below-hero gain
+
+/* trunk / branch guide tubes (peak attractant, gaussian sigma in cells) --
+   soft and wide so agents meander around the trace instead of pipelining */
+const TRUNK_PEAK = 0.55;
+const TRUNK_SIG = 2.2;
+const BR_PEAK = 0.5;
+const BR_SIG = 1.8;
+
+/* branch tip -> terminal activation: dispatch "myc:reach" when this much
+   trail mass has accumulated in the 3x3 around the branch endpoint */
+const REACH_SUM = 1.6;
 
 const TAU = Math.PI * 2;
 const cosSA = Math.cos(SA);
 const sinSA = Math.sin(SA);
+const cosTA = Math.cos(TA);
+const sinTA = Math.sin(TA);
 const SVGNS = "http://www.w3.org/2000/svg";
 
-/* ================= ribbon model ================= */
-
-interface Ribbon {
-  len: number;
-  wid: number;
-  latScale: number;
-  cx: Float32Array;
-  cy: Float32Array; // trunk: monotonic in document-y
-  nx: Float32Array;
-  ny: Float32Array;
-  guide: Float32Array;
-  field: Float32Array;
-  tmp: Float32Array;
-  ag: Float32Array; // [s, u, heading] * nAg
-  nAg: number;
-  isTrunk: boolean;
-  anchorS: number; // trunk arc index a branch attaches to (0 for trunk)
-  active: boolean;
-  frontier: number;
-  wob: Float32Array; // per-arc radius modulation (organic width variation)
-  panel: HTMLElement | null; // terminal panel this branch pours into (null for trunk)
-  reached: boolean; // "myc:reach" already dispatched on `panel`
-}
-
-interface Pt {
-  x: number;
-  y: number;
-}
-
-interface BranchDef {
-  sx: number;
-  sy: number;
-  c1x: number;
-  c1y: number;
-  c2x: number;
-  c2y: number;
-  tx: number;
-  ty: number;
-  anchorY: number;
-  panel: HTMLElement | null;
-}
-
-/* ================= pure helpers (allocation-free in the frame path) ================= */
+/* ================= pure helpers ================= */
 
 function mulberry32(seed: number): () => number {
-  let a = seed;
+  let a = seed >>> 0;
   return function () {
-    a |= 0;
     a = (a + 0x6d2b79f5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
@@ -251,6 +155,11 @@ function mulberry32(seed: number): () => number {
 
 function clampInt(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
+}
+
+interface Pt {
+  x: number;
+  y: number;
 }
 
 /** Catmull-Rom -> cubic path data. */
@@ -289,242 +198,28 @@ function cubicAt(t: number, a: number, b: number, c: number, d: number): number 
   return mt * mt * mt * a + 3 * mt * mt * t * b + 3 * mt * t * t * c + t * t * t * d;
 }
 
-/** Float arc index whose centreline-y is `y` (cy monotonic increasing). */
-function arcIndexAtY(cy: Float32Array, len: number, y: number): number {
-  if (len < 2) return 0;
-  if (y <= cy[0]!) return 0;
-  if (y >= cy[len - 1]!) return len - 1;
-  let lo = 0;
-  let hi = len - 1;
-  while (hi - lo > 1) {
-    const mid = (lo + hi) >> 1;
-    if (cy[mid]! < y) lo = mid;
-    else hi = mid;
-  }
-  const y0 = cy[lo]!;
-  const y1 = cy[hi]!;
-  const denom = y1 - y0;
-  return lo + (denom > 1e-4 ? (y - y0) / denom : 0);
-}
-
-function senseR(
-  guide: Float32Array,
-  field: Float32Array,
-  len: number,
-  wid: number,
-  sf: number,
-  uf: number,
-): number {
-  let si = sf | 0;
-  if (si < 0) si = 0;
-  else if (si > len - 1) si = len - 1;
-  let ui = uf | 0;
-  if (ui < 0) ui = 0;
-  else if (ui > wid - 1) ui = wid - 1;
-  const idx = si * wid + ui;
-  return guide[idx]! * GUIDE_WEIGHT + field[idx]!;
-}
-
-/** Advance a ribbon's agents one step (sense, turn, move, gate, deposit). */
-function stepRibbon(r: Ribbon): void {
-  const len = r.len;
-  const wid = r.wid;
-  const guide = r.guide;
-  const field = r.field;
-  const ag = r.ag;
-  const n = r.nAg;
-  const frontI = r.frontier + 1.5;
-  const half = (wid - 1) * 0.5;
-  for (let i = 0; i < n; i++) {
-    const b = i * 3;
-    let s = ag[b]!;
-    let u = ag[b + 1]!;
-    let h = ag[b + 2]! + (Math.random() - 0.5) * JIT;
-    const ch = Math.cos(h);
-    const sh = Math.sin(h);
-    const fv = senseR(guide, field, len, wid, s + ch * SD, u + sh * SD);
-    const lv = senseR(
-      guide,
-      field,
-      len,
-      wid,
-      s + (ch * cosSA + sh * sinSA) * SD,
-      u + (sh * cosSA - ch * sinSA) * SD,
-    );
-    const rv = senseR(
-      guide,
-      field,
-      len,
-      wid,
-      s + (ch * cosSA - sh * sinSA) * SD,
-      u + (sh * cosSA + ch * sinSA) * SD,
-    );
-    if (fv >= lv && fv >= rv) {
-      /* keep heading */
-    } else if (lv > fv && rv > fv) {
-      h += Math.random() < 0.5 ? -TA : TA;
-    } else if (lv > rv) {
-      h -= TA;
-    } else {
-      h += TA;
-    }
-    if (h > HCONE) h = HCONE;
-    else if (h < -HCONE) h = -HCONE;
-    s += Math.cos(h) * SPEED;
-    u += Math.sin(h) * SPEED;
-    if (u < 0) {
-      u = 0;
-      h = -h;
-    } else if (u > wid - 1) {
-      u = wid - 1;
-      h = -h;
-    }
-    if (s >= frontI || s >= len - 1) {
-      if (Math.random() < 0.55) s = Math.random() * 2;
-      else s = Math.random() * (frontI > 0 ? frontI : 1);
-      u = half + (Math.random() - 0.5) * 3;
-      h = (Math.random() - 0.5) * 0.6;
-    } else if (s < 0) {
-      s = 0;
-    }
-    ag[b] = s;
-    ag[b + 1] = u;
-    ag[b + 2] = h;
-    let si = s | 0;
-    if (si < 0) si = 0;
-    else if (si > len - 1) si = len - 1;
-    let ui = u | 0;
-    if (ui < 0) ui = 0;
-    else if (ui > wid - 1) ui = wid - 1;
-    const idx = si * wid + ui;
-    let nv = field[idx]! + DEPOSIT;
-    if (nv > CAP) nv = CAP;
-    field[idx] = nv;
-    if (ui > 0) {
-      let lv2 = field[idx - 1]! + DEPOSIT * 0.45;
-      field[idx - 1] = lv2 > CAP ? CAP : lv2;
-    }
-    if (ui < wid - 1) {
-      let rv2 = field[idx + 1]! + DEPOSIT * 0.45;
-      field[idx + 1] = rv2 > CAP ? CAP : rv2;
+/** x of the trunk polyline at document-y `y` (linear interp; y monotonic). */
+function trunkXAt(pts: Pt[], y: number): number {
+  const first = pts[0]!;
+  const last = pts[pts.length - 1]!;
+  if (y <= first.y) return first.x;
+  if (y >= last.y) return last.x;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i]!;
+    const b = pts[i + 1]!;
+    if (y >= a.y && y <= b.y) {
+      const f = (y - a.y) / (b.y - a.y || 1);
+      return a.x + (b.x - a.x) * f;
     }
   }
+  return last.x;
 }
 
-/** 3x3 blur folded with evaporation, rows [0, maxRow). Buffers swapped. */
-function diffuse(r: Ribbon, maxRow: number): void {
-  const wid = r.wid;
-  const len = r.len;
-  const f = r.field;
-  const t = r.tmp;
-  const rows = maxRow < len ? maxRow : len;
-  const e = EVAP / 9;
-  for (let s = 0; s < rows; s++) {
-    const s0 = (s > 0 ? s - 1 : 0) * wid;
-    const s1 = s * wid;
-    const s2 = (s < len - 1 ? s + 1 : len - 1) * wid;
-    for (let u = 0; u < wid; u++) {
-      const u0 = u > 0 ? u - 1 : 0;
-      const u2 = u < wid - 1 ? u + 1 : wid - 1;
-      t[s1 + u] =
-        (f[s0 + u0]! +
-          f[s0 + u]! +
-          f[s0 + u2]! +
-          f[s1 + u0]! +
-          f[s1 + u]! +
-          f[s1 + u2]! +
-          f[s2 + u0]! +
-          f[s2 + u]! +
-          f[s2 + u2]!) *
-        e;
-    }
-  }
-  r.field = t;
-  r.tmp = f;
-}
-
-function blankRibbon(len: number, wid: number, latScale: number): Ribbon {
-  const cells = len * wid;
-  return {
-    len,
-    wid,
-    latScale,
-    cx: new Float32Array(len),
-    cy: new Float32Array(len),
-    nx: new Float32Array(len),
-    ny: new Float32Array(len),
-    guide: new Float32Array(cells),
-    field: new Float32Array(cells),
-    tmp: new Float32Array(cells),
-    ag: new Float32Array(0),
-    nAg: 0,
-    isTrunk: false,
-    anchorS: 0,
-    active: false,
-    frontier: 0,
-    wob: new Float32Array(len),
-    panel: null,
-    reached: false,
-  };
-}
-
-/** Smooth per-arc radius noise in ~[0.6, 1.4] so the strand width breathes. */
-function computeWob(r: Ribbon, seed: number): void {
-  const rnd = mulberry32(seed);
-  const p1 = rnd() * TAU;
-  const p2 = rnd() * TAU;
-  const p3 = rnd() * TAU;
-  for (let i = 0; i < r.len; i++) {
-    const w =
-      0.55 * Math.sin(i * 0.11 + p1) +
-      0.3 * Math.sin(i * 0.27 + p2) +
-      0.15 * Math.sin(i * 0.5 + p3);
-    r.wob[i] = 1 + w * 0.4;
-  }
-}
-
-function computeNormals(r: Ribbon): void {
-  const len = r.len;
-  const cx = r.cx;
-  const cy = r.cy;
-  for (let i = 0; i < len; i++) {
-    const i0 = i > 0 ? i - 1 : i;
-    const i1 = i < len - 1 ? i + 1 : i;
-    let tx = cx[i1]! - cx[i0]!;
-    let ty = cy[i1]! - cy[i0]!;
-    const m = Math.sqrt(tx * tx + ty * ty) || 1;
-    tx /= m;
-    ty /= m;
-    r.nx[i] = -ty;
-    r.ny[i] = tx;
-  }
-}
-
-function depositGuide(r: Ribbon): void {
-  const len = r.len;
-  const wid = r.wid;
-  const half = (wid - 1) * 0.5;
-  const twoSigma2 = 2 * GUIDE_SIGMA * GUIDE_SIGMA;
-  for (let s = 0; s < len; s++) {
-    const row = s * wid;
-    for (let u = 0; u < wid; u++) {
-      const du = u - half;
-      r.guide[row + u] = GUIDE_PEAK * Math.exp(-(du * du) / twoSigma2);
-    }
-  }
-}
-
-function seedRibbonAgents(r: Ribbon, n: number): void {
-  r.nAg = n;
-  r.ag = new Float32Array(n * 3);
-  const half = (r.wid - 1) * 0.5;
-  const top = Math.min(r.len, 4);
-  for (let i = 0; i < n; i++) {
-    const b = i * 3;
-    r.ag[b] = Math.random() * top;
-    r.ag[b + 1] = half + (Math.random() - 0.5) * 3;
-    r.ag[b + 2] = (Math.random() - 0.5) * 0.6;
-  }
+interface BranchEnd {
+  x: number; // endpoint, cells
+  y: number;
+  panel: HTMLElement;
+  reached: boolean;
 }
 
 /* ================= mount ================= */
@@ -543,301 +238,294 @@ export function mountMycelium(root: HTMLElement): Mycelium {
   canvas.dataset.mycMounted = "1";
 
   const anim = document.documentElement.classList.contains("anim");
-
   const LUT = buildLut();
-  const sprites = buildSprites();
 
-  /* ---- hero bloom state (fixed-resolution torus grid, persists across nav) ---- */
-  const heroCanvas = document.createElement("canvas");
-  heroCanvas.width = H_W;
-  heroCanvas.height = H_H;
-  const heroCtx = heroCanvas.getContext("2d", { alpha: true })!;
-  const heroImg = heroCtx.createImageData(H_W, H_H);
-  const heroBuf32 = new Uint32Array(heroImg.data.buffer);
-  const H_CELLS = H_W * H_H;
-  let heroTrail = new Float32Array(H_CELLS);
-  let heroTmp = new Float32Array(H_CELLS);
-  const heroGuide = new Float32Array(H_CELLS);
-  const H_N = clampInt(Math.round(H_CELLS * 0.14), 4000, 9000);
-  const H_RESPAWN = Math.max(1, (H_N * 0.002) | 0);
-  const heroAg = new Float32Array(H_N * 3);
-  let heroSeeded = false;
+  /* ---- unified grid state ---- */
+  let gw = 0; // grid width, cells
+  let gh = 0; // grid height, cells
+  let trail = new Float32Array(0);
+  let tmp = new Float32Array(0);
+  let guide = new Float32Array(0);
+  const ag = new Float32Array(AG_CAP * 3); // [x, y, heading] in cell coords
+  let nAg = 0;
+  let seeded = false;
+  let rp = 0; // rolling respawn-scan pointer
 
-  /* ---- ribbon + document state ---- */
-  let ribbons: Ribbon[] = [];
+  /* ---- per-page geometry (cells unless noted) ---- */
   let cssW = 1;
-  let docH = 1;
-  let scale = 1;
-  let heroTop = 0;
-  let heroH = 0;
-  let vh = window.innerHeight;
+  let docH = 1; // px
+  let vh = window.innerHeight; // px
+  let hTopRow = 0;
+  let hBotRow = 0;
+  let heroFullV = true;
+  let endRow = 0;
+  let frontier = 0; // float row; monotonic per page
+  let lastPath = "";
 
-  /* seed the bloom left-weighted so the mass gathers toward the trunk mouth */
-  function seedHero(): void {
-    const cx = H_W * 0.24;
-    const cy = H_H * 0.5;
-    const R = Math.min(H_W, H_H) * 0.3;
-    const nRing = Math.floor(H_N * 0.6);
-    let k = 0;
-    for (let i = 0; i < nRing; i++) {
-      const a = Math.random() * TAU;
-      const rr = R * (0.9 + Math.random() * 0.18);
-      heroAg[k++] = (cx + Math.cos(a) * rr + H_W) % H_W;
-      heroAg[k++] = (cy + Math.sin(a) * rr + H_H) % H_H;
-      heroAg[k++] = a + Math.PI / 2 + (Math.random() - 0.5) * 1.2;
-    }
-    const c1x = H_W * 0.1;
-    const c1y = H_H * 0.78;
-    const c2x = H_W * 0.4;
-    const c2y = H_H * 0.22;
-    const cr = Math.min(H_W, H_H) * 0.09;
-    for (let i = nRing; i < H_N; i++) {
-      const even = (i & 1) === 0;
-      const a = Math.random() * TAU;
-      const rr = cr * Math.sqrt(Math.random());
-      heroAg[k++] = ((even ? c1x : c2x) + Math.cos(a) * rr + H_W) % H_W;
-      heroAg[k++] = ((even ? c1y : c2y) + Math.sin(a) * rr + H_H) % H_H;
-      heroAg[k++] = Math.random() * TAU;
-    }
-    heroSeeded = true;
+  /* ---- guide spine (respawn targets along trunk+branches, y-sorted) ---- */
+  let spineX = new Float32Array(0);
+  let spineY = new Float32Array(0);
+  let spineLen = 0;
+  let branchEnds: BranchEnd[] = [];
+
+  /* ---- render strip (band rows -> LUT -> upscaled into the doc canvas) ---- */
+  const strip = document.createElement("canvas");
+  const stripCtx = strip.getContext("2d", { alpha: true })!;
+  let img: ImageData | null = null;
+  let buf32 = new Uint32Array(0);
+  let bandMaxRows = 0;
+
+  function sense(x: number, y: number): number {
+    const xi = x | 0;
+    const yi = y | 0;
+    // repellent border: without this the reflecting wall + deposited trail
+    // form a positive feedback loop and the colony paints a solid gold bar
+    if (xi < WALL || xi >= gw - WALL || yi < hTopRow + WALL) return -0.6;
+    const i = (yi >= gh ? gh - 1 : yi) * gw + xi;
+    return trail[i]! + guide[i]! * GW_SENSE;
   }
 
-  /* A soft, gently meandering vertical BAND down an interior left lane (not a
-     razor column pinned to the hard edge, which used to pile trail into a
-     saturated straight bar). `spill` widens the rightward tail: wide on full
-     heroes, tight on band. A bottom-left funnel feeds the trunk mouth. */
-  function buildHeroGuide(spill: number): void {
-    const xc0 = H_W * 0.11; // lane centre, kept off the left edge
-    const sigL = H_W * 0.05; // steep-ish toward the edge -> no edge pile-up
-    const sigR = H_W * spill; // soft rightward spill (variant-controlled)
-    const twoSigL2 = 2 * sigL * sigL;
-    const fsx = H_W * 0.1;
-    const fsy = H_H * 0.34;
-    const twoFsx2 = 2 * fsx * fsx;
-    const twoFsy2 = 2 * fsy * fsy;
-    for (let y = 0; y < H_H; y++) {
-      // organic meander so the lit strand never reads as a ruled line
-      const xc = xc0 + Math.sin(y * 0.05) * H_W * 0.03 + Math.sin(y * 0.017 + 1.3) * H_W * 0.02;
-      const dyF = y - H_H; // funnel toward the very bottom (trunk mouth)
-      for (let x = 0; x < H_W; x++) {
-        const dx = x - xc;
-        const twoS2 = dx < 0 ? twoSigL2 : 2 * sigR * sigR;
-        const band = Math.exp(-(dx * dx) / twoS2);
-        const dxF = x - xc0;
-        const funnel = Math.exp(-(dxF * dxF) / twoFsx2 - (dyF * dyF) / twoFsy2);
-        heroGuide[y * H_W + x] = band * 0.75 + funnel * 0.9;
-      }
+  /** Find the spine index window with y in [yLo, yHi); returns packed lo/hi. */
+  let winLo = 0;
+  let winHi = 0;
+  function spineWindow(yLo: number, yHi: number): boolean {
+    let lo = 0;
+    let hi = spineLen;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (spineY[mid]! < yLo) lo = mid + 1;
+      else hi = mid;
     }
-  }
-
-  const heroMask = document.createElement("canvas");
-  heroMask.width = H_W;
-  heroMask.height = H_H;
-  const heroMaskCtx = heroMask.getContext("2d", { alpha: true })!;
-  const heroMaskImg = heroMaskCtx.createImageData(H_W, H_H);
-
-  /* Alpha mask that feathers all borders of the bloom rect (so the drawImage
-     boundary is invisible); on the band variant it also confines the mass to
-     the left ~46% with a soft tail, instead of full-width strands. */
-  function buildHeroMask(full: boolean): void {
-    const d = heroMaskImg.data;
-    const edgeT = H_H * 0.12;
-    const edgeB = H_H * 0.1;
-    const edgeL = H_W * 0.09;
-    const edgeR = full ? H_W * 0.14 : H_W * 0.18;
-    const confineStart = 0.46;
-    const confineEnd = 0.62;
-    for (let y = 0; y < H_H; y++) {
-      let ty = Math.min(y, H_H - 1 - y) / (y < H_H * 0.5 ? edgeT : edgeB);
-      if (ty > 1) ty = 1;
-      else if (ty < 0) ty = 0;
-      const fy = ty * ty * (3 - 2 * ty);
-      for (let x = 0; x < H_W; x++) {
-        let tx = Math.min(x / edgeL, (H_W - 1 - x) / edgeR);
-        if (tx > 1) tx = 1;
-        else if (tx < 0) tx = 0;
-        const fx = tx * tx * (3 - 2 * tx);
-        let a = fy * fx;
-        if (!full) {
-          const fr = x / H_W;
-          const c =
-            fr <= confineStart
-              ? 1
-              : fr >= confineEnd
-                ? 0
-                : 1 - (fr - confineStart) / (confineEnd - confineStart);
-          a *= c * c;
-        }
-        d[(y * H_W + x) * 4 + 3] = (a * 255) | 0;
-      }
+    winLo = lo;
+    hi = spineLen;
+    let lo2 = lo;
+    while (lo2 < hi) {
+      const mid = (lo2 + hi) >> 1;
+      if (spineY[mid]! < yHi) lo2 = mid + 1;
+      else hi = mid;
     }
-    heroMaskCtx.putImageData(heroMaskImg, 0, 0);
+    winHi = lo2;
+    return winHi > winLo;
   }
 
-  function heroSense(sx: number, sy: number): number {
-    let xi = sx | 0;
-    let yi = sy | 0;
-    if (xi < 0) xi += H_W;
-    else if (xi >= H_W) xi -= H_W;
-    if (yi < 0) yi += H_H;
-    else if (yi >= H_H) yi -= H_H;
-    const idx = yi * H_W + xi;
-    return heroTrail[idx]! + heroGuide[idx]! * H_GUIDE_W;
+  /** Re-emerge agent j on the guide spine within [yLo, yHi) (cells). */
+  function relocate(j: number, yLo: number, yHi: number): boolean {
+    if (!spineWindow(yLo, yHi)) return false;
+    const k = winLo + ((Math.random() * (winHi - winLo)) | 0);
+    ag[j] = spineX[k]! + (Math.random() - 0.5) * 3;
+    ag[j + 1] = spineY[k]! + (Math.random() - 0.5) * 2;
+    ag[j + 2] = Math.random() * TAU;
+    return true;
   }
 
-  function stepHero(): void {
-    for (let i = 0; i < H_N; i++) {
+  /** Advance agents inside band rows [r0, r1); deposit; cull strays. */
+  function stepAgents(r0: number, r1: number): void {
+    const topEdge = hTopRow + 0.5;
+    for (let i = 0; i < nAg; i++) {
       const j = i * 3;
-      let x = heroAg[j]!;
-      let y = heroAg[j + 1]!;
-      let h = heroAg[j + 2]! + (Math.random() - 0.5) * H_JIT;
+      let y = ag[j + 1]!;
+      if (y < r0 || y >= r1) continue; // frozen outside the active band
+      let x = ag[j]!;
+      let h = ag[j + 2]! + (Math.random() - 0.5) * JIT;
       let ch = Math.cos(h);
       let sh = Math.sin(h);
-      const f = heroSense(x + ch * H_SD, y + sh * H_SD);
-      const l = heroSense(
-        x + (ch * hCosSA + sh * hSinSA) * H_SD,
-        y + (sh * hCosSA - ch * hSinSA) * H_SD,
-      );
-      const r = heroSense(
-        x + (ch * hCosSA - sh * hSinSA) * H_SD,
-        y + (sh * hCosSA + ch * hSinSA) * H_SD,
-      );
+      const f = sense(x + ch * SD, y + sh * SD);
+      const l = sense(x + (ch * cosSA + sh * sinSA) * SD, y + (sh * cosSA - ch * sinSA) * SD);
+      const r = sense(x + (ch * cosSA - sh * sinSA) * SD, y + (sh * cosSA + ch * sinSA) * SD);
       let d = 0;
       if (f >= l && f >= r) d = 0;
-      else if (l > f && r > f) d = Math.random() < 0.5 ? -H_TA : H_TA;
-      else if (l > r) d = -H_TA;
-      else d = H_TA;
+      else if (l > f && r > f) d = Math.random() < 0.5 ? -TA : TA;
+      else if (l > r) d = -TA;
+      else d = TA;
       if (d !== 0) {
-        const sgn = d > 0 ? hSinTA : -hSinTA;
-        const c2 = ch * hCosTA - sh * sgn;
-        const s2 = sh * hCosTA + ch * sgn;
+        const sgn = d > 0 ? sinTA : -sinTA;
+        const c2 = ch * cosTA - sh * sgn;
+        const s2 = sh * cosTA + ch * sgn;
         ch = c2;
         sh = s2;
         h += d;
       }
-      x += ch * H_SPEED;
-      y += sh * H_SPEED;
-      if (x < 0) x += H_W;
-      else if (x >= H_W) x -= H_W;
-      if (y < 0) y += H_H;
-      else if (y >= H_H) y -= H_H;
-      heroAg[j] = x;
-      heroAg[j + 1] = y;
-      heroAg[j + 2] = h;
-      const ti = (y | 0) * H_W + (x | 0);
-      const nv = heroTrail[ti]! + H_DEPOSIT;
-      heroTrail[ti] = nv > H_CAP ? H_CAP : nv;
+      x += ch * SPEED;
+      y += sh * SPEED;
+      if (x < 0.5) {
+        x = 1 - x;
+        h = Math.PI - h;
+      } else if (x > gw - 1.5) {
+        x = 2 * (gw - 1.5) - x;
+        h = Math.PI - h;
+      }
+      if (y < topEdge) {
+        y = 2 * topEdge - y;
+        h = -h;
+      } else if (y > frontier) {
+        y = 2 * frontier - y;
+        h = -h;
+        if (y < topEdge) y = topEdge;
+      }
+      ag[j] = x;
+      ag[j + 1] = y;
+      ag[j + 2] = h;
+      const ti = (y | 0) * gw + (x | 0);
+      // stray cull below the hero: off the network with nothing to follow ->
+      // re-emerge on the spine so the colony never dusts the whole page
+      if (
+        y > hBotRow &&
+        guide[ti]! < CULL_GUIDE &&
+        trail[ti]! < CULL_TRAIL &&
+        Math.random() < CULL_P
+      ) {
+        if (relocate(j, y - 30, y + 30) || relocate(j, hBotRow, frontier)) continue;
+      }
+      const cap = y > hBotRow ? CAP_BELOW : CAP;
+      const tv = trail[ti]!;
+      // overcrowd thinning: an agent squatting a saturated strand cell adds
+      // nothing but width; redistribute it to nearby starved guide (branches)
+      if (tv >= cap) {
+        if (y > hBotRow && Math.random() < CROWD_P && relocate(j, y - 60, frontier)) continue;
+      } else {
+        const nv = tv + DEPOSIT;
+        trail[ti] = nv > cap ? cap : nv;
+      }
     }
-    for (let i = 0; i < H_RESPAWN; i++) {
-      const j = ((Math.random() * H_N) | 0) * 3;
-      // respawn left-biased so the colony keeps its centre of mass on the left
-      heroAg[j] = Math.random() * Math.random() * H_W;
-      heroAg[j + 1] = Math.random() * H_H;
-      heroAg[j + 2] = Math.random() * TAU;
+  }
+
+  /** Tip growth + hero ambience churn. */
+  function respawn(r0: number, r1: number): void {
+    // frozen agents outside the band re-emerge on the guide: alternately at
+    // the growth tip (colonization keeps pace with scroll) and on any starved
+    // guide cell in view (branches keep receiving flux after the tip passes)
+    if (frontier > hBotRow + 4) {
+      const want = Math.max(1, (nAg * RESPAWN_FRAC) | 0);
+      const scan = Math.max(want, (nAg * SCAN_FRAC) | 0);
+      let moved = 0;
+      const tipLo = Math.max(hBotRow, frontier - TIP_ROWS);
+      const fillLo = Math.max(hBotRow, r0);
+      for (let s = 0; s < scan && moved < want; s++) {
+        rp = rp + 1 >= nAg ? 0 : rp + 1;
+        const j = rp * 3;
+        const y = ag[j + 1]!;
+        if (y >= r0 && y < r1) continue; // alive, leave it
+        if ((moved & 1) === 0) {
+          if (relocate(j, tipLo, frontier)) moved++;
+        } else if (spineWindow(fillLo, frontier)) {
+          // pick a starved spine cell (low trail) so flux goes where needed
+          const k = winLo + ((Math.random() * (winHi - winLo)) | 0);
+          const ti = (spineY[k]! | 0) * gw + (spineX[k]! | 0);
+          if (trail[ti]! < 1.0) {
+            ag[j] = spineX[k]! + (Math.random() - 0.5) * 3;
+            ag[j + 1] = spineY[k]! + (Math.random() - 0.5) * 2;
+            ag[j + 2] = Math.random() * TAU;
+            moved++;
+          }
+        }
+      }
     }
-    const e9 = H_EVAP / 9;
-    for (let yy = 0; yy < H_H; yy++) {
-      const y0 = ((yy - 1 + H_H) % H_H) * H_W;
-      const y1 = yy * H_W;
-      const y2 = ((yy + 1) % H_H) * H_W;
-      for (let xx = 0; xx < H_W; xx++) {
-        const x0 = xx === 0 ? H_W - 1 : xx - 1;
-        const x2 = xx === H_W - 1 ? 0 : xx + 1;
-        heroTmp[y1 + xx] =
-          (heroTrail[y0 + x0]! +
-            heroTrail[y0 + xx]! +
-            heroTrail[y0 + x2]! +
-            heroTrail[y1 + x0]! +
-            heroTrail[y1 + xx]! +
-            heroTrail[y1 + x2]! +
-            heroTrail[y2 + x0]! +
-            heroTrail[y2 + xx]! +
-            heroTrail[y2 + x2]!) *
+    // hero ambience: tiny left-biased churn keeps the bloom breathing
+    if (r0 < hBotRow && hBotRow > hTopRow) {
+      const n = Math.max(1, (nAg * HERO_RESPAWN_FRAC) | 0);
+      for (let k = 0; k < n; k++) {
+        const j = ((Math.random() * nAg) | 0) * 3;
+        // band heroes stay left-confined; full heroes may spill wide
+        ag[j] = 3 + Math.random() * Math.random() * ((heroFullV ? gw : gw * 0.5) - 6);
+        ag[j + 1] = hTopRow + Math.random() * (hBotRow - hTopRow);
+        ag[j + 2] = Math.random() * TAU;
+      }
+    }
+  }
+
+  /** 3x3 blur folded with evaporation over band rows [r0, r1). */
+  function diffuseBand(r0: number, r1: number): void {
+    const e9 = EVAP / 9;
+    const topAbs = hTopRow + 2; // absorbing rows at the document top edge
+    for (let yy = r0; yy < r1; yy++) {
+      const y1 = yy * gw;
+      if (yy < topAbs) {
+        tmp.fill(0, y1, y1 + gw);
+        continue;
+      }
+      const y0 = (yy === 0 ? 0 : yy - 1) * gw;
+      const y2 = (yy === gh - 1 ? gh - 1 : yy + 1) * gw;
+      for (let xx = 2; xx < gw - 2; xx++) {
+        const x0 = xx - 1;
+        const x2 = xx + 1;
+        tmp[y1 + xx] =
+          (trail[y0 + x0]! +
+            trail[y0 + xx]! +
+            trail[y0 + x2]! +
+            trail[y1 + x0]! +
+            trail[y1 + xx]! +
+            trail[y1 + x2]! +
+            trail[y2 + x0]! +
+            trail[y2 + xx]! +
+            trail[y2 + x2]!) *
           e9;
       }
+      // absorbing side walls: trail dies at the margin instead of piling up
+      // against the reflect boundary (clamped blur would otherwise retain it)
+      tmp[y1] = 0;
+      tmp[y1 + 1] = 0;
+      tmp[y1 + gw - 2] = 0;
+      tmp[y1 + gw - 1] = 0;
     }
-    const swap = heroTrail;
-    heroTrail = heroTmp;
-    heroTmp = swap;
+    trail.set(tmp.subarray(r0 * gw, r1 * gw), r0 * gw);
   }
 
-  function renderHero(): void {
-    for (let i = 0; i < H_CELLS; i++) {
-      const v = heroTrail[i]!;
-      heroBuf32[i] = LUT[((v / (v + H_KNEE)) * 255) | 0]!;
-    }
-    heroCtx.putImageData(heroImg, 0, 0);
-    // feather + confine the bloom so the rect boundary is invisible
-    heroCtx.globalCompositeOperation = "destination-in";
-    heroCtx.drawImage(heroMask, 0, 0);
-    heroCtx.globalCompositeOperation = "source-over";
-    // draw the bloom into the measured hero rect (document coords; scaled).
-    ctx!.drawImage(heroCanvas, 0, 0, H_W, H_H, 0, heroTop, cssW, heroH);
-  }
-
-  /** Render a ribbon's grown field in document coords, viewport-culled. */
-  function renderRibbonField(r: Ribbon): void {
-    const len = r.len;
-    const wid = r.wid;
-    const latScale = r.latScale;
-    const cx = r.cx;
-    const cy = r.cy;
-    const nx = r.nx;
-    const ny = r.ny;
-    const wob = r.wob;
-    const field = r.field;
-    const guide = r.guide;
-    const half = (wid - 1) * 0.5;
-    const front = r.frontier;
-    let maxI = Math.ceil(front);
-    if (maxI > len - 1) maxI = len - 1;
-    const top = scrollTopCache;
-    const bot = top + vh;
-    // one overlapping soft stamp per arc step: centred on the field's lateral
-    // centroid, radius grown by how reinforced the strand is (organic width),
-    // colour by peak intensity. Overlap (spacing << 2*R) fuses it into a
-    // continuous filament; source-over avoids junction bulges.
-    for (let i = 0; i <= maxI; i++) {
-      const yc = cy[i]!;
-      if (yc < top - 16 || yc > bot + 16) continue;
-      const feather = front - i;
-      const fm = feather >= REVEAL_FEATHER ? 1 : feather <= 0 ? 0 : feather / REVEAL_FEATHER;
-      if (fm <= 0) continue;
-      const base = i * wid;
-      let sum = 0;
-      let wsum = 0;
-      let peak = 0;
-      for (let u = 0; u < wid; u++) {
-        const v = field[base + u]! + guide[base + u]! * GUIDE_WEIGHT;
-        sum += v;
-        wsum += v * u;
-        if (v > peak) peak = v;
+  /** LUT-render band rows [r0, r1) and paint them into the document canvas. */
+  function renderBand(r0: number, r1: number): void {
+    if (!img) return;
+    const rows = r1 - r0;
+    for (let yy = r0; yy < r1; yy++) {
+      let fm = frontier - yy;
+      fm = fm >= FEATHER_ROWS ? 1 : fm <= 0 ? 0 : fm / FEATHER_ROWS;
+      const src = yy * gw;
+      const dst = (yy - r0) * gw;
+      if (fm === 0) {
+        buf32.fill(0, dst, dst + gw);
+        continue;
       }
-      if (sum < 1e-3) continue;
-      const coreN = peak / (peak + KNEE_R);
-      const alpha = coreN * fm * ALPHA_MAX;
-      if (alpha < MIN_N) continue;
-      const uc = wsum / sum;
-      const widthN = sum / (sum + SUM_KNEE);
-      const rad = (R_MIN + R_SPAN * widthN) * wob[i]!;
-      const off = (uc - half) * latScale;
-      const wx = cx[i]! + nx[i]! * off;
-      const wy = yc + ny[i]! * off;
-      let bk = (coreN * (SPR_COUNT - 1)) | 0;
-      if (bk < 0) bk = 0;
-      else if (bk > SPR_COUNT - 1) bk = SPR_COUNT - 1;
-      ctx!.globalAlpha = alpha;
-      ctx!.drawImage(sprites[bk]!, wx - rad, wy - rad, rad * 2, rad * 2);
+      const gain =
+        yy <= hBotRow ? fm : fm * Math.max(BELOW_GAIN, 1 - (yy - hBotRow) * GAIN_FADE);
+      if (gain === 1) {
+        for (let x = 0; x < gw; x++) {
+          const v = trail[src + x]!;
+          buf32[dst + x] = LUT[((v / (v + KNEE)) * 255) | 0]!;
+        }
+      } else {
+        for (let x = 0; x < gw; x++) {
+          const v = trail[src + x]! * gain;
+          buf32[dst + x] = LUT[((v / (v + KNEE)) * 255) | 0]!;
+        }
+      }
     }
-    ctx!.globalAlpha = 1;
+    stripCtx.putImageData(img, 0, 0, 0, 0, gw, rows);
+    ctx!.clearRect(0, r0 * CELL, cssW, rows * CELL);
+    ctx!.drawImage(strip, 0, 0, gw, rows, 0, r0 * CELL, gw * CELL, rows * CELL);
   }
 
-  /* ---- frame loop, gated on visibility + active domains ---- */
+  /** Wake terminals whose branch endpoint has real trail mass on it. */
+  function reachCheck(): void {
+    for (let b = 0; b < branchEnds.length; b++) {
+      const e = branchEnds[b]!;
+      if (e.reached || e.y > frontier + 2) continue;
+      const xi = clampInt(e.x | 0, 1, gw - 2);
+      const yi = clampInt(e.y | 0, 1, gh - 2);
+      let sum = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        const o = (yi + dy) * gw + xi;
+        sum += trail[o - 1]! + trail[o]! + trail[o + 1]!;
+      }
+      if (sum >= REACH_SUM) {
+        e.reached = true;
+        e.panel.dispatchEvent(new CustomEvent("myc:reach"));
+      }
+    }
+  }
+
+  /* ---- frame loop, gated on visibility ---- */
   let rafId = 0;
   let running = false;
   let last = 0;
   let destroyed = false;
-  let scrollTopCache = 0;
 
   function frame(ts: number): void {
     rafId = requestAnimationFrame(frame);
@@ -845,66 +533,25 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     last = ts;
 
     const sy = window.pageYOffset || 0;
-    scrollTopCache = sy;
-    const viewTop = sy;
-    const viewBot = sy + vh;
+    let r0 = ((sy - BAND_MARGIN) / CELL) | 0;
+    if (r0 < 0) r0 = 0;
+    let r1 = Math.ceil((sy + vh + BAND_MARGIN) / CELL);
+    if (r1 > gh) r1 = gh;
+    if (r1 - r0 > bandMaxRows) r1 = r0 + bandMaxRows;
+    if (r1 <= r0) return;
 
-    // advance the trunk frontier from scroll (cheap; always) + branch waking
-    const trunk = ribbons[0];
-    if (trunk) {
-      // tip at 62% vh (not 50%): panels visible in the upper viewport at page
-      // load get colonized immediately instead of waiting out the term-type
-      // grace deadline; on slow scroll the branch still lands just before the
-      // panel crosses the old IO reveal line (~72% vh)
-      const tipY = sy + vh * 0.62;
-      const tgt = arcIndexAtY(trunk.cy, trunk.len, tipY);
-      trunk.frontier += (tgt - trunk.frontier) * FRONT_LERP;
-      const tf = trunk.frontier;
-      for (let i = 1; i < ribbons.length; i++) {
-        const br = ribbons[i];
-        if (br && !br.active && tf >= br.anchorS) br.active = true;
-      }
-    }
+    // growth tip chases the scroll (62% vh), never retreats within a page
+    let tgt = (sy + vh * TIP_VH) / CELL;
+    if (tgt < hBotRow) tgt = hBotRow;
+    if (tgt > endRow) tgt = endRow;
+    if (tgt > frontier) frontier += (tgt - frontier) * FRONT_LERP;
 
-    // clear only the current viewport band; grown regions above stay painted
-    ctx!.clearRect(0, sy, cssW, vh);
-
-    // hero bloom: step + draw only while the hero band is near the viewport
-    const heroBottom = heroTop + heroH;
-    const heroActive = heroBottom > viewTop - vh * 0.5 && heroTop < viewBot + vh * 0.25;
-    if (heroActive) {
-      stepHero();
-      renderHero();
-    }
-
-    // ribbons: step + render only while their grown span meets the viewport
-    for (let i = 0; i < ribbons.length; i++) {
-      const r = ribbons[i];
-      if (!r || !r.active) continue;
-      let maxI = Math.ceil(r.frontier);
-      if (maxI > r.len - 1) maxI = r.len - 1;
-      const spanTop = r.cy[0]!;
-      const spanBot = r.cy[maxI]!;
-      const visible = spanBot > viewTop - vh * 0.25 && spanTop < viewBot + vh * 0.25;
-      if (!r.isTrunk) {
-        const tg = r.len - 1;
-        r.frontier += (tg - r.frontier) * BR_FRONT_LERP;
-        // the pouring tip touches the header: wake the terminal (term-type
-        // listens for "myc:reach" on panels marked data-myc-claim)
-        if (!r.reached && r.frontier >= tg - REACH_CELLS) {
-          r.reached = true;
-          if (r.panel) r.panel.dispatchEvent(new CustomEvent("myc:reach"));
-        }
-      }
-      if (!visible) continue;
-      stepRibbon(r);
-      let maxRow = Math.ceil(r.frontier) + DIFFUSE_MARGIN;
-      if (maxRow > r.len) maxRow = r.len;
-      diffuse(r, maxRow);
-      renderRibbonField(r);
-    }
+    stepAgents(r0, r1);
+    respawn(r0, r1);
+    diffuseBand(r0, r1);
+    renderBand(r0, r1);
+    reachCheck();
   }
-
 
   function startLoop(): void {
     if (running || !anim || destroyed) return;
@@ -922,65 +569,124 @@ export function mountMycelium(root: HTMLElement): Mycelium {
 
   /* ---- construction (cold path) ---- */
 
-  function makeTrunkRibbon(tlen: number): Ribbon {
-    const rl = clampInt(Math.round(tlen / ARC_STRIDE), 24, 1600);
-    const r = blankRibbon(rl, RIB_WID, LAT_SCALE);
-    for (let i = 0; i < rl; i++) {
-      const p = trunkEl!.getPointAtLength((tlen * i) / (rl - 1));
-      r.cx[i] = p.x;
-      r.cy[i] = p.y;
+  /** Soft meandering hero lane + funnel into the trunk mouth, written into
+   *  `guide` rows [hTopRow, hBotRow). Band heroes are confined leftward. */
+  function buildHeroGuide(spill: number, mouthX: number): void {
+    const rows = hBotRow - hTopRow;
+    if (rows <= 0) return;
+    const xc0 = gw * 0.11;
+    const sigL = gw * 0.05;
+    const sigR = gw * spill;
+    const twoSigL2 = 2 * sigL * sigL;
+    const twoSigR2 = 2 * sigR * sigR;
+    const fsx = gw * 0.1;
+    const fsy = rows * 0.34;
+    const twoFsx2 = 2 * fsx * fsx;
+    const twoFsy2 = 2 * fsy * fsy;
+    const confineStart = 0.46;
+    const confineEnd = 0.62;
+    for (let y = hTopRow; y < hBotRow; y++) {
+      const ry = y - hTopRow;
+      const xc = xc0 + Math.sin(ry * 0.05) * gw * 0.03 + Math.sin(ry * 0.017 + 1.3) * gw * 0.02;
+      const dyF = y - hBotRow;
+      // feather the very top so trail never piles against the document edge
+      const edge = ry >= 3 ? 1 : ry / 3;
+      for (let x = 0; x < gw; x++) {
+        const dx = x - xc;
+        const twoS2 = dx < 0 ? twoSigL2 : twoSigR2;
+        const band = Math.exp(-(dx * dx) / twoS2);
+        const dxF = x - mouthX;
+        const funnel = Math.exp(-(dxF * dxF) / twoFsx2 - (dyF * dyF) / twoFsy2);
+        let g = (band * 0.75 + funnel * 0.9) * edge;
+        if (!heroFullV) {
+          const fr = x / gw;
+          const c =
+            fr <= confineStart
+              ? 1
+              : fr >= confineEnd
+                ? 0
+                : 1 - (fr - confineStart) / (confineEnd - confineStart);
+          g *= c * c;
+        }
+        guide[y * gw + x] = g;
+      }
     }
-    computeNormals(r);
-    depositGuide(r);
-    computeWob(r, 0x7ea1 ^ (r.len & 0xffff));
-    r.isTrunk = true;
-    r.active = true;
-    r.anchorS = 0;
-    return r;
   }
 
-  function makeBranchRibbon(def: BranchDef, trunk: Ribbon): Ribbon {
-    const chord = Math.hypot(def.tx - def.sx, def.ty - def.sy);
-    const rl = clampInt(Math.round((chord * 1.15) / BR_ARC), 6, 60);
-    const r = blankRibbon(rl, BR_WID, BR_LAT);
-    for (let i = 0; i < rl; i++) {
-      const t = rl > 1 ? i / (rl - 1) : 0;
-      r.cx[i] = cubicAt(t, def.sx, def.c1x, def.c2x, def.tx);
-      r.cy[i] = cubicAt(t, def.sy, def.c1y, def.c2y, def.ty);
+  /** Stamp a gaussian attractant tube cell (max-blend, cold path). */
+  function depositTube(cxPx: number, cyPx: number, peak: number, sigma: number): void {
+    const cx = cxPx / CELL;
+    const cy = cyPx / CELL;
+    const R = Math.ceil(sigma * 2.6);
+    const inv = 1 / (2 * sigma * sigma);
+    const xi0 = clampInt((cx | 0) - R, 0, gw - 1);
+    const xi1 = clampInt((cx | 0) + R, 0, gw - 1);
+    const yi0 = clampInt((cy | 0) - R, 0, gh - 1);
+    const yi1 = clampInt((cy | 0) + R, 0, gh - 1);
+    for (let y = yi0; y <= yi1; y++) {
+      const dy = y + 0.5 - cy;
+      for (let x = xi0; x <= xi1; x++) {
+        const dx = x + 0.5 - cx;
+        const g = peak * Math.exp(-(dx * dx + dy * dy) * inv);
+        const i = y * gw + x;
+        if (g > guide[i]!) guide[i] = g;
+      }
     }
-    computeNormals(r);
-    depositGuide(r);
-    computeWob(r, (0xb2c3 + def.anchorY * 131) | 0);
-    r.isTrunk = false;
-    r.active = false;
-    r.anchorS = arcIndexAtY(trunk.cy, trunk.len, def.anchorY);
-    r.panel = def.panel;
-    return r;
+  }
+
+  function seedAgents(): void {
+    const rows = hBotRow - hTopRow;
+    const cx = gw * 0.24;
+    const cy = hTopRow + rows * 0.5;
+    const R = Math.min(gw, rows) * 0.3;
+    const nRing = Math.floor(nAg * 0.6);
+    let k = 0;
+    for (let i = 0; i < nRing; i++) {
+      const a = Math.random() * TAU;
+      const rr = R * (0.9 + Math.random() * 0.18);
+      ag[k++] = clampInt(cx + Math.cos(a) * rr, 1, gw - 2);
+      ag[k++] = clampInt(cy + Math.sin(a) * rr, hTopRow + 1, hBotRow - 1);
+      ag[k++] = a + Math.PI / 2 + (Math.random() - 0.5) * 1.2;
+    }
+    const c1x = gw * 0.1;
+    const c1y = hTopRow + rows * 0.78;
+    const c2x = gw * 0.4;
+    const c2y = hTopRow + rows * 0.22;
+    const cr = Math.min(gw, rows) * 0.09;
+    for (let i = nRing; i < nAg; i++) {
+      const even = (i & 1) === 0;
+      const a = Math.random() * TAU;
+      const rr = cr * Math.sqrt(Math.random());
+      ag[k++] = clampInt((even ? c1x : c2x) + Math.cos(a) * rr, 1, gw - 2);
+      ag[k++] = clampInt((even ? c1y : c2y) + Math.sin(a) * rr, hTopRow + 1, hBotRow - 1);
+      ag[k++] = Math.random() * TAU;
+    }
+    seeded = true;
   }
 
   function sizeCanvas(): void {
-    scale = 1; // document-tall canvas: keep backing bounded on integrated GPUs
-    canvas!.width = Math.max(1, Math.round(cssW * scale));
-    canvas!.height = Math.max(1, Math.round(docH * scale));
+    canvas!.width = Math.max(1, cssW);
+    canvas!.height = Math.max(1, docH);
     canvas!.style.height = docH + "px";
-    ctx!.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx!.setTransform(1, 0, 0, 1, 0, 0);
     ctx!.imageSmoothingEnabled = true;
   }
 
   /**
-   * Measure the page, (re)generate the SVG reference path + ribbon domain, and
-   * refresh the hero rect. Preserves the hero field (bloom continuity); resets
-   * the below-hero frontier to the current scroll.
+   * Measure the page, (re)generate the SVG reference path, author the guide
+   * field + spine for THIS page, and carry the organism over: row-copy on
+   * same-page rebuilds, hero-zone resample on navigation.
    */
   function build(): void {
     if (destroyed) return;
 
     const W = document.documentElement.clientWidth || window.innerWidth;
-    cssW = W;
+    const newGw = Math.max(32, Math.ceil(W / CELL));
     vh = window.innerHeight;
     const mobile = W < 768;
     const scrollY = window.pageYOffset || 0;
     const scrollX = window.pageXOffset || 0;
+    const path = location.pathname;
 
     // claims are re-derived from the fresh branch domain below; a rebuild may
     // legitimately drop a branch, so stale marks must not gate typing forever
@@ -989,20 +695,19 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     });
 
     const hero = document.querySelector<HTMLElement>(".hero");
-    const heroFull = !!document.querySelector(".hero.full");
-    const footer =
-      document.querySelector(".site-foot") || document.querySelector("footer");
+    heroFullV = !!document.querySelector(".hero.full");
+    const footer = document.querySelector(".site-foot") || document.querySelector("footer");
 
+    let heroTop = 0;
+    let heroH = 0;
     let startY: number;
     if (hero) {
       const hr = hero.getBoundingClientRect();
       heroTop = hr.top + scrollY;
       heroH = hr.height;
-      // seam the trunk just inside the hero bottom so it emerges from the bloom
+      // seam the trunk just inside the hero bottom so it emerges from the mass
       startY = heroTop + heroH - heroH * 0.08;
     } else {
-      heroTop = 0;
-      heroH = 0;
       const main = document.querySelector("main");
       startY = main ? main.getBoundingClientRect().top + scrollY + 8 : 80;
     }
@@ -1014,27 +719,21 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     }
 
     // collapse both layers before measuring so they never inflate scrollHeight
-    // (the SVG is absolutely positioned; a stale height would self-perpetuate)
     canvas!.style.height = "0px";
     svg!.style.height = "0px";
-    docH = Math.max(document.documentElement.scrollHeight, endY + 40, startY + 400);
-    if (!footer || endY <= startY + 40) endY = docH - 40;
+    const newDocH = Math.max(document.documentElement.scrollHeight, endY + 40, startY + 400);
+    if (!footer || endY <= startY + 40) endY = newDocH - 40;
     if (endY <= startY + 40) endY = startY + 400;
 
-    // SVG spans the full document (fallback stroke + coordinate space). Drive
-    // its visibility from the captured anim flag rather than the html.anim CSS
-    // gate, which ClientRouter drops from <html> on navigation.
-    svg!.setAttribute("viewBox", "0 0 " + W + " " + docH);
+    svg!.setAttribute("viewBox", "0 0 " + W + " " + newDocH);
     svg!.setAttribute("width", String(W));
-    svg!.setAttribute("height", String(docH));
-    svg!.style.height = docH + "px";
+    svg!.setAttribute("height", String(newDocH));
+    svg!.style.height = newDocH + "px";
     svg!.style.display = anim ? "none" : "block";
 
     // ---- trunk: seeded organic meander down a left lane ----
     const rnd = mulberry32(0x5eed21 ^ (W & 0xffff));
-    const laneX = mobile
-      ? Math.max(11, W * 0.04)
-      : Math.max(20, Math.min(44, W * 0.03));
+    const laneX = mobile ? Math.max(11, W * 0.04) : Math.max(20, Math.min(44, W * 0.03));
     const amp = mobile ? 6 : Math.min(22, W * 0.018);
     const span = endY - startY;
     const segs = Math.max(8, Math.round(span / 130));
@@ -1055,7 +754,18 @@ export function mountMycelium(root: HTMLElement): Mycelium {
 
     // ---- branches pouring into each panel header ----
     while (brg!.firstChild) brg!.removeChild(brg!.firstChild);
-    const defs: BranchDef[] = [];
+    interface BDef {
+      sx: number;
+      sy: number;
+      c1x: number;
+      c1y: number;
+      c2x: number;
+      c2y: number;
+      tx: number;
+      ty: number;
+      panel: HTMLElement | null;
+    }
+    const defs: BDef[] = [];
     const heads = Array.prototype.slice.call(
       document.querySelectorAll(".panel-head"),
     ) as HTMLElement[];
@@ -1102,9 +812,9 @@ export function mountMycelium(root: HTMLElement): Mycelium {
         const mx = sx + dx * f;
         const my = sy + dy * f;
         const len = (mobile ? 16 : 30) + br() * (mobile ? 14 : 34);
-        const ang = (br() < 0.5 ? -1 : 1) * (0.5 + br() * 0.7);
-        const ex = mx + Math.cos(ang) * len * (dx > 0 ? 1 : -1);
-        const ey = my + Math.sin(ang) * len;
+        const angA = (br() < 0.5 ? -1 : 1) * (0.5 + br() * 0.7);
+        const ex = mx + Math.cos(angA) * len * (dx > 0 ? 1 : -1);
+        const ey = my + Math.sin(angA) * len;
         const mcx = mx + (ex - mx) * 0.5 + (br() - 0.5) * 18;
         const mcy = my + (ey - my) * 0.5 + (br() - 0.5) * 18;
         d +=
@@ -1121,82 +831,173 @@ export function mountMycelium(root: HTMLElement): Mycelium {
           "," +
           ey.toFixed(1);
       }
-      const path = document.createElementNS(SVGNS, "path");
-      path.setAttribute("d", d);
-      brg!.appendChild(path);
-      defs.push({
-        sx,
-        sy,
-        c1x,
-        c1y,
-        c2x,
-        c2y,
-        tx,
-        ty,
-        anchorY: sy,
-        panel: head.closest<HTMLElement>(".panel"),
-      });
+      const pathEl = document.createElementNS(SVGNS, "path");
+      pathEl.setAttribute("d", d);
+      brg!.appendChild(pathEl);
+      defs.push({ sx, sy, c1x, c1y, c2x, c2y, tx, ty, panel: head.closest<HTMLElement>(".panel") });
     }
 
-    // hero guide follows the variant: full spills softer, band stays tight
-    buildHeroGuide(heroFull ? 0.6 : 0.34);
-    buildHeroMask(heroFull);
-    if (!heroSeeded) seedHero();
+    // ---- grid carry-over ----
+    const newGh = Math.max(64, Math.ceil(newDocH / CELL));
+    const newHTop = Math.max(0, (heroTop / CELL) | 0);
+    const newHBot = Math.min(newGh, Math.ceil((heroTop + heroH) / CELL));
+    const samePage = path === lastPath && newGw === gw && trail.length > 0;
+    const oldTrail = trail;
+    const oldGw = gw;
+    const oldHTop = hTopRow;
+    const oldHBot = hBotRow;
+
+    if (samePage) {
+      // typing reveals / height shifts: keep the whole organism, row-copy
+      if (newGh !== gh) {
+        const next = new Float32Array(newGw * newGh);
+        next.set(oldTrail.subarray(0, Math.min(oldTrail.length, next.length)));
+        trail = next;
+        tmp = new Float32Array(newGw * newGh);
+      }
+      gh = newGh;
+      hTopRow = newHTop;
+      hBotRow = newHBot;
+    } else {
+      // navigation / width change: preserve the hero bloom by CROPPING the
+      // old hero zone 1:1 into the new hero rect (no vertical scaling - a
+      // squish reads as streaky banding), slightly decayed so the sim
+      // re-equilibrates to the new page's guide; below-hero re-grows fresh
+      trail = new Float32Array(newGw * newGh);
+      tmp = new Float32Array(newGw * newGh);
+      const oldRows = oldHBot - oldHTop;
+      const newRows = newHBot - newHTop;
+      if (oldRows > 2 && newRows > 2 && oldGw > 0) {
+        const copyRows = Math.min(oldRows, newRows);
+        const confine = !heroFullV;
+        for (let y = 0; y < copyRows; y++) {
+          const srcRow = (oldHTop + y) * oldGw;
+          const dst = (newHTop + y) * newGw;
+          for (let x = 0; x < newGw; x++) {
+            const sxC =
+              oldGw === newGw ? x : clampInt(((x / newGw) * oldGw) | 0, 0, oldGw - 1);
+            let v = oldTrail[srcRow + sxC]! * 0.85;
+            if (confine) {
+              const fr = x / newGw;
+              const c = fr <= 0.46 ? 1 : fr >= 0.62 ? 0 : 1 - (fr - 0.46) / 0.16;
+              v *= c * c;
+            }
+            trail[dst + x] = v;
+          }
+        }
+        // carry agents 1:1 where they land inside the new hero; refold the rest
+        for (let i = 0; i < nAg; i++) {
+          const j = i * 3;
+          let axc = clampInt((ag[j]! / oldGw) * newGw, 1, newGw - 2);
+          if (confine && axc > newGw * 0.6) axc = 1 + Math.random() * newGw * 0.45;
+          ag[j] = axc;
+          const oy = ag[j + 1]! - oldHTop + newHTop;
+          ag[j + 1] =
+            oy >= newHTop + 1 && oy < newHBot - 1
+              ? oy
+              : newHTop + 1 + Math.random() * Math.max(1, newRows - 2);
+        }
+      }
+      gw = newGw;
+      gh = newGh;
+      hTopRow = newHTop;
+      hBotRow = newHBot;
+      frontier = hBotRow;
+      rp = 0;
+    }
+    lastPath = path;
+    cssW = W;
+    docH = newDocH;
+    endRow = Math.min(gh - 1, Math.ceil(endY / CELL));
+    if (frontier > endRow) frontier = endRow;
+    if (frontier < hBotRow) frontier = hBotRow;
+
+    if (!seeded || nAg === 0) {
+      nAg = clampInt(Math.round(gw * 26), 4000, AG_CAP);
+      if (hBotRow > hTopRow + 2) seedAgents();
+      else {
+        // heroless page: colony starts at the trunk mouth
+        nAg = clampInt(nAg >> 1, 2000, AG_CAP);
+        for (let i = 0; i < nAg; i++) {
+          const j = i * 3;
+          ag[j] = clampInt(pts[0]!.x / CELL + (Math.random() - 0.5) * 8, 1, gw - 2);
+          ag[j + 1] = startY / CELL + Math.random() * 6;
+          ag[j + 2] = Math.random() * TAU;
+        }
+        seeded = true;
+      }
+    }
+
+    // ---- guide field + spine for THIS page ----
+    guide = new Float32Array(gw * gh);
+    buildHeroGuide(heroFullV ? 0.6 : 0.34, pts[0]!.x / CELL);
+    const spinePts: number[] = [];
+    if (tlen > 1) {
+      const steps = Math.max(8, Math.ceil(tlen / CELL));
+      for (let s = 0; s <= steps; s++) {
+        const p = trunkEl!.getPointAtLength((tlen * s) / steps);
+        depositTube(p.x, p.y, TRUNK_PEAK, TRUNK_SIG);
+        if ((s & 1) === 0) spinePts.push(p.x / CELL, p.y / CELL);
+      }
+    }
+    branchEnds = [];
+    for (let b = 0; b < defs.length; b++) {
+      const def = defs[b]!;
+      const chord = Math.hypot(def.tx - def.sx, def.ty - def.sy);
+      const steps = Math.max(6, Math.ceil((chord * 1.15) / CELL));
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const px = cubicAt(t, def.sx, def.c1x, def.c2x, def.tx);
+        const py = cubicAt(t, def.sy, def.c1y, def.c2y, def.ty);
+        depositTube(px, py, BR_PEAK, BR_SIG);
+        if ((s & 1) === 0) spinePts.push(px / CELL, py / CELL);
+      }
+      if (def.panel) {
+        def.panel.dataset.mycClaim = "1";
+        branchEnds.push({ x: def.tx / CELL, y: def.ty / CELL, panel: def.panel, reached: false });
+      }
+    }
+    // y-sorted spine arrays for binary-searched respawn windows
+    const pairs: [number, number][] = [];
+    for (let i = 0; i < spinePts.length; i += 2) pairs.push([spinePts[i]!, spinePts[i + 1]!]);
+    pairs.sort((a, b) => a[1] - b[1]);
+    spineLen = pairs.length;
+    spineX = new Float32Array(spineLen);
+    spineY = new Float32Array(spineLen);
+    for (let i = 0; i < spineLen; i++) {
+      spineX[i] = pairs[i]![0];
+      spineY[i] = pairs[i]![1];
+    }
+
+    // ---- render strip sized for the largest band this viewport can need ----
+    bandMaxRows = Math.ceil((Math.max(vh, heroH) + 2 * BAND_MARGIN) / CELL) + 2;
+    if (strip.width !== gw || strip.height < bandMaxRows) {
+      strip.width = gw;
+      strip.height = bandMaxRows;
+      img = stripCtx.createImageData(gw, bandMaxRows);
+      buf32 = new Uint32Array(img.data.buffer);
+    }
+
+    sizeCanvas();
 
     if (!anim) {
-      // reduced motion: static SVG + a settled, frozen bloom drawn once.
+      // reduced motion: settle the hero zone synchronously, draw once; the
+      // fully-drawn static SVG carries the trunk/branches
       stopLoop();
-      ribbons = [];
-      sizeCanvas();
-      ctx!.clearRect(0, 0, cssW, docH);
-      if (heroH > 0) {
-        for (let s = 0; s < H_FREEZE_STEPS; s++) stepHero();
-        renderHero();
+      if (hBotRow > hTopRow + 2) {
+        const keep = frontier;
+        frontier = hBotRow;
+        for (let s = 0; s < FREEZE_STEPS; s++) {
+          stepAgents(hTopRow, hBotRow);
+          diffuseBand(hTopRow, hBotRow);
+        }
+        renderBand(hTopRow, Math.min(hBotRow, hTopRow + bandMaxRows));
+        frontier = keep;
       }
       return;
     }
 
-    // ---- ribbon domain: trunk + dormant pouring branches ----
-    const next: Ribbon[] = [];
-    if (tlen > 1) {
-      const trunk = makeTrunkRibbon(tlen);
-      const nBr = defs.length;
-      const trunkAgents = clampInt(trunk.len, 300, MAX_TRUNK_AGENTS);
-      seedRibbonAgents(trunk, trunkAgents);
-      next.push(trunk);
-      if (nBr > 0) {
-        const remaining = MAX_RIBBON_AGENTS - trunkAgents;
-        const per = clampInt(Math.floor(remaining / nBr), 12, 48);
-        for (let i = 0; i < nBr; i++) {
-          const rib = makeBranchRibbon(defs[i]!, trunk);
-          seedRibbonAgents(rib, per);
-          // claim: this panel's typing now waits for the branch tip
-          if (rib.panel) rib.panel.dataset.mycClaim = "1";
-          next.push(rib);
-        }
-      }
-    }
-    ribbons = next;
-
-    sizeCanvas();
     startLoop();
-  }
-
-  /** x of the trunk polyline at document-y `y` (linear interp; y monotonic). */
-  function trunkXAt(pts: Pt[], y: number): number {
-    const first = pts[0]!;
-    const last = pts[pts.length - 1]!;
-    if (y <= first.y) return first.x;
-    if (y >= last.y) return last.x;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const a = pts[i]!;
-      const b = pts[i + 1]!;
-      if (y >= a.y && y <= b.y) {
-        const f = (y - a.y) / (b.y - a.y || 1);
-        return a.x + (b.x - a.x) * f;
-      }
-    }
-    return last.x;
   }
 
   /* ---- lifecycle (no scroll listener) ---- */
@@ -1234,7 +1035,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
 
   return {
     rebuild() {
-      // re-measure the new page; the persisted hero field carries over.
+      // re-measure the new page; the persisted hero-zone trail carries over.
       queueBuild();
     },
     destroy() {
@@ -1243,7 +1044,6 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       ro.disconnect();
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
-      ribbons = [];
       delete canvas.dataset.mycMounted;
     },
   };

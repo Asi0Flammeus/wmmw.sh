@@ -3,11 +3,12 @@
  * Mycelium layer (spec 2.1 + 2.3, unified). Rendered once per page by
  * BaseLayout, above the page background and below the content/hero.
  *
- * One document-level canvas carries the whole living organism: the hero bloom
- * (rasterised into the measured hero rect) and the below-hero predilection
- * channels (trunk + pouring branches). The wrapper persists across ClientRouter
- * navigations (transition:persist) so the sim instance and its bloom state
- * survive page swaps; `Mycelium.rebuild()` re-measures each new page.
+ * One document-level canvas, ONE simulation: a single physarum trail grid
+ * spans the whole page; only the per-page guide field (hero bloom zone +
+ * trunk + branches into each terminal) differs. The wrapper persists across
+ * ClientRouter navigations (transition:persist) so the sim instance and its
+ * hero-zone trail survive page swaps; `Mycelium.rebuild()` re-measures each
+ * new page and re-authors the guide.
  *
  * The `.myc-svg` is the reduced-motion / static fallback: JS draws the full
  * trunk + branch strokes into it and it is the visible layer when `html.anim`
