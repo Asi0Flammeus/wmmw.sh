@@ -854,10 +854,12 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       hTopRow = newHTop;
       hBotRow = newHBot;
     } else {
-      // navigation / width change: preserve the hero bloom by CROPPING the
-      // old hero zone 1:1 into the new hero rect (no vertical scaling - a
-      // squish reads as streaky banding), slightly decayed so the sim
-      // re-equilibrates to the new page's guide; below-hero re-grows fresh
+      // navigation / width change: the hero bloom carries over by CROPPING
+      // the old hero zone 1:1 into the new hero rect (no vertical scaling -
+      // a squish reads as streaky banding). Heroes are uniform across pages,
+      // so the guide is identical and the bloom continues exactly, mid-motion
+      // (no decay, no restart); below-hero re-grows along the new page's
+      // guide.
       trail = new Float32Array(newGw * newGh);
       tmp = new Float32Array(newGw * newGh);
       const oldRows = oldHBot - oldHTop;
@@ -870,7 +872,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
           for (let x = 0; x < newGw; x++) {
             const sxC =
               oldGw === newGw ? x : clampInt(((x / newGw) * oldGw) | 0, 0, oldGw - 1);
-            trail[dst + x] = oldTrail[srcRow + sxC]! * 0.85;
+            trail[dst + x] = oldTrail[srcRow + sxC]!;
           }
         }
         // carry agents 1:1 where they land inside the new hero; refold the rest
@@ -981,6 +983,18 @@ export function mountMycelium(root: HTMLElement): Mycelium {
         frontier = keep;
       }
       return;
+    }
+
+    // repaint the current band in the same task: sizeCanvas() wiped the
+    // canvas, and waiting for the next rAF frame would flash blank on nav
+    {
+      const sy = window.pageYOffset || 0;
+      let r0 = ((sy - BAND_MARGIN) / CELL) | 0;
+      if (r0 < 0) r0 = 0;
+      let r1 = Math.ceil((sy + vh + BAND_MARGIN) / CELL);
+      if (r1 > gh) r1 = gh;
+      if (r1 - r0 > bandMaxRows) r1 = r0 + bandMaxRows;
+      if (r1 > r0) renderBand(r0, r1);
     }
 
     startLoop();
