@@ -158,13 +158,6 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
     color: var(--ink-3);
   }
 
-  /* palindrome nod: wordmark mirrors on hover. reduced-motion + anim gated. */
-  :global(html.anim) .wordmark {
-    transition: transform 0.45s cubic-bezier(0.6, 0, 0.2, 1);
-  }
-  :global(html.anim) .wordmark:hover {
-    transform: scaleX(-1);
-  }
   :global(html.anim) .site-nav a,
   :global(html.anim) .lang a {
     transition: color 0.2s ease;

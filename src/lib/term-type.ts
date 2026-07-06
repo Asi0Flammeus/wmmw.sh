@@ -1,11 +1,11 @@
 /**
- * Terminal block-reveal engine.
+ * Terminal typing / reveal engine.
  *
- * On first viewport entry of each `.panel`, reveals its `[data-step]` blocks
- * in document order: a command line (`data-step="type"`) appears as a whole
- * block, then its output (`data-step="fade"`) prints, and only then the next
- * command, like a real shell running commands one by one. No character typing.
- * Runs once per panel.
+ * On first viewport entry of each `.panel`, plays its `[data-step]` blocks
+ * in document order like a real shell: a command line (`data-step="type"`)
+ * types out character-by-character with a blinking caret, then its output
+ * (`data-step="fade"`) prints as a whole block, and only then the next
+ * command types. Runs once per panel.
  *
  * Gating:
  *  - No `html.anim`  -> no-op. Markup already carries the final visible state.
@@ -53,12 +53,41 @@ export function initTermTyping(): void {
     const CMD_TO_OUT = 240; // command block shown -> its output prints
     const OUT_TO_NEXT = 460; // output shown -> next command appears
     const REACH_GRACE = 3800; // claimed panel: max wait after viewport entry
+    const CHAR_MS = 32; // per-character cadence while a command line types
 
     const start = (panel: HTMLElement): void => {
       // idempotent across the reach event, the grace deadline and re-inits
       if (panel.dataset.termStarted === "1") return;
       panel.dataset.termStarted = "1";
       runSeq(panel);
+    };
+
+    // Type a command line out character-by-character (its prompt is already
+    // visible); the blinking caret trails the text. `done` fires once fully
+    // typed. `.cmd-text` + dataset.full lets a panel revealed mid-type
+    // elsewhere (see NourrituresPage finalize) restore the full command text.
+    const typeCmd = (el: HTMLElement, done: () => void): void => {
+      const textEl = el.querySelector<HTMLElement>(".cmd-text");
+      if (!textEl) {
+        done();
+        return;
+      }
+      const full = textEl.dataset.full ?? textEl.textContent ?? "";
+      textEl.dataset.full = full;
+      textEl.textContent = "";
+      el.classList.add("typing");
+      let n = 0;
+      const tick = (): void => {
+        textEl.textContent = full.slice(0, n);
+        if (n >= full.length) {
+          el.classList.remove("typing");
+          done();
+          return;
+        }
+        n += 1;
+        setTimeout(tick, CHAR_MS);
+      };
+      tick();
     };
 
     const runSeq = (panel: HTMLElement): void => {
@@ -72,11 +101,14 @@ export function initTermTyping(): void {
         if (!el) return;
         el.classList.add("on");
         if (el.getAttribute("data-step") === "type") {
-          // Caret blinks on the active command until its output prints.
-          setTimeout(() => {
-            el.classList.add("done");
-            next();
-          }, CMD_TO_OUT);
+          // Command types out; the caret keeps blinking through a short dwell,
+          // then the command "runs" and its output block prints.
+          typeCmd(el, () => {
+            setTimeout(() => {
+              el.classList.add("done");
+              next();
+            }, CMD_TO_OUT);
+          });
         } else {
           setTimeout(next, OUT_TO_NEXT);
         }
