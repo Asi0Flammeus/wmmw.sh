@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { type Locale, t, localePath } from "@i18n/index";
+import { type Locale, t, localePath, isoDate } from "@i18n/index";
 import { SITE_URL, GITHUB_URL, TERM_USER } from "@lib/site";
 import { publishedWritings, baseSlug } from "@lib/writings";
 import BaseLayout from "@layouts/BaseLayout.astro";
@@ -20,9 +20,6 @@ const projects = (await getCollection("projects")).sort(
 const tools = (await getCollection("tools")).sort(
   (a, b) => a.data.order - b.data.order,
 );
-const livres = (await getCollection("nourritures"))
-  .filter((n) => n.data.type === "livre")
-  .sort((a, b) => a.data.order - b.data.order);
 const writings = (await publishedWritings(locale)).slice(0, 3);
 
 const jsonLd = {
@@ -238,7 +235,7 @@ const tz = teaser[locale];
                         <span class="fname">{slug}.md</span>
                         <span class="lead" aria-hidden="true" />
                         <span class="fdate">
-                          {entry.data.publishedAt.getFullYear()}
+                          {isoDate(entry.data.publishedAt)}
                         </span>
                       </p>
                       <p class="ftitle">{entry.data.title}</p>
@@ -257,40 +254,6 @@ const tz = teaser[locale];
       </div>
     </div>
   </section>
-
-  <section class="sec offset-l" data-block>
-    <div class="wrap">
-      <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.nourritures.heading}</h2>
-        <TerminalPanel path="~/nourritures" class="reveal">
-          <TermCmd command={chrome.nourritures.cmdBooks} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{chrome.nourritures.intro}</p>
-            <ol class="books">
-              {
-                livres.map((book, i) => (
-                  <li>
-                    <span class="n" aria-hidden="true">{i + 1}</span>
-                    <span class="a">{book.data.author},</span>{" "}
-                    <em>{book.data.title}</em>
-                  </li>
-                ))
-              }
-            </ol>
-          </div>
-          <div class="dir-listing">
-            <TermCmd command={chrome.nourritures.cmdDirs} />
-            <div class="out lsdirs" data-step="fade">
-              <p class="dhead">nourritures/films/:</p>
-              <p class="c">{chrome.nourritures.empty}</p>
-              <p class="dhead">nourritures/videos/:</p>
-              <p class="c">{chrome.nourritures.empty}</p>
-            </div>
-          </div>
-        </TerminalPanel>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
 
 <style>
@@ -299,7 +262,6 @@ const tz = teaser[locale];
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    max-width: 66ch;
   }
   .md .h {
     color: var(--bone);
@@ -497,47 +459,6 @@ const tz = teaser[locale];
     max-width: 58ch;
   }
 
-  /* ---------- nourritures : cat -n bibliography + empty dirs ---------- */
-  .books {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-  }
-  .books li {
-    color: var(--ink-2);
-  }
-  .books .n {
-    display: inline-block;
-    width: 4ch;
-    text-align: right;
-    margin-right: 2.5ch;
-    color: var(--ink-3);
-  }
-  .books .a {
-    color: var(--ink-2);
-  }
-  .books em {
-    color: var(--bone);
-    font-style: italic;
-  }
-  .dir-listing {
-    margin-top: 2.4rem;
-  }
-  .lsdirs {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-  }
-  .dhead {
-    color: var(--bone);
-    font-weight: 600;
-    margin-top: 1.1rem;
-  }
-  .dhead:first-child {
-    margin-top: 0;
-  }
-
   /* ---------- single-column collapse ---------- */
   @media (max-width: 767px) {
     .prow {
@@ -550,10 +471,6 @@ const tz = teaser[locale];
     }
     .trow .tdesc {
       padding-left: 4ch;
-    }
-    .books .n {
-      width: 3ch;
-      margin-right: 1.5ch;
     }
   }
 </style>
