@@ -1,0 +1,211 @@
+---
+title: "Un workflow para perder la cabeza"
+description: "Tres años de traducción automática en Découvre Bitcoin: de la API bruta de GPT-3.5 a un workflow agéntico headless, y lo que ese camino me enseñó sobre control, confianza y silicio."
+publishedAt: 2026-07-04
+author: "asi0"
+tags: ["IA", "open source", "Bitcoin", "traducción", "agentes"]
+draft: false
+lang: "es"
+translationOf: "workflow-a-en-perdre-la-tete"
+image: "./29-languages-one-pr-cover.jpg"
+imageAlt: "Una torre de Babel hecha de placas de circuito, idiomas irradiando desde una terminal"
+---
+
+import Timeline from '../../components/blog/Timeline.astro';
+import Poll from '../../components/blog/Poll.astro';
+import wfV1 from './workflow-v1.png';
+import wfV2 from './workflow-v2.png';
+import wfV3 from './workflow-v3.png';
+
+*Por asi0 — y un agente sin cabeza*
+
+---
+
+Hay un momento extraño, cuando trabajas con agentes, en el que te das cuenta de que algo avanzó mientras ya no lo sostenías en la mano.
+
+No «avanzó» en el sentido de que un script corrió. No solo una barra de progreso llegando al 100 %. Algo más inquietante: una parte de tu intención se desprendió, cruzó el repositorio, abrió archivos, corrigió sus propios errores, dejó logs, y luego te devolvió un resultado casi limpio.
+
+Un workflow *headless*.
+
+Sin cabeza.
+
+O quizá: un workflow para perder la cabeza.
+
+La [PR #4552](https://github.com/PlanB-Network/bitcoin-educational-content/pull/4552), la que reemplaza el antiguo sistema de traducción de `bitcoin-educational-content`, está mergeándose mientras escribo esto. Técnicamente, es una PR de infraestructura: scripts, orquestador, prompts, verificación, gobernanza de uso. Pero no es realmente por eso que quiero hablar de ella.
+
+Quiero hablar de ella porque este workflow cuenta tres años de mi relación con el silicio.
+
+Y porque la traducción a gran escala no es una misión secundaria para Découvre Bitcoin. Fue mi primera misión real, mi primera responsabilidad en el repositorio. El corazón del proyecto cabe en dos frases que sonarían absurdas si no fueran tan prácticas: **reinventar la rueda una última vez**, y luego **aniquilar la barrera del idioma**.
+
+La rueda, aquí, es toda la infraestructura educativa Bitcoin. La barrera es esa frontera silenciosa que hace que un saber libre quede, en la práctica, reservado a quienes leen inglés.
+
+Durante tres años he estado dando vueltas alrededor de esa frontera con LLM. Y en cada versión del workflow, no cambió solo la técnica. Cambió mi manera de sostener el problema.
+
+## Versión 1 — la oración API
+
+La primera versión era casi vergonzosamente simple.
+
+Tomas el contenido. Lo envías a la API de GPT-3.5. Recibes una traducción. Repites. Bruto. Directo. Ingenuo.
+
+Y lo peor es que funcionaba.
+
+No perfectamente. Pero lo suficiente para crear la ilusión peligrosa de que el problema estaba casi resuelto. La tasa de alucinación era baja — alrededor del 1 %. Si pruebas eso en tres párrafos, puedes pensar: fantástico. Si lo lanzas sobre más de diez mil líneas, en una docena de idiomas, el 1 % deja de ser un error marginal. Se vuelve una certeza estadística.
+
+En algún lugar, en algún archivo, una frase se deslizó. Un término técnico cambió de sentido. Un trozo de estructura fue devorado. Una URL fue tocada. Y no sabes dónde.
+
+La v1 fue mi fase de confianza ingenua. Estaba descubriendo que una máquina podía cargar una cantidad absurda de trabajo lingüístico, y quería creerlo con suficiente fuerza como para olvidar que el repositorio, a diferencia de mí, no olvidaría nada.
+
+El silicio hablaba. Pero a veces hablaba demasiado rápido, y yo todavía no había aprendido dónde poner las barandillas.
+
+## Versión 2 — la jaula determinista
+
+La segunda versión fue mi respuesta de desarrollador inquieto: ya que el modelo es probabilístico, vamos a encerrarlo dentro del determinismo.
+
+Línea por línea. Segmento por segmento. API de traducción automática. Glosario estático. Parser. Recomposición. Verificaciones. Múltiples proveedores. Una arquitectura que intentaba reducir el espacio donde la máquina podía hacer algo extraño.
+
+Sobre el papel, era más serio.
+
+En la práctica, era sobre todo yo agarrando el volante demasiado fuerte.
+
+La v2 reducía los errores estructurales. Hacía el sistema más predecible. Costaba significativamente más. Y sobre todo sacrificaba algo que yo todavía no respetaba lo suficiente: el contexto.
+
+Una línea sola no entiende el capítulo. Una frase sola no entiende el tono. Un término técnico no se traduce igual dentro de una definición, un quiz, una nota de curso o el glosario vivo de un repositorio que ya tiene su propia memoria.
+
+Había construido un workflow con LLM, pero seguía pensando como si el problema principal fuera impedir que el modelo existiera.
+
+Quizá eso sea el sobre-engineering: una arquitectura que conserva el miedo a su herramienta en el centro del diseño.
+
+## Versión 3 — el determinismo adaptativo
+
+La tercera versión, la de la PR #4552, hace casi lo contrario.
+
+Deja de cortar el problema hasta volverlo estúpido. Devuelve al modelo lo que necesita para ser útil: el archivo entero, el contexto del repositorio, el glosario real, el derecho a buscar, el derecho a leer, el derecho a decidir que un término no debe traducirse.
+
+Y alrededor de eso, mantiene determinismo. Pero no el determinismo rígido de una jaula. Determinismo adaptativo.
+
+En la entrada: un script encuentra exactamente lo que falta. Sin LLM. Sin red. Solo el repo, los archivos en inglés, los idiomas ausentes.
+
+En el medio: un agente `omp -p`, headless, trabaja archivo por archivo. Traduce in situ. Respeta la estructura. Consulta el glosario vivo. Escribe lo que aprende en un archivo de conocimiento por idioma.
+
+En la salida: un verificador determinista compara fuente y destino. Títulos, fences, YAML, identificadores, enlaces críticos. Si la estructura se rompe, no pasa. Si falla, reintentamos — pero no al azar: bajamos por una cadena de modelos adaptada al idioma.
+
+El determinismo ya no reemplaza la inteligencia del modelo. Le da un cauce de río.
+
+Ahí sentí el vuelco. La v3 es más simple que la v2, mejor en calidad, y su coste se mantiene en el mismo orden de magnitud — probablemente incluso inferior en ciertos casos, gracias al batching y a la caché. La prueba a escala real sobre `scr403` lo mostró: 29 idiomas, 1349 archivos, casi todo pasa, y el resto queda explícitamente excluido en vez de deslizarse bajo la alfombra.
+
+<Timeline items={[
+  { n: 1, tone: "muted", when: "v1 · API GPT-3.5 bruta", title: "la confianza ingenua", desc: "Traducir directamente por la API. Funciona lo suficiente para creer, pero ~1 % de alucinación sobre +10k líneas y una docena de idiomas se vuelve la certeza de que algo estará mal en algún lugar.", image: wfV1, imageAlt: "Manos abiertas liberando un estallido de partículas luminosas en la oscuridad" },
+  { n: 2, tone: "warn", when: "v2 · ML API línea por línea", title: "la jaula determinista", desc: "Sobre-engineering: parser, glosario estático, traducción línea por línea, múltiples proveedores. Menos errores estructurales, coste significativo, calidad a menudo más plana porque se sacrifica el contexto.", image: wfV2, imageAlt: "Hilos luminosos rígidos encerrados en una jaula mecánica de engranajes" },
+  { n: 3, tone: "accent", when: "v3 · <code>omp -p</code> headless", title: "el determinismo adaptativo", desc: "Un agente traduce con contexto completo; scripts deterministas descubren el trabajo y verifican la estructura. Menos código, mejor calidad, coste comparable, y errores que se vuelven visibles en vez de silenciosos.", image: wfV3, imageAlt: "Una red micelial verde tejida a través de una estructura geométrica alrededor de un nodo luminoso" },
+]}>
+  <span slot="caption">Tres versiones del workflow, tres maneras distintas de sostener el mismo problema.</span>
+</Timeline>
+
+## LLM agénticos que construyen workflows para LLM agénticos
+
+Hay una mise en abyme bastante graciosa en esta historia.
+
+La v3 no es solo un workflow que usa LLM agénticos. Es un workflow que, en gran parte, fue pensado, escrito, corregido y estabilizado con LLM agénticos.
+
+ALLM que craftean un workflow para orquestar ALLM.
+
+La serpiente se muerde la cola — pero esta vez produce un diff limpio.
+
+Esa frase habría sonado ridícula hace tres años. Hoy es una forma bastante precisa de describir mi trabajo. Ya no estoy simplemente llamando una API. Estoy formando un pequeño ecosistema de competencias: un script determinista, un agente traductor, un verificador, un governor de cuota, un agente de release, archivos de conocimiento que persisten de una batch a la siguiente.
+
+Nadie «entiende» todo en el sentido humano. Y sin embargo el conjunto empieza a portar algo que se parece a una comprensión práctica.
+
+No magia. No autonomía. No una inteligencia que reemplaza el juicio.
+
+Coordinación.
+
+## Shoutout a omp
+
+Nada de esto habría tomado esta forma sin **omp — Oh My Pi**.
+
+`omp -p`, en este workflow, es la pieza que me permite dejar de tratar al LLM como una caja de texto. Le doy una misión, un repo, herramientas, restricciones, y trabaja sin interfaz de chat. Lo headless no es un detalle ergonómico: es lo que permite al sistema entrar en el flujo real del repositorio.
+
+El pipeline conserva las decisiones tontas donde deben seguir siendo tontas: encontrar los archivos que faltan, crear un worktree, lanzar un job pool, leer logs de uso, verificar la estructura. Y confía al modelo la parte donde la rigidez hace daño: entender el contexto, elegir un término, respetar un tono, saber cuándo no traducir.
+
+Esa es, para mí, la lección técnica de esta versión: no pedirle al modelo que sostenga el marco, y no pedirle al marco que hable la lengua.
+
+Cada uno su rol.
+
+## La fuerza bruta como soltar el control
+
+Theo ([t3](https://t3.gg)) tiene una intuición que me parece cada vez más justa: la era de los agentes vuelve viables enfoques tontos, pesados, casi brutales.
+
+No porque la sutileza ya no importe. Porque una parte de la sutileza cambió de lugar.
+
+La v2 intentaba ser inteligente dentro del pipeline. Cortaba, controlaba, recomponía. La v3 es casi insultante de simple: toma el archivo entero, dáselo a un agente competente, verifica después. Si falla, reintenta con una ruta mejor.
+
+Eso no es «pensar menos». Es dejar de pensar en lugar de la máquina.
+
+La fuerza bruta, aquí, no es una ausencia de cuidado. Es una redistribución del cuidado. Ya no gasto mi energía impidiendo que el modelo se mueva. La pongo en el encuadre, la verificación, la trazabilidad, los logs, los costes, los puntos donde el error debe volverse visible.
+
+Y quizá ese sea el verdadero paso del control a la confianza: no confiar en el modelo como se confía en un humano. Confiar en un sistema donde cada componente sabe, lo suficiente, lo que no debe cargar.
+
+## Por qué importa
+
+Todo esto podría quedarse en una historia de tooling interno. Una pequeña victoria de maintainer. Un bonito antes/después en un repositorio.
+
+Pero el workflow no es el punto.
+
+El punto es que un curso avanzado de Bitcoin pueda existir en francés, español, swahili, cingalés, farsi, kirundi. No porque una organización tenga un presupuesto infinito de traducción. No porque el mercado haya decidido que esas lenguas merecen una línea de Excel. Sino porque el coste marginal de hacer circular el saber acaba de desplomarse.
+
+La barrera del idioma no desapareció. Pero cambió de textura. Se parece menos a un muro y más a una cola de jobs.
+
+Da vértigo.
+
+Y ahí es donde los LLM agénticos me parecen más interesantes: no como máquinas para producir contenido infinito, sino como máquinas para pasar lo que ya existe de un borde del red al otro. Un curso. Un glosario. Una explicación. Una intuición. Un pequeño ladrillo de comprensión que no tenía ninguna buena razón para quedarse atrapado en un solo idioma.
+
+Siempre habrá un humano al final del bucle. Para revisar. Para sentir el tono. Para ver lo que la estructura no puede ver. La evolución de ese rol merece su propio texto, y no se lo voy a robar aquí.
+
+Por ahora, quiero quedarme con esta imagen: un agente sin cabeza trabajando en un worktree, y detrás de él, idiomas que se encienden.
+
+## ¿Una forja para agentes?
+
+Pequeña semilla, sin desarrollarla: si este tipo de workflow se vuelve normal, nuestras forjas no están listas.
+
+GitHub &amp; compañía fueron pensados para humanos que abren PR, no para enjambres de agentes capaces de producir diffs, traducciones, issues, reviews y ruido a velocidad industrial.
+
+Kevin ([Wizardsardine](https://wizardsardine.com)) compartía una pista que me parece importante: el **pay-to-publish**, al estilo [stacker.news](https://stacker.news). Un micro-coste en sats para publicar. No para monetizar el acceso. Para dar peso al gesto. Si publicar cuesta algo, spamear deja de ser gratis.
+
+Todavía no sé qué forma tendrán las forjas adaptadas a agentes. Pero estoy casi seguro de que tendrán que pensar juntas dos cosas que antes separábamos: la colaboración y la resistencia al ruido.
+
+## La pregunta abierta
+
+La v3 no resuelve la traducción universal. Solo desplaza la frontera.
+
+Antes, el problema era: «¿podemos producir una traducción utilizable a gran escala sin explotar el coste, la estructura y el mantenimiento?»
+
+Ahora la pregunta se vuelve más fina: «¿en qué momento la revisión humana deja de ser indispensable, y qué se vuelve el rol del revisor cuando no siempre lo es?»
+
+Todavía no tengo mi respuesta. O más bien: tengo una intuición, pero prefiero preguntarte la tuya primero.
+
+<Poll
+  id="universal-translation-solved"
+  lang="es"
+  question="¿Cuándo será la traducción universal un problema completamente resuelto — sin ninguna revisión humana?"
+  options={["ya", "~2 años", "~5 años", "~10 años", "nunca · el humano se queda en el bucle"]}
+/>
+
+## Perder la cabeza, mantener el rumbo
+
+Creo que eso es lo que esta PR me hace sentir.
+
+Necesito menos sostener cada línea. Menos apretar el workflow hasta asfixiarlo. Menos ser listo en todas partes.
+
+Pero el rumbo está más claro que antes.
+
+Reinventar la rueda una última vez. Aniquilar la barrera del idioma. Construir herramientas que hagan circular el saber hacia donde no habría ido solo.
+
+La cabeza se pierde un poco.
+
+El rumbo queda.
+
+Y en algún lugar de un worktree, un agente sin cabeza sigue traduciendo.
+
+---
+
+*Escrito el 4 de julio de 2026, mientras la PR #4552 del pipeline de traducción agéntico está a punto de unirse a `dev`. El run `scr403` en 29 idiomas sigue siendo la prueba a escala real que me convenció de que esta versión se sostenía. Las versiones inglesa y española de este texto fueron producidas por un agente — obviamente.*

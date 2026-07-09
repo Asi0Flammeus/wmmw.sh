@@ -1,0 +1,152 @@
+---
+import type { Locale } from "@i18n/index";
+
+/**
+ * Single-choice reader poll. No backend: the vote is persisted locally
+ * (localStorage), the chosen option is highlighted, and a confirmation line
+ * is shown. No aggregate counts are displayed (none are collected).
+ */
+interface Props {
+  /** Stable key for localStorage (unique per poll). */
+  id: string;
+  question: string;
+  options: string[];
+  lang: Locale;
+}
+
+const { id, question, options, lang } = Astro.props;
+
+const allLabels: Record<Locale, { voted: string }> = {
+  fr: { voted: "Vote enregistré (en local, sur ton appareil)." },
+  en: { voted: "Vote saved (locally, on your device)." },
+  es: { voted: "Voto guardado (localmente, en tu dispositivo)." },
+};
+const labels = allLabels[lang];
+---
+
+<figure class="poll" data-poll={id} data-labels={JSON.stringify(labels)}>
+  <p class="poll-q">{question}</p>
+  <div class="poll-opts" role="group" aria-label={question}>
+    {
+      options.map((opt) => (
+        <button type="button" class="poll-opt" data-value={opt}>
+          {opt}
+        </button>
+      ))
+    }
+  </div>
+  <p class="poll-status" aria-live="polite" hidden></p>
+</figure>
+
+<style>
+  .poll {
+    margin-block: var(--space-8);
+    padding: var(--space-6);
+    background: color-mix(in oklab, var(--green-400) 8%, transparent);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md, 8px);
+  }
+
+  .poll-q {
+    margin: 0 0 var(--space-4);
+    font-family: var(--disp);
+    font-size: 1.1rem;
+    font-style: italic;
+    text-align: center;
+    color: var(--text-primary);
+  }
+
+  .poll-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: center;
+  }
+
+  .poll-opt {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--green-600);
+    border-radius: var(--r-pill, 999px);
+    background: transparent;
+    color: var(--green-400);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium, 500);
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      transform 0.15s ease;
+  }
+
+  .poll-opt:hover {
+    background: color-mix(in oklab, var(--green-400) 16%, transparent);
+  }
+
+  .poll-opt:focus-visible {
+    outline: 2px solid var(--green-400);
+    outline-offset: 2px;
+  }
+
+  .poll-opt[aria-pressed="true"] {
+    background: var(--green-400);
+    color: var(--black, #000);
+    border-color: var(--green-400);
+    font-weight: var(--font-semibold, 600);
+  }
+
+  .poll-status {
+    margin: var(--space-4) 0 0;
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+  .poll-status[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-poll]").forEach((poll) => {
+    const id = poll.dataset.poll;
+    if (!id) return;
+    const key = `wmmw-poll-${id}`;
+    const labels = JSON.parse(poll.dataset.labels || "{}") as { voted?: string };
+    const opts = Array.from(
+      poll.querySelectorAll<HTMLButtonElement>(".poll-opt"),
+    );
+    const status = poll.querySelector<HTMLElement>(".poll-status");
+
+    const reflect = (value: string) => {
+      opts.forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.value === value)),
+      );
+      if (status && labels.voted) {
+        status.textContent = labels.voted;
+        status.hidden = false;
+      }
+    };
+
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(key);
+    } catch {
+      stored = null;
+    }
+    if (stored) reflect(stored);
+
+    opts.forEach((b) => {
+      b.addEventListener("click", () => {
+        const value = b.dataset.value ?? "";
+        try {
+          localStorage.setItem(key, value);
+        } catch {
+          /* private mode — vote still reflected for the session */
+        }
+        reflect(value);
+      });
+    });
+  });
+</script>

@@ -1,0 +1,207 @@
+---
+title: "Un workflow à en perdre la tête"
+description: "Trois ans de traduction automatique chez Découvre Bitcoin : de l'API GPT-3.5 brute au workflow agentique headless, et ce que ce trajet m'a appris sur le contrôle, la confiance et le silicium."
+publishedAt: 2026-07-04
+author: "asi0"
+tags: ["IA", "open source", "Bitcoin", "traduction", "agents"]
+draft: false
+lang: "fr"
+translationOf: "workflow-a-en-perdre-la-tete"
+image: "./29-languages-one-pr-cover.jpg"
+imageAlt: "Une tour de Babel faite de circuits imprimés, des langues rayonnant depuis un terminal"
+---
+
+import Timeline from '../../components/blog/Timeline.astro';
+import Poll from '../../components/blog/Poll.astro';
+import wfV1 from './workflow-v1.png';
+import wfV2 from './workflow-v2.png';
+import wfV3 from './workflow-v3.png';
+
+*Par asi0 & Daïmon*
+
+---
+
+Il y a un moment étrange, dans une journée de travail avec des agents LLM (ALLM), où tu réalises que quelque chose a avancé pendant que tu ne le tenais plus dans ta main.
+
+Pas « avancé » au sens où un script a tourné. Pas seulement une barre de progression qui atteint 100 %. Quelque chose de plus dérangeant : une partie de ton intention s'est détachée, s'est baladé sur ton terminal, a travaillé des fichiers, a corrigé ses propres erreurs, a laissé des logs, puis t'a rendu un résultat productif.
+
+Un workflow *headless*. Sans tête. 
+
+Ou plutôt : un workflow à en perdre la tête.
+
+La [PR #4552](https://github.com/PlanB-Network/bitcoin-educational-content/pull/4552), celle qui remplace l'ancien système de traduction de `bitcoin-educational-content`, est en train de merge au moment où j'écris ça. Techniquement, c'est une PR d'infrastructure : scripts, orchestrateur, prompts, vérification, gouvernance d'usage. Mais ce n'est pas vraiment pour ça que j'ai envie d'en parler.
+
+Ce dont j'ai envie de parler c'est ce que ce workflow raconte sur mon rapport au silicium ces trois dernières années.
+
+Parce que la traduction à grande échelle n'est pas un sujet annexe pour Découvre Bitcoin. C'est ma première mission, ma première responsabilité de ce dépôt. Le cœur du projet tient en deux phrases qui pourraient sembler absurdes si elles n'étaient pas aussi pratiques : 
+- **réinventer la roue une dernière fois**
+- **annihiler la barrière de la langue**.
+
+La roue, ici, c'est toute l'infrastructure éducative Bitcoin. La barrière, c'est cette frontière silencieuse qui fait qu'un savoir libre reste, en pratique, réservé à ceux qui lisent l'anglais.
+
+Depuis trois ans, je tourne autour de cette frontière avec des LLM. Et à chaque version du workflow, ce n'est pas seulement la technique qui a changé, c'est ma manière d'approcher le problème.
+
+## Version 1 : la prière API
+
+La première version était presque embarrassante de simplicité.
+
+On prend le contenu. On l'envoie à l'API de openai vers GPT-3.5. On récupère une traduction. On recommence. Brut. Direct. Naïf.
+
+Et le pire, c'est que ça marchait.
+
+Pas parfaitement. Mais suffisamment pour créer l'illusion dangereuse que le problème était presque résolu. Le taux d'hallucination était faible, moins de 1 %. Si tu testes ça sur trois paragraphes, tu peux te dire : formidable. Si tu le lances sur plus de dix mille lignes, dans une douzaine de langues, le 1 % cesse d'être une erreur marginale. Il devient une certitude statistique.
+
+Quelque part, dans un fichier, une phrase a dérapé. Un terme technique a changé de sens. Un bout de structure s'est fait manger. Une URL a été touchée. La référence à une image à disparu. Et tu ne sais pas où.
+
+La v1, c'était ma phase de confiance naïve. Je découvrais qu'une machine pouvait porter une quantité absurde de travail linguistique, et je voulais y croire assez fort pour oublier que le dépôt, lui, n'oublierait rien.
+
+Le silicium craché du texte. Souvent trop vite, et je n'avais pas encore appris où mettre les garde-fous.
+
+## Version 2 — la cage déterministe
+
+La deuxième version a été ma réponse de "control freak" qui jette le bébé avec l'eau du bain; puisque le modèle est probabiliste, on reconstruit tout avec des process le plus déterminisme possible.
+
+Ligne par ligne. Segment par segment. API de traduction automatique. Glossaire statique. Parser. Recomposition. Vérifications. Fournisseurs multiples. Une architecture qui essayait de réduire l'espace où la machine pouvait faire n'importe quoi.
+
+Sur le papier, c'était plus sérieux.
+
+Dans la pratique, c'était surtout moi en train de serrer le volant beaucoup trop fort.
+
+La v2 réduisait les erreurs structurelles. Elle rendait le système plus prévisible. Elle coûtait significativement plus cher. Et surtout, elle sacrifiait quelque chose que je n'avais pas encore assez respecté : le contexte linguistique.
+
+Une ligne seule ne comprend pas le chapitre. Une phrase seule ne comprend pas le ton. Un terme technique ne se traduit pas de la même manière s'il apparaît dans une définition, dans un quiz, dans une note de cours ou dans le glossaire vivant d'un dépôt qui a déjà sa propre mémoire.
+
+C'est peut-être aussi ça le sur-engineering : une architecture qui conserve la peur de son outil au centre du design et devient sous-optimale.
+
+## Version 3 — le déterminisme adaptatif
+
+La troisième version, celle de la PR #4552, fait presque l'inverse.
+
+Elle arrête de découper le problème jusqu'à le rendre stupide. Elle redonne aux agents LLMs ce dont il a besoin pour être utile : le fichier entier, le contexte du dépôt, le glossaire réel, le droit de chercher, le droit de lire, le droit de décider qu'un terme ne doit pas être traduit.
+
+Et autour de ça, elle garde du déterminisme. Mais plus le déterminisme rigide de la cage. Un déterminisme adaptatif.
+
+En entrée : un script trouve exactement ce qui manque. Pas de LLM. Pas de réseau. Juste le dépôt, les fichiers anglais, les langues absentes.
+
+Au milieu : un agent `omp -p`, headless, travaille fichier par fichier. Il traduit en place. Il respecte la structure. Il consulte le glossaire. Il écrit ce qu'il apprend dans un fichier de connaissance par langue.
+
+En sortie : un vérificateur déterministe compare la source et la cible. Titres, fences, YAML, identifiants, liens critiques. Si la structure casse, ça ne passe pas. Si ça rate, on retente mais pas au hasard : on descend une chaîne de modèles adaptée à la langue.
+
+Le déterminisme ne remplace plus l'intelligence du modèle. Il lui donne un lit de rivière dans lequel couler.
+
+C'est là que j'ai senti le basculement. La v3 est plus simple que la v2, meilleure en qualité, et son coût reste du même ordre de grandeur — probablement même inférieur dans certains cas. Le test grandeur nature sur `scr403` l'a montré : 29 langues, 1349 fichiers, presque tout passe, et le reste est explicitement exclu plutôt que glissé sous le tapis.
+
+<Timeline items={[
+  { n: 1, tone: "muted", when: "v1 · GPT-3.5 API brute", title: "la confiance naïve", desc: "Traduire directement via l'API. Ça marche assez pour y croire, mais ~1 % d'hallucination sur +10k lignes et une douzaine de langues devient une certitude d'erreur quelque part.", image: wfV1, imageAlt: "Des mains ouvertes libérant une gerbe de particules lumineuses dans le noir" },
+  { n: 2, tone: "warn", when: "v2 · ML API ligne par ligne", title: "la cage déterministe", desc: "Sur-ingénierie : parser, glossaire statique, traduction ligne par ligne, fournisseurs multiples. Moins d'erreurs structurelles, coût significatif, qualité souvent plus plate parce que le contexte est sacrifié.", image: wfV2, imageAlt: "Des fils lumineux rigides enfermés dans une cage mécanique d'engrenages" },
+  { n: 3, tone: "accent", when: "v3 · <code>omp -p</code> headless", title: "le déterminisme adaptatif", desc: "Un agent traduit avec le contexte complet ; des scripts déterministes trouvent le travail et vérifient la structure. Moins de code, meilleure qualité, coût comparable, et des erreurs qui deviennent visibles plutôt que silencieuses.", image: wfV3, imageAlt: "Un réseau mycélien vert tissé dans une structure géométrique autour d'un nœud lumineux" },
+]}>
+  <span slot="caption">Trois versions du workflow, trois manières différentes de tenir le même problème.</span>
+</Timeline>
+
+## Des ALLM qui construisent des workflows d'ALLM
+
+Il y a une mise en abyme assez drôle dans cette histoire.
+
+La v3 n'est pas seulement un workflow qui utilise des LLM agentiques. C'est un workflow qui a été en grande partie pensé, écrit, corrigé et stabilisé avec des LLM agentiques.
+
+Des ALLM qui craftent un workflow pour orchestrer des ALLM.
+
+Une sorte serpent se mord la queue mais qui en se faisant génère des diffs utiles aux communautés Bitcoin du quatre coins du monde.
+
+C'est exactement le genre de phrase qui aurait sonné ridicule il y a trois ans. Aujourd'hui, c'est juste une manière assez précise de décrire mon travail. Je ne suis plus seulement en train d'appeler une API. Je suis en train de former un petit écosystème de compétences : un script déterministe, un agent traducteur, un vérificateur, un governor de quota, un agent de release, des fichiers de connaissance qui persistent d'une batch à l'autre.
+
+Personne ne « comprend » tout au sens humain du terme. Et pourtant l'ensemble se met à porter quelque chose qui ressemble à une compréhension pratique.
+
+Un process coordinateur qui s'adapte à chaque situation. 
+
+## Shoutout à omp
+
+Rien de tout ça n'aurait pris cette forme sans **omp — Oh My Pi**.
+
+`omp -p`, dans ce workflow, c'est la pièce qui me permet d'arrêter de traiter le LLM comme une boîte de texte. Je lui donne une mission, un dépôt, des outils, des contraintes, et il travaille sans interface de chat. Le côté headless n'est pas un détail ergonomique : c'est ce qui permet au système d'entrer dans le flux réel du dépôt.
+
+Le pipeline garde les décisions bêtes là où elles doivent rester bêtes : trouver les fichiers manquants, créer un worktree, lancer un job pool, lire les logs d'usage, vérifier la structure. Et il confie au modèle la partie où la rigidité fait mal : comprendre le contexte, choisir un terme, respecter un ton, savoir quand ne pas traduire.
+
+C'est ça, pour moi, la leçon technique de cette version : ne pas demander au modèle de tenir le cadre, et ne pas demander au cadre de parler la langue.
+
+Chacun son rôle.
+
+## La force brute comme lâcher-prise
+
+Theo ([t3](https://t3.gg)) a une intuition que je trouve de plus en plus juste : l'ère des agents rend de nouveau viables des approches bêtes, lourdes, presque brutales.
+
+Pas parce que la finesse ne compte plus. Parce qu'une partie de la finesse a changé d'endroit.
+
+La v2 essayait d'être intelligente dans le pipeline. Elle découpait, contrôlait, recomposait. La v3 est presque insultante de simplicité : prends le fichier entier, donne-le à un agent compétent, vérifie derrière. Si ça échoue, recommence avec une meilleure route.
+
+Ce n'est pas « moins penser ». C'est arrêter de penser à la place de la machine.
+
+La force brute, ici, n'est pas une absence de soin. C'est une redistribution du soin. Je ne mets plus mon énergie à empêcher le modèle de bouger. Je la mets dans le cadrage, la vérification, la traçabilité, les logs, les coûts, les points où l'erreur doit devenir visible.
+
+Et c'est peut-être ça, le vrai passage du contrôle à la confiance : ne pas faire confiance au modèle comme on ferait confiance à un humain. Faire confiance à un système où chaque composant sait suffisamment ce qu'il ne doit pas porter.
+
+## Pourquoi ça compte
+
+Tout ça pourrait rester une histoire d'outillage interne. Une petite victoire de maintainer. Un joli avant/après dans un dépôt.
+
+Mais l'enjeu n'est pas le workflow.
+
+L'enjeu, c'est qu'un cours Bitcoin avancé puisse exister en français, en espagnol, en swahili, en cinghalais, en farsi, en kirundi. Pas parce qu'une organisation a un budget de traduction infini. Pas parce que le marché a décidé que ces langues méritaient une ligne Excel. Mais parce que le coût marginal de faire circuler le savoir vient de s'effondrer.
+
+La barrière de la langue n'a pas disparu. Mais elle a changé de texture. Elle ressemble moins à un mur et plus à une file de jobs.
+
+C'est vertigineux.
+
+Et c'est là que les ALLM me semblent les plus intéressants : pas comme machines à produire du contenu infini, mais comme machines à faire passer ce qui existe déjà d'un bord du réseau à l'autre. Un cours. Un glossaire. Une explication. Une intuition. Une petite brique de compréhension qui n'avait aucune raison de rester coincée dans une seule langue.
+
+Il y aura toujours un humain au bout de la boucle. Pour relire. Pour sentir le ton. Pour voir ce que la structure ne peut pas voir. L'évolution de ce rôle-là mérite son propre texte, et je ne vais pas le voler ici.
+
+Pour l'instant, je veux juste rester avec cette image : un agent sans tête qui travaille dans un worktree, et derrière lui, des langues qui s'allument.
+
+## Une forge pour des agents ?
+
+Petite graine, sans la développer : si ce genre de workflow devient normal, nos forges ne sont pas prêtes.
+
+GitHub &amp; co ont été pensés pour des humains qui ouvrent des PR, pas pour des essaims d'agents qui peuvent produire des diffs, des traductions, des issues, des reviews et du bruit à une vitesse industrielle.
+
+Kevin ([Wizardsardine](https://wizardsardine.com)) partageait une piste que je trouve importante : le **pay-to-publish**, à la [stacker.news](https://stacker.news). Un micro-coût en sats pour publier. Pas pour monétiser l'accès. Pour donner un poids au geste. Si publier coûte quelque chose, spammer cesse d'être gratuit.
+
+Je ne sais pas encore quelle forme prendront les forges adaptées aux agents. Mais je suis presque certain qu'elles devront penser ensemble deux choses qu'on séparait jusque-là : la collaboration et la résistance au bruit.
+
+## La question ouverte
+
+La v3 ne résout pas la traduction universelle. Elle déplace juste la frontière.
+
+Avant, le problème était : « peut-on produire une traduction utilisable à grande échelle sans exploser le coût, la structure et la maintenance ? »
+
+Maintenant, la question devient plus fine : « à quel moment la relecture humaine cesse-t-elle d'être indispensable, et que devient le rôle du relecteur quand elle ne l'est plus toujours ? »
+
+Je n'ai pas encore ma réponse. Ou plutôt : j'ai une intuition, mais je préfère te demander la tienne d'abord.
+
+<Poll
+  id="universal-translation-solved"
+  lang="fr"
+  question="Quand la traduction universelle sera-t-elle un problème complètement résolu — plus aucune relecture humaine nécessaire ?"
+  options={["déjà", "~2 ans", "~5 ans", "~10 ans", "jamais · l'humain reste dans la boucle"]}
+/>
+
+## Perdre la tête, garder le cap
+
+Je crois que c'est ça que cette PR me fait sentir.
+
+J'ai moins besoin de tenir chaque ligne. Moins besoin de serrer le workflow jusqu'à l'étouffer. Moins besoin d'être malin partout.
+
+Mais le cap, lui, est plus net qu'avant.
+
+Réinventer la roue une dernière fois. Annihiler la barrière de la langue. Construire des outils qui font circuler le savoir là où il ne serait pas allé tout seul.
+
+La tête se perd un peu.
+
+Le cap reste.
+
+Et quelque part dans un worktree, un agent sans tête continue de traduire.
+
+---
+
+*Écrit le 4 juillet 2026, au moment où la PR #4552 du pipeline de traduction agentique s'apprête à rejoindre `dev`. Le run `scr403` sur 29 langues reste le test grandeur nature qui m'a convaincu que cette version tenait debout. Les versions anglaise et espagnole de ce billet ont été produites par un agent — évidemment.*
