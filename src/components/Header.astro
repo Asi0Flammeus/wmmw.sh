@@ -27,7 +27,10 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
   <a
     class="wordmark"
     href={localePath(locale, "/")}
-    aria-label={dict.nav.home}>wmmw.sh</a
+    aria-label={dict.nav.home}
+    ><span class="br" aria-hidden="true">[</span><span class="lead">w</span
+    ><span class="rest" aria-hidden="true"><i>m</i><i>m</i><i>w</i></span
+    ><span class="br" aria-hidden="true">]</span></a
   >
   <nav class="site-nav" aria-label={dict.nav.ariaLabel}>
     {
@@ -99,14 +102,50 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
 
   .wordmark {
     grid-area: mark;
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: 1.15rem;
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 1.1rem;
     line-height: 1;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.01em;
     text-decoration: none;
-    display: inline-block;
     color: var(--bone);
+    border-radius: 8px;
+  }
+  .wordmark .br {
+    color: var(--accent);
+  }
+  .wordmark .rest {
+    display: inline-flex;
+    overflow: hidden;
+  }
+  .wordmark .rest i {
+    font-style: normal;
+    display: inline-block;
+  }
+  .wordmark:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* Collapse to [w], expand to [wmmw] on hover/focus where hovering exists;
+     touch / no-hover devices always show the full [wmmw]. */
+  @media (hover: hover) {
+    .wordmark .rest {
+      max-width: 0;
+    }
+    .wordmark .rest i {
+      opacity: 0;
+    }
+    .wordmark:hover .rest,
+    .wordmark:focus-visible .rest {
+      max-width: 3.2ch;
+    }
+    .wordmark:hover .rest i,
+    .wordmark:focus-visible .rest i {
+      opacity: 1;
+    }
   }
 
   .site-nav {
@@ -174,6 +213,35 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
       flex-wrap: wrap;
       gap: 1rem;
       font-size: 0.88rem;
+    }
+  }
+
+  /* Motion only when the site has armed animation (respects reduced-motion). */
+  @media (hover: hover) {
+    :global(html.anim) .wordmark .rest {
+      transition: max-width 0.44s cubic-bezier(0.2, 0.85, 0.25, 1);
+    }
+    :global(html.anim) .wordmark .rest i {
+      transform: translateX(-0.28em);
+      transition:
+        opacity 0.3s ease,
+        transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1);
+    }
+    :global(html.anim) .wordmark:hover .rest i,
+    :global(html.anim) .wordmark:focus-visible .rest i {
+      transform: none;
+    }
+    :global(html.anim) .wordmark:hover .rest i:nth-child(1),
+    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(1) {
+      transition-delay: 0.03s;
+    }
+    :global(html.anim) .wordmark:hover .rest i:nth-child(2),
+    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(2) {
+      transition-delay: 0.09s;
+    }
+    :global(html.anim) .wordmark:hover .rest i:nth-child(3),
+    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(3) {
+      transition-delay: 0.15s;
     }
   }
 </style>
