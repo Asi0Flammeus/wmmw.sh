@@ -15,5 +15,8 @@ bun-debug.log*
 .env.*
 !.env.example
 
+# QA annotation feedback buffer (local-only)
+.prototype-feedback/
+
 # macOS-specific files
 .DS_Store

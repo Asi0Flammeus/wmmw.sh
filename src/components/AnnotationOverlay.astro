@@ -1,0 +1,539 @@
+---
+// Element-click annotation overlay. Opt-in via ANNOTATION_SYSTEM=true.
+// QA feedback tooling ported from alysis.cat.
+---
+
+<div id="proto-chrome">
+  <div class="proto-toolbar">
+    <button type="button" id="proto-anno-toggle" class="proto-btn">
+      <span class="dot"></span>
+      <span class="proto-toggle-label">Annoter</span>
+    </button>
+    <button type="button" id="proto-anno-list" class="proto-btn proto-btn--ghost" aria-label="Voir les commentaires">
+      <span id="proto-anno-count">0</span>
+    </button>
+  </div>
+
+  <div id="proto-anno-hint" hidden>
+    Clique sur n'importe quel élément. Échap pour annuler.
+  </div>
+
+  <div id="proto-anno-popover" hidden>
+    <div class="proto-popover-target"></div>
+    <textarea
+      id="proto-anno-text"
+      placeholder="Ton commentaire sur cet élément…"
+      rows="4"
+    ></textarea>
+    <div class="proto-popover-row">
+      <button type="button" id="proto-anno-cancel" class="proto-btn proto-btn--ghost">Annuler</button>
+      <button type="button" id="proto-anno-submit" class="proto-btn">Envoyer</button>
+    </div>
+  </div>
+
+  <div id="proto-anno-list-panel" hidden>
+    <div class="proto-list-head">
+      <strong>Commentaires sur cette page</strong>
+      <button type="button" id="proto-anno-list-close" class="proto-btn proto-btn--ghost">Fermer</button>
+    </div>
+    <ul id="proto-anno-list-items"></ul>
+    <div class="proto-list-foot">
+      <button type="button" id="proto-anno-export" class="proto-btn proto-btn--ghost">Copier en JSON</button>
+    </div>
+  </div>
+
+  <div id="proto-toast" hidden></div>
+</div>
+
+<style>
+  #proto-chrome {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    font-family: var(--font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+    font-size: var(--text-sm);
+  }
+  #proto-chrome > * {
+    pointer-events: auto;
+  }
+
+  .proto-toolbar {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .proto-btn {
+    background: #141413;
+    color: #FBFAF4;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+  }
+  .proto-btn:hover { background: var(--accent, #c0563b); color: #FBFAF4; }
+  .proto-btn--ghost {
+    background: rgba(20, 20, 19, 0.6);
+  }
+  .proto-btn .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent, #c0563b);
+    box-shadow: 0 0 0 2px rgba(192, 86, 59, 0.25);
+  }
+  #proto-chrome.is-active .proto-btn .dot {
+    background: #1ABF55;
+    box-shadow: 0 0 0 2px rgba(26, 191, 85, 0.3);
+    animation: proto-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes proto-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+
+  #proto-anno-hint {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent, #c0563b);
+    color: #FBFAF4;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  }
+
+  /* Highlight overlay during annotation mode */
+  :global(.proto-anno-hover) {
+    outline: 2px solid var(--accent, #c0563b) !important;
+    outline-offset: 2px;
+    cursor: crosshair !important;
+    background-color: rgba(192, 86, 59, 0.08) !important;
+  }
+  :global(.proto-anno-frozen) {
+    outline: 3px solid var(--accent, #c0563b) !important;
+    outline-offset: 3px;
+    background-color: rgba(192, 86, 59, 0.12) !important;
+  }
+  :global(body.proto-anno-mode), :global(body.proto-anno-mode *) {
+    cursor: crosshair !important;
+  }
+
+  #proto-anno-popover {
+    position: fixed;
+    background: #FBFAF4;
+    color: #141413;
+    border: 1px solid #1B1B18;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    width: min(360px, calc(100vw - 32px));
+    z-index: 10000;
+  }
+  .proto-popover-target {
+    font-size: var(--text-xs);
+    color: #6B6B68;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    margin-bottom: 8px;
+    word-break: break-all;
+    background: rgba(192, 86, 59, 0.08);
+    padding: 6px 8px;
+    border-radius: 6px;
+    line-height: 1.4;
+  }
+  #proto-anno-text {
+    width: 100%;
+    border: 1px solid #D4D2C9;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    color: #141413;
+    background: #fff;
+    resize: vertical;
+    min-height: 80px;
+  }
+  #proto-anno-text:focus {
+    outline: 2px solid var(--accent, #c0563b);
+    outline-offset: 0;
+    border-color: var(--accent, #c0563b);
+  }
+  .proto-popover-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  #proto-anno-list-panel {
+    position: fixed;
+    bottom: 70px;
+    right: 16px;
+    background: #FBFAF4;
+    color: #141413;
+    border: 1px solid #1B1B18;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    width: min(420px, calc(100vw - 32px));
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 10000;
+  }
+  .proto-list-head, .proto-list-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .proto-list-foot { margin-top: 10px; margin-bottom: 0; }
+  #proto-anno-list-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  #proto-anno-list-items li {
+    background: #fff;
+    border: 1px solid #E8E6DD;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  #proto-anno-list-items .meta {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 10px;
+    color: #6B6B68;
+    margin-bottom: 4px;
+    word-break: break-all;
+  }
+  #proto-anno-list-items .text {
+    color: #141413;
+    white-space: pre-wrap;
+  }
+
+  #proto-toast {
+    position: fixed;
+    bottom: 70px;
+    right: 16px;
+    background: #1ABF55;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    z-index: 10001;
+  }
+  #proto-toast.is-error { background: #C24C4C; }
+</style>
+
+<script>
+  type FeedbackPayload = {
+    page: string;
+    selector: string;
+    elementText?: string;
+    elementTag?: string;
+    rect?: { x: number; y: number; w: number; h: number };
+    viewport?: {
+      w: number;
+      h: number;
+      device: 'mobile' | 'desktop';
+      pointer?: 'coarse' | 'fine';
+    };
+    comment: string;
+  };
+
+  type StoredComment = FeedbackPayload & { ts: string };
+
+  function bootProtoChrome() {
+    const chrome = document.getElementById('proto-chrome');
+    if (!chrome || chrome.dataset.mounted === '1') return;
+    const chromeEl = chrome;
+    chromeEl.dataset.mounted = '1';
+
+    const toggle = document.getElementById('proto-anno-toggle') as HTMLButtonElement;
+    const toggleLabel = chromeEl.querySelector('.proto-toggle-label') as HTMLElement;
+    const hint = document.getElementById('proto-anno-hint')!;
+    const popover = document.getElementById('proto-anno-popover')!;
+    const popoverTarget = popover.querySelector('.proto-popover-target') as HTMLElement;
+    const textarea = document.getElementById('proto-anno-text') as HTMLTextAreaElement;
+    const submitBtn = document.getElementById('proto-anno-submit') as HTMLButtonElement;
+    const cancelBtn = document.getElementById('proto-anno-cancel') as HTMLButtonElement;
+    const listBtn = document.getElementById('proto-anno-list') as HTMLButtonElement;
+    const listPanel = document.getElementById('proto-anno-list-panel')!;
+    const listItems = document.getElementById('proto-anno-list-items')!;
+    const listClose = document.getElementById('proto-anno-list-close') as HTMLButtonElement;
+    const exportBtn = document.getElementById('proto-anno-export') as HTMLButtonElement;
+    const countEl = document.getElementById('proto-anno-count')!;
+    const toast = document.getElementById('proto-toast')!;
+
+    let mode = false;
+    let frozen: HTMLElement | null = null;
+    let lastHover: HTMLElement | null = null;
+    let pending: FeedbackPayload | null = null;
+
+    const PAGE = window.location.pathname;
+
+    function isInsideChrome(el: EventTarget | null): boolean {
+      return el instanceof Element && !!el.closest('#proto-chrome');
+    }
+
+    function showToast(msg: string, isError = false) {
+      toast.textContent = msg;
+      toast.classList.toggle('is-error', isError);
+      toast.hidden = false;
+      setTimeout(() => { toast.hidden = true; }, 2200);
+    }
+
+    function setMode(on: boolean) {
+      mode = on;
+      chromeEl.classList.toggle('is-active', on);
+      document.body.classList.toggle('proto-anno-mode', on);
+      hint.hidden = !on;
+      toggleLabel.textContent = on ? 'Quitter' : 'Annoter';
+      if (!on) {
+        clearHover();
+        clearFrozen();
+        popover.hidden = true;
+      }
+    }
+
+    function clearHover() {
+      if (lastHover) {
+        lastHover.classList.remove('proto-anno-hover');
+        lastHover = null;
+      }
+    }
+
+    function clearFrozen() {
+      if (frozen) {
+        frozen.classList.remove('proto-anno-frozen');
+        frozen = null;
+      }
+    }
+
+    function getSelector(el: Element): string {
+      if (el.id) return `#${CSS.escape(el.id)}`;
+      const path: string[] = [];
+      let cur: Element | null = el;
+      while (cur && cur.nodeType === 1 && cur !== document.body && path.length < 8) {
+        let part = cur.nodeName.toLowerCase();
+        const parent: Element | null = cur.parentElement;
+        if (parent) {
+          const same = Array.from(parent.children).filter((c) => c.nodeName === cur!.nodeName);
+          if (same.length > 1) {
+            part += `:nth-of-type(${same.indexOf(cur) + 1})`;
+          }
+        }
+        path.unshift(part);
+        cur = parent;
+      }
+      return path.join(' > ');
+    }
+
+    function onMove(e: MouseEvent) {
+      if (!mode || frozen) return;
+      const target = e.target as HTMLElement | null;
+      if (!target || isInsideChrome(target)) {
+        clearHover();
+        return;
+      }
+      if (target !== lastHover) {
+        clearHover();
+        lastHover = target;
+        lastHover.classList.add('proto-anno-hover');
+      }
+    }
+
+    function positionPopover(rect: DOMRect) {
+      const margin = 12;
+      const pw = popover.offsetWidth || 360;
+      const ph = popover.offsetHeight || 200;
+      let left = rect.left;
+      let top = rect.bottom + margin;
+      if (top + ph > window.innerHeight - margin) {
+        top = rect.top - ph - margin;
+      }
+      if (top < margin) top = margin;
+      if (left + pw > window.innerWidth - margin) {
+        left = window.innerWidth - pw - margin;
+      }
+      if (left < margin) left = margin;
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+    }
+
+    function onClickCapture(e: MouseEvent) {
+      if (!mode) return;
+      const target = e.target as HTMLElement | null;
+      if (!target || isInsideChrome(target)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      clearHover();
+      clearFrozen();
+      frozen = target;
+      frozen.classList.add('proto-anno-frozen');
+      const rect = target.getBoundingClientRect();
+      const text = (target.textContent || '').trim().slice(0, 200);
+      // Capture the viewport at click time: mobile breakpoint = max-width 639px
+      // (consistent with the rest of the code); pointer:coarse distinguishes real phones
+      // from narrow desktop DevTools.
+      const isMobileLayout = matchMedia('(max-width: 639px)').matches;
+      const isCoarse = matchMedia('(pointer: coarse)').matches;
+      pending = {
+        page: PAGE,
+        selector: getSelector(target),
+        elementText: text,
+        elementTag: target.nodeName.toLowerCase(),
+        rect: {
+          x: Math.round(rect.left + window.scrollX),
+          y: Math.round(rect.top + window.scrollY),
+          w: Math.round(rect.width),
+          h: Math.round(rect.height),
+        },
+        viewport: {
+          w: window.innerWidth,
+          h: window.innerHeight,
+          device: isMobileLayout ? 'mobile' : 'desktop',
+          pointer: isCoarse ? 'coarse' : 'fine',
+        },
+        comment: '',
+      };
+      popoverTarget.textContent = `<${pending.elementTag}> ${pending.selector}`;
+      textarea.value = '';
+      popover.hidden = false;
+      positionPopover(rect);
+      setTimeout(() => textarea.focus(), 0);
+    }
+
+    function closePopover() {
+      popover.hidden = true;
+      pending = null;
+      clearFrozen();
+    }
+
+    async function submit() {
+      if (!pending) return;
+      const comment = textarea.value.trim();
+      if (!comment) {
+        textarea.focus();
+        return;
+      }
+      pending.comment = comment;
+      submitBtn.disabled = true;
+      try {
+        const res = await fetch('/api/prototype-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pending),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showToast('Commentaire envoyé');
+        closePopover();
+        setMode(false);
+        refreshCount();
+      } catch (err) {
+        console.error(err);
+        showToast('Erreur, réessaie', true);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function fetchComments(): Promise<StoredComment[]> {
+      try {
+        const res = await fetch(`/api/prototype-feedback?page=${encodeURIComponent(PAGE)}`);
+        if (!res.ok) return [];
+        return await res.json();
+      } catch {
+        return [];
+      }
+    }
+
+    async function refreshCount() {
+      const items = await fetchComments();
+      countEl.textContent = String(items.length);
+    }
+
+    async function openList() {
+      const items = await fetchComments();
+      listItems.innerHTML = '';
+      if (items.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'Aucun commentaire pour l’instant.';
+        li.style.color = '#6B6B68';
+        listItems.appendChild(li);
+      } else {
+        items.forEach((it) => {
+          const li = document.createElement('li');
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          const dev = it.viewport?.device ? ` · ${it.viewport.device}` : '';
+          meta.textContent = `${new Date(it.ts).toLocaleString('fr-FR')}${dev} · <${it.elementTag}> · ${it.selector}`;
+          const text = document.createElement('div');
+          text.className = 'text';
+          text.textContent = it.comment;
+          li.appendChild(meta);
+          li.appendChild(text);
+          listItems.appendChild(li);
+        });
+      }
+      listPanel.hidden = false;
+    }
+
+    exportBtn.addEventListener('click', async () => {
+      const items = await fetchComments();
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(items, null, 2));
+        showToast('Copié dans le presse-papier');
+      } catch {
+        showToast('Copie impossible', true);
+      }
+    });
+
+    toggle.addEventListener('click', () => setMode(!mode));
+    cancelBtn.addEventListener('click', () => { closePopover(); setMode(false); });
+    submitBtn.addEventListener('click', submit);
+    listBtn.addEventListener('click', openList);
+    listClose.addEventListener('click', () => { listPanel.hidden = true; });
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('click', onClickCapture, true);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!popover.hidden) { closePopover(); return; }
+        if (mode) setMode(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !popover.hidden) {
+        submit();
+      }
+      // Alt+Y toggles annotation mode. e.code stays 'KeyY' even if Alt
+      // remaps the key (on macOS Alt+y produces '¥', on some layouts
+      // another glyph), so we test the physical key code.
+      if (e.altKey && e.code === 'KeyY' && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (!popover.hidden) return;
+        setMode(!mode);
+      }
+    });
+
+    refreshCount();
+  }
+
+  bootProtoChrome();
+  document.addEventListener('astro:page-load', bootProtoChrome);
+</script>

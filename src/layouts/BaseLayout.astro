@@ -11,6 +11,7 @@ import Mycelium from "@components/Mycelium.astro";
 import Header from "@components/Header.astro";
 import Hero from "@components/Hero.astro";
 import Footer from "@components/Footer.astro";
+import AnnotationOverlay from "@components/AnnotationOverlay.astro";
 
 interface Props {
   locale: Locale;
@@ -35,6 +36,11 @@ const {
   heroTitle,
   jsonLd,
 } = Astro.props;
+
+/** QA annotation overlay — opt-in via ANNOTATION_SYSTEM=true (or PUBLIC_ variant). */
+const annotationEnabled =
+  import.meta.env.ANNOTATION_SYSTEM === "true" ||
+  import.meta.env.PUBLIC_ANNOTATION_SYSTEM === "true";
 
 const dict = t(locale);
 
@@ -148,6 +154,7 @@ const absoluteOg = ogImage
       <slot />
     </main>
     <Footer locale={locale} />
+    {annotationEnabled && <AnnotationOverlay />}
 
     <script>
       import { initTermTyping } from "@lib/term-type";
