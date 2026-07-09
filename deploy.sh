@@ -235,13 +235,18 @@ ENVEOF
     step_done "$ENV_FILE created"
 }
 
-# Build with .env.prod values exported into the shell so Astro/Vite picks them up
+# Build with .env.prod values exported so Astro/Vite pick them up. Run in a
+# subshell: .env.prod sets PORT=4321 (container-internal); sourcing it in the
+# parent would clobber the script's PORT (4327, host-published) used by health
+# checks. The subshell keeps that pollution local to the build.
 build_image() {
-    set -a
-    # shellcheck disable=SC1090
-    source "$APP_DIR/$ENV_FILE"
-    set +a
-    $COMPOSE build --pull
+    (
+        set -a
+        # shellcheck disable=SC1090
+        source "$APP_DIR/$ENV_FILE"
+        set +a
+        $COMPOSE build --pull
+    )
 }
 
 # ==============================================================================
