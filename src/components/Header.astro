@@ -104,6 +104,10 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
     grid-area: mark;
     display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
+    /* Reserve the full [wmmw] width so expanding the logo moves only its own
+       letters, never the (centered) nav or the grid columns. */
+    min-width: 6.2ch;
     font-family: var(--mono);
     font-weight: 700;
     font-size: 1.1rem;
