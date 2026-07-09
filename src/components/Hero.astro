@@ -17,6 +17,12 @@ const emAt = h1a.indexOf(h1aEm);
 const h1aBefore = emAt >= 0 ? h1a.slice(0, emAt) : h1a;
 const h1aAfter = emAt >= 0 ? h1a.slice(emAt + h1aEm.length) : "";
 const h1aHasEm = emAt >= 0;
+
+/* break the sub onto a second line before its last sentence (the
+   "Je fais circuler..." clause), robust across fr/en/es */
+const subCut = sub.lastIndexOf(". ");
+const subLead = subCut >= 0 ? sub.slice(0, subCut + 1) : sub;
+const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
 ---
 
 <section class:list={["hero", variant]}>
@@ -39,7 +45,15 @@ const h1aHasEm = emAt >= 0;
             </span>{" "}
             <span>{h1b}</span>
           </h1>
-          <p class="hero-sub">{sub}</p>
+          <p class="hero-sub">
+            {subLead}
+            {subTail && (
+              <>
+                <br />
+                {subTail}
+              </>
+            )}
+          </p>
           <p class="hero-cmd">
             <span class="ps">
               <b>{TERM_USER}</b>:~$
@@ -110,9 +124,11 @@ const h1aHasEm = emAt >= 0;
     inset: -4rem -4rem -2rem -6rem;
     z-index: -1;
     background: radial-gradient(
-      85% 90% at 60% 62%,
+      95% 100% at 60% 62%,
       rgba(18, 16, 13, 0.9) 0%,
-      rgba(18, 16, 13, 0.55) 55%,
+      rgba(18, 16, 13, 0.7) 30%,
+      rgba(18, 16, 13, 0.4) 55%,
+      rgba(18, 16, 13, 0.15) 78%,
       transparent 100%
     );
   }

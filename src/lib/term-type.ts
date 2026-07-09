@@ -136,7 +136,7 @@ export function initTermTyping(): void {
           }
         });
       },
-      { threshold: 0.05, rootMargin: "0px 0px -28% 0px" },
+      { threshold: 0.05, rootMargin: "0px 0px -50% 0px" },
     );
     activeObserver = io;
     panels.forEach((panel) => {

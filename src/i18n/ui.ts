@@ -40,7 +40,7 @@ const fr = {
   },
   outils: {
     heading: "Outils & repos",
-    cmd: "tree outils/",
+    cmd: "tree tools/",
     intro: "# Des outils libres, comme des spores : prenez, semez.",
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
@@ -49,7 +49,7 @@ const fr = {
   },
   ecrits: {
     heading: "Écrits",
-    cmd: "ls ecrits/*.md",
+    cmd: "ls writings/*.md",
     intro: "# Des signaux envoyés dans le réseau.",
     all: "cd ecrits/",
     published: "publié le",
@@ -139,7 +139,7 @@ const en: Dict = {
   },
   outils: {
     heading: "Tools & repos",
-    cmd: "tree outils/",
+    cmd: "tree tools/",
     intro: "# Free tools, like spores: take them, sow them.",
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
@@ -148,7 +148,7 @@ const en: Dict = {
   },
   ecrits: {
     heading: "Writings",
-    cmd: "ls ecrits/*.md",
+    cmd: "ls writings/*.md",
     intro: "# Signals sent into the network.",
     all: "cd ecrits/",
     published: "published",
@@ -229,7 +229,7 @@ const es: Dict = {
   },
   outils: {
     heading: "Herramientas y repos",
-    cmd: "tree outils/",
+    cmd: "tree tools/",
     intro: "# Herramientas libres, como esporas: toma, siembra.",
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
@@ -238,7 +238,7 @@ const es: Dict = {
   },
   ecrits: {
     heading: "Escritos",
-    cmd: "ls ecrits/*.md",
+    cmd: "ls writings/*.md",
     intro: "# Señales enviadas a la red.",
     all: "cd ecrits/",
     published: "publicado el",
