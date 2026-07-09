@@ -5,7 +5,7 @@ set -e
 # wmmw.sh Deployment Script (Docker Compose)
 # Containerized: Astro node-standalone app via docker compose
 #
-# Cloudron App Proxy routes wmmw.sh -> localhost:4322
+# nginx vhost routes wmmw.sh -> localhost:4327 (TLS via certbot)
 #
 # Usage:
 #   ./deploy.sh              # First deploy (creates .env.prod, builds, starts)
@@ -19,7 +19,7 @@ set -e
 # Configuration
 DOMAIN="wmmw.sh"
 APP_DIR="$(cd "$(dirname "$0")" && pwd)"
-PORT=4322            # host-published port (Cloudron App Proxy -> localhost:4322)
+PORT=4327            # host-published port (nginx vhost -> localhost:4327)
 COMPOSE_FILE="docker-compose.yml"
 ENV_FILE=".env.prod"
 SERVICE="wmmw"       # docker compose service name

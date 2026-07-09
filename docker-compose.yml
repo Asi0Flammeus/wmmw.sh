@@ -5,8 +5,8 @@ services:
     build:
       context: .
     ports:
-      # host 4322 -> container 4321 (alysis.cat uses 4321; wmmw takes the next port)
-      - "4322:4321"
+      # host 4327 -> container 4321 (4321-4326 already taken; wmmw uses 4327)
+      - "4327:4321"
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0

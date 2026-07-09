@@ -46,9 +46,10 @@ typed dictionary under `src/i18n/`.
 
 Containerized: a multi-stage `Dockerfile` builds with bun and runs the Astro
 node-standalone server on Node 22 (`node dist/server/entry.mjs`).
-`docker-compose.yml` publishes the container's port 4321 on host port 4322
-(alysis.cat already uses 4321; wmmw takes the next port). On the crqpt server the
-Cloudron App Proxy routes `wmmw.sh` to `localhost:4322`.
+`docker-compose.yml` publishes the container's port 4321 on host port 4327
+(4321-4326 are already used by sibling apps). On the crqpt server an nginx
+vhost (`/etc/nginx/sites-enabled/wmmw.sh`) reverse-proxies `wmmw.sh` and
+`www.wmmw.sh` to `localhost:4327`, with TLS issued by certbot (Let's Encrypt).
 
 - `./deploy.sh`            first deploy (creates `.env.prod`, builds, starts)
 - `./deploy.sh update`     pull latest, rebuild, restart, health check
