@@ -10,7 +10,7 @@ interface Props {
 
 const { locale, variant, heading = "" } = Astro.props;
 const chrome = t(locale);
-const { h1a, h1aEm, h1b, sub, cta } = chrome.hero;
+const { h1a, h1aEm, h1b, sub, cta, eyebrow, scrollCue } = chrome.hero;
 
 /* wrap the accent <em> around the h1aEm substring of h1a (holds for fr/en/es) */
 const emAt = h1a.indexOf(h1aEm);
@@ -27,25 +27,39 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
 
 <section class:list={["hero", variant]}>
   <div class="hero-veil" aria-hidden="true"></div>
+  <!--
+    The palindrome as the silent grid mark. It is brand, not decoration: wmmw
+    read backwards is wmmw, which is the whole thesis of the site.
+  -->
+  <p class="ghost par fade" style="--pd:3; --d:1150ms" aria-hidden="true">wmmw</p>
   <div class="hero-copy">
     {
       variant === "full" ? (
         <>
-          <h1>
-            <span>
-              {h1aHasEm ? (
-                <>
-                  {h1aBefore}
-                  <em>{h1aEm}</em>
-                  {h1aAfter}
-                </>
-              ) : (
-                h1a
-              )}
-            </span>{" "}
-            <span>{h1b}</span>
+          <p class="hero-eyebrow par fade" style="--pd:12; --d:180ms">
+            {eyebrow}
+          </p>
+          {/* .par on the h1, .rise on each line: the parallax and the entrance
+              must never share a node, or one transform eats the other. */}
+          <h1 class="par" style="--pd:18; --pr:1.2">
+            <span class="rise" style="--d:260ms">
+              <i>
+                {h1aHasEm ? (
+                  <>
+                    {h1aBefore}
+                    <em>{h1aEm}</em>
+                    {h1aAfter}
+                  </>
+                ) : (
+                  h1a
+                )}
+              </i>
+            </span>
+            <span class="rise" style="--d:360ms">
+              <i>{h1b}</i>
+            </span>
           </h1>
-          <p class="hero-sub">
+          <p class="hero-sub par fade" style="--pd:14; --pr:1; --d:480ms">
             {subLead}
             {subTail && (
               <>
@@ -54,20 +68,37 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
               </>
             )}
           </p>
-          <p class="hero-cmd">
+          <p class="hero-cmd par fade" style="--pd:15; --pr:1.4; --d:600ms">
             <span class="ps">
               <b>{TERM_USER}</b>:~$
-            </span>{" "}
-            <a class="cta-chip" href={localePath(locale, "/manifeste")}>
+            </span>
+            <a
+              class="cta-chip glass"
+              href={localePath(locale, "/manifeste")}
+              data-spec
+            >
               {cta}
             </a>
           </p>
         </>
       ) : (
-        <h1 class="band-h">{heading}</h1>
+        <>
+          <p class="hero-eyebrow par fade" style="--pd:12; --d:160ms">
+            {eyebrow}
+          </p>
+          <h1 class="band-h par" style="--pd:18; --pr:1.2">
+            <span class="rise" style="--d:280ms">
+              <i>{heading}</i>
+            </span>
+          </h1>
+        </>
       )
     }
   </div>
+  <a class="scroll-cue par fade" style="--pd:9; --d:1040ms" href="#contenu">
+    <span>{scrollCue}</span>
+    <span class="track" aria-hidden="true"></span>
+  </a>
 </section>
 
 <style>
@@ -77,47 +108,59 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
-    overflow: hidden;
-    /* one hero size everywhere; the homepage is the reference */
+    /* clip, not hidden: clip opens no scroll container, and it keeps the
+       oversized ghost wordmark from ever widening the page on any viewport. */
+    overflow: clip;
+    /* one hero size everywhere; the homepage is the reference. mycelium.ts
+       measures this element for its bloom zone, so 100dvh is load bearing. */
     min-height: 100dvh;
+    padding-inline: var(--pad);
+    padding-bottom: clamp(3.5rem, 9vh, 6rem);
   }
+
+  /* Paint = soft top vignette + bottom fondu into --bg for legibility and a
+     clean hand-off to the content below. Every stop is deliberately light: the
+     WebGL root sits at z-index 3 and the physarum bloom at z-index 1, both
+     BEHIND this whole section, so a heavy veil would erase them.
+     The horizontal mask feathers the veil open over the LEFT column (~0-16%)
+     so the unified organism, which is left-weighted and exits bottom-left,
+     crosses the hero boundary unwalled. */
   .hero-veil {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-  }
-  /* Paint = soft top vignette + bottom fondu into --bg for legibility and a
-     clean hand-off to the content below. The horizontal mask feathers the veil
-     open over the LEFT column (~0-18%) so the unified organism, which is
-     left-weighted and exits bottom-left, crosses the hero boundary unwalled.
-     The document-level Mycelium canvas shows through from behind. */
-  .hero-veil {
     background:
-      radial-gradient(120% 95% at 60% 12%, transparent 55%, rgba(18, 16, 13, 0.5) 100%),
+      radial-gradient(120% 95% at 62% 10%, transparent 58%, rgba(18, 16, 13, 0.32) 100%),
       linear-gradient(
         to bottom,
-        rgba(18, 16, 13, 0.35) 0%,
-        transparent 20%,
-        transparent 58%,
-        rgba(18, 16, 13, 0.8) 84%,
-        var(--bg) 94%
+        rgba(18, 16, 13, 0.24) 0%,
+        transparent 22%,
+        transparent 60%,
+        rgba(18, 16, 13, 0.66) 84%,
+        var(--bg) 95%
       );
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 18%, #000 44%);
-    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.35) 18%, #000 44%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 16%, #000 40%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 16%, #000 40%);
+  }
+
+  /* Above the veil, below the copy. At the stage.css default of z-index 0 the
+     bottom fondu would erase it, which is not a ghost, it is nothing. */
+  .hero .ghost {
+    z-index: 2;
   }
 
   /* copy block lives on the RIGHT, away from the left-weighted bloom */
   .hero-copy {
     position: relative;
-    z-index: 2;
-    max-width: 42rem;
-    padding-inline: var(--pad);
-    padding-bottom: clamp(3.5rem, 9vh, 6rem);
+    z-index: 4;
+    /* --d inherits, so every layer states its own delay and none of them
+       silently picks up a wrapper's stagger. */
+    --d: 0ms;
+    width: min(100%, max(22rem, calc(780 * var(--u))));
   }
-  /* copy scrim: local darkening behind the text so it stays AA-legible over
-     the bloom's rightward spill, without flattening the organism elsewhere.
-     Reaches further LEFT, toward the incoming mass. */
+  /* copy scrim: local darkening behind the text so it stays AA-legible over the
+     bloom's rightward spill, without flattening the organism elsewhere. */
   .hero-copy::before {
     content: "";
     position: absolute;
@@ -125,49 +168,70 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     z-index: -1;
     background: radial-gradient(
       95% 100% at 60% 62%,
-      rgba(18, 16, 13, 0.9) 0%,
-      rgba(18, 16, 13, 0.7) 30%,
-      rgba(18, 16, 13, 0.4) 55%,
-      rgba(18, 16, 13, 0.15) 78%,
+      rgba(18, 16, 13, 0.82) 0%,
+      rgba(18, 16, 13, 0.62) 30%,
+      rgba(18, 16, 13, 0.34) 55%,
+      rgba(18, 16, 13, 0.12) 78%,
       transparent 100%
     );
   }
 
+  .hero-eyebrow {
+    margin-bottom: max(0.9rem, calc(16 * var(--u)));
+    font-family: var(--mono);
+    font-size: max(10px, calc(11 * var(--u)));
+    font-weight: 500;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* Composed, not fluid: 1u == 1px on the 1440x900 reference frame, floored in
+     rem so a 320px screen stays readable. */
   .hero h1 {
     font-family: var(--disp);
     font-weight: 500;
-    font-size: clamp(2.5rem, 6.5vw, 5.2rem);
-    line-height: 1.04;
-    letter-spacing: -0.035em;
+    font-size: max(2.35rem, calc(63 * var(--u)));
+    line-height: 1.03;
+    letter-spacing: calc(-0.4 * var(--u));
     text-wrap: balance;
+  }
+  /* .rise > i is block only under html.anim; the two authored lines must stack
+     with animation off too. */
+  .hero h1 .rise,
+  .hero h1 i {
+    display: block;
+  }
+  .hero h1 i {
+    font-style: normal;
   }
   .hero h1 em {
     font-style: normal;
     color: var(--accent);
   }
+
   .hero .band-h {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: clamp(2rem, 4.5vw, 3.4rem);
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-    text-wrap: balance;
+    font-size: max(1.9rem, calc(46 * var(--u)));
+    line-height: 1.06;
     color: var(--bone);
     max-width: 24ch;
   }
+
   .hero-sub {
-    margin-top: 1.4rem;
-    max-width: 34rem;
-    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    margin-top: max(1.2rem, calc(24 * var(--u)));
+    max-width: min(100%, max(17rem, calc(300 * var(--u))));
+    font-size: max(1rem, calc(16.5 * var(--u)));
+    line-height: max(1.5rem, calc(22 * var(--u)));
     color: var(--ink-2);
   }
+
   .hero-cmd {
-    margin-top: 2.1rem;
+    margin-top: max(1.7rem, calc(32 * var(--u)));
     font-family: var(--mono);
-    font-size: 0.95rem;
+    font-size: max(0.85rem, calc(13.5 * var(--u)));
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     gap: 0.9ch;
   }
   .ps {
@@ -179,40 +243,72 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     color: var(--accent);
     font-weight: 500;
   }
+
+  /* glass ground, gold ink, gold inversion on hover. No background at rest, or
+     it would paint over .glass. */
   .cta-chip {
-    display: inline-block;
+    /* the prompt line carries --d:600ms; the chip has no entrance of its own */
+    --d: 0ms;
+    display: inline-flex;
+    align-items: center;
+    min-height: max(44px, calc(42 * var(--u)));
+    padding-inline: max(0.9rem, calc(18 * var(--u)));
+    border-radius: max(8px, calc(11 * var(--u)));
+    border-color: rgba(217, 162, 74, 0.42);
     font-family: var(--mono);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: inherit;
     text-decoration: none;
     color: var(--accent);
-    background: var(--accent-soft);
-    border: 1px solid rgba(217, 162, 74, 0.5);
-    padding: 0.5em 0.95em;
-    border-radius: var(--r-tile);
   }
-  .cta-chip:hover {
+  .cta-chip:hover,
+  .cta-chip:focus-visible {
     background: var(--accent);
     color: var(--bg);
+    border-color: var(--accent);
   }
   .cta-chip:active {
     transform: translateY(1px);
   }
 
-  @media (min-width: 768px) {
-    .hero.full h1 span {
-      display: block;
+  /* pinned bottom-left, in the gutter the copy never uses */
+  .hero .scroll-cue {
+    left: max(8px, calc(16 * var(--u)));
+    bottom: max(18px, calc(30 * var(--u)));
+    z-index: 5;
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .hero h1 {
+      font-size: max(2rem, calc(62 * var(--u)));
+    }
+    .hero .band-h {
+      font-size: max(1.75rem, calc(44 * var(--u)));
+    }
+    .hero-sub {
+      max-width: min(100%, calc(620 * var(--u)));
+      font-size: max(1.05rem, calc(19 * var(--u)));
+      line-height: max(1.6rem, calc(27 * var(--u)));
+    }
+    /* the ghost is allowed to bleed off the left edge, never to widen the page */
+    .hero .ghost {
+      font-size: max(96px, calc(190 * var(--u)));
+      letter-spacing: calc(10 * var(--u));
     }
   }
+
   @media (max-width: 767px) {
-    .hero.full .hero-copy {
+    .hero.full {
+      /* room for the scroll cue under the copy block */
       padding-bottom: clamp(4.5rem, 12vh, 7rem);
     }
   }
 
-  html.anim .cta-chip {
+  :global(html.anim) .cta-chip {
     transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
+      color 0.2s var(--ease),
+      background-color 0.2s var(--ease),
+      border-color 0.2s var(--ease);
   }
 </style>

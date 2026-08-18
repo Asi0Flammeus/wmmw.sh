@@ -5,10 +5,19 @@ interface Props {
   command: string;
   ariaLabel?: string;
   class?: string;
+  /** Entrance delay in ms, for a page that staggers several commands. */
+  d?: number;
 }
 
-const { command, ariaLabel, class: className } = Astro.props;
+const { command, ariaLabel, class: className, d } = Astro.props;
 const label = ariaLabel ?? `${TERM_USER}:~$ ${command}`;
 ---
 
-<p class:list={["cmdline", className]} data-step="type" aria-label={label}><span class="ps"><b>{TERM_USER}</b>:~$</span> <span class="cmd-text">{command}</span><span class="caret" aria-hidden="true"></span></p>
+<p
+  class:list={["cmdline", className]}
+  data-step="type"
+  aria-label={label}
+  style={d === undefined ? undefined : `--d:${d}ms`}
+><span class="ps"><b>{TERM_USER}</b>:~$</span> <span class="cmd-text">{command}</span><span
+    class="caret"
+    aria-hidden="true"></span></p>

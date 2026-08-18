@@ -27,17 +27,17 @@ const { Content } = await render(entry);
   ogImage={data.image ? data.image.src : undefined}
 >
   <article class="post">
-    <p class="post-back">
-      <a href={localePath(locale, "/ecrits")}>{dict.ecrits.back}</a>
+    <p class="post-back mask" style="--d:60ms">
+      <a href={localePath(locale, "/ecrits")} data-spec>{dict.ecrits.back}</a>
     </p>
 
-    <header class="post-head">
+    <header class="post-head mask" style="--d:160ms">
       <p class="post-path">{dict.ecrits.readingDir}{slug}.md</p>
       <p class="post-meta">
         <span>{dict.ecrits.published} {formatDate(data.publishedAt, locale)}</span>
         {
           data.updatedAt && (
-            <span class="post-meta-sep">
+            <span>
               {dict.ecrits.updated} {formatDate(data.updatedAt, locale)}
             </span>
           )
@@ -55,14 +55,11 @@ const { Content } = await render(entry);
       {
         translations.length > 0 && (
           <p class="post-translations">
-            {dict.ecrits.translations}{" "}
-            {translations.map((tr, i) => (
-              <Fragment>
-                {i > 0 && <span class="sep">, </span>}
-                <a href={localePath(tr.data.lang, `/ecrits/${baseSlug(tr)}`)}>
-                  {dict.lang.switchTo[tr.data.lang]}
-                </a>
-              </Fragment>
+            <span class="pt-label">{dict.ecrits.translations}</span>
+            {translations.map((tr) => (
+              <a href={localePath(tr.data.lang, `/ecrits/${baseSlug(tr)}`)}>
+                {dict.lang.switchTo[tr.data.lang]}
+              </a>
             ))}
           </p>
         )
@@ -71,7 +68,7 @@ const { Content } = await render(entry);
 
     {
       data.image && (
-        <figure class="post-cover">
+        <figure class="post-cover mask" style="--d:280ms; --mr:calc(34 * var(--u))">
           <Image
             src={data.image}
             alt={data.imageAlt ?? ""}
@@ -82,107 +79,174 @@ const { Content } = await render(entry);
       )
     }
 
-    <div class="prose crqpt-compat">
+    <div class="prose crqpt-compat fade" style="--d:420ms">
       <Content />
     </div>
 
-    <p class="post-back post-back-end">
-      <a href={localePath(locale, "/ecrits")}>{dict.ecrits.back}</a>
+    <p class="post-back post-back-end fade" style="--d:120ms">
+      <a href={localePath(locale, "/ecrits")} data-spec>{dict.ecrits.back}</a>
     </p>
   </article>
 </BaseLayout>
 
 <style>
-  /* ---------- post shell (readable measure) ---------- */
+  /* ---------- post shell (readable measure) ----------
+     This page has no .panel: no mycelium branch, no typing run. Its whole job
+     is reading comfort, so the body copy never carries a transform and the
+     prose has no parallax rung. Only the chrome around it moves. */
   .post {
     max-width: 65ch;
     margin-inline: auto;
     padding: clamp(2.5rem, 6vw, 4.5rem) var(--pad) 5rem;
   }
 
-  /* ---------- terminal-flavored back nav ---------- */
+  /* --d inherits. Every block that carries an entrance delay hands it back to
+     0ms at its own children, so nothing inside the prose (or inside a blog
+     component the MDX renders) silently absorbs the parent's stagger. */
+  .post-back > :global(*),
+  .post-head > :global(*),
+  .post-cover > :global(*),
+  .prose > :global(*) {
+    --d: 0ms;
+  }
+
+  /* ---------- back nav: glass pills, lit by the shared specular driver ---------- */
   .post-back {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    margin-bottom: 2rem;
+    margin-bottom: 2.4rem;
   }
   .post-back a {
-    color: var(--ink-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+    min-height: 44px;
+    padding-inline: max(14px, calc(18 * var(--u)));
+    border-radius: var(--r-pill);
+    font-family: var(--mono);
+    font-size: max(11px, calc(12 * var(--u)));
+    letter-spacing: 0.08em;
+    color: var(--ink-2);
     text-decoration: none;
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
+    border: 1px solid rgba(232, 226, 213, 0.11);
+    box-shadow:
+      0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(8, 7, 5, 0.34),
+      inset 0 1px rgba(232, 226, 213, 0.06);
   }
   .post-back a::before {
-    content: "$ ";
-    color: var(--ink-3);
+    content: "$";
+    color: var(--accent);
   }
   .post-back a:hover,
   .post-back a:focus-visible {
-    color: var(--accent);
+    color: var(--bone);
+    border-color: rgba(232, 226, 213, 0.2);
+  }
+  :global(html.anim) .post-back a {
+    transition:
+      color 0.4s var(--ease),
+      border-color 0.4s var(--ease);
   }
   .post-back-end {
-    margin-top: 3rem;
+    margin-top: 3.4rem;
     margin-bottom: 0;
   }
 
-  /* ---------- mono metadata header ---------- */
+  /* ---------- metadata header: tracked mono micro-labels ---------- */
   .post-head {
-    margin-bottom: 2.4rem;
+    margin-bottom: 2.6rem;
   }
   .post-path {
     font-family: var(--mono);
-    font-size: 0.8rem;
+    /* A shell path is literal: it keeps its own case, unlike the labels below. */
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.08em;
     color: var(--ink-3);
-    margin-bottom: 1rem;
+    margin-bottom: 1.1rem;
   }
   .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
     font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--ink-3);
-    margin-bottom: 1rem;
-  }
-  .post-meta-sep::before {
-    content: " · ";
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1.2rem;
   }
   .post-tags {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.45rem;
     padding: 0;
-    margin: 0 0 1rem;
+    margin: 0 0 1.2rem;
   }
   .post-tags li {
     font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--ink-3);
-    border: 1px solid var(--hair);
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.06em;
+    color: var(--ink-2);
+    padding: 0.28rem 0.7rem;
     border-radius: var(--r-pill);
-    padding: 0.2rem 0.65rem;
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
+    border: 1px solid rgba(232, 226, 213, 0.11);
   }
+
+  /* compact switcher: one label, then the sibling locales as small pills */
   .post-translations {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.8rem;
+    margin: 0;
+  }
+  .pt-label {
     font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--ink-3);
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
   }
   .post-translations a {
+    font-family: var(--mono);
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.06em;
     color: var(--accent);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease;
+    padding: 0.24rem 0.7rem;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--hair);
   }
   .post-translations a:hover,
   .post-translations a:focus-visible {
-    border-bottom-color: var(--accent);
+    color: var(--accent-2);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  :global(html.anim) .post-translations a {
+    transition:
+      color 0.4s var(--ease),
+      border-color 0.4s var(--ease),
+      background 0.4s var(--ease);
   }
 
-  /* ---------- cover ---------- */
+  /* ---------- cover: paper-adjacent well, the one soft frame on the page ---------- */
   .post-cover {
-    margin: 0 0 2.6rem;
+    margin: 0 0 2.8rem;
+    padding: max(8px, calc(14 * var(--u)));
+    background: var(--paper-well);
+    border-radius: calc(34 * var(--u));
   }
   .post-cover :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--r-tile);
+    border-radius: calc(22 * var(--u));
   }
 
   /* ---------- article body (MDX renders here; needs :global) ---------- */

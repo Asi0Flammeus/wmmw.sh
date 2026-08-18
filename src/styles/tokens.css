@@ -1,4 +1,6 @@
-/* wmmw.sh design tokens (design of record: mockup D "hybride") */
+/* wmmw.sh design tokens.
+   Base: mockup D "hybride" (humus + gold).
+   Layer 2: Sylva-grade composition unit, paper contrast and easings. */
 :root {
   /* palette: dark, locked */
   --bg: #12100d;
@@ -13,11 +15,27 @@
   --accent-soft: rgba(217, 162, 74, 0.12);
   --hair: rgba(232, 226, 213, 0.14);
   --hair-2: rgba(232, 226, 213, 0.12);
+  --rule: rgba(232, 226, 213, 0.055);
+  /* .55 keeps it quiet and still measures 4.7:1 on --bg, so micro-labels at
+     10px stay above AA for normal text. */
+  --ink-faint: rgba(232, 226, 213, 0.55);
+
+  /* paper: the one high-contrast surface, used for a single spotlight per page */
+  --paper: #f2f3ef;
+  --paper-ink: #23261f;
+  /* Sylva's #7c8177 measures 3.58:1 on paper, below AA for normal text. This
+     value measures 5.4:1 and keeps the label quiet against the heading. */
+  --paper-label: #5f645b;
+  --paper-well: #262b20;
 
   /* layout */
   --pad: clamp(1.25rem, 5vw, 3rem);
   --maxw: 1200px;
   --panelw: 880px;
+
+  /* composition unit: 1u == 1px on a 1440x900 reference frame.
+     Only the hero stage furniture is measured in u; the document keeps rem. */
+  --u: calc(100vw / 1440);
 
   /* radii: one system */
   --r-tile: 10px;
@@ -37,4 +55,20 @@
   --disp: "Space Grotesk Variable", "Space Grotesk", sans-serif;
   --body: "Instrument Sans Variable", "Instrument Sans", sans-serif;
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+
+  /* motion: two curves for the whole site */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 1680px) {
+  :root {
+    --u: calc(1680px / 1440);
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --u: calc(100vw / 760);
+  }
 }

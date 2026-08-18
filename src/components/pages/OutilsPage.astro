@@ -18,6 +18,34 @@ const tools = (await getCollection("tools")).sort(
 
 /** Public destination for the tree name: repo when open, product url otherwise. */
 const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
+
+/**
+ * The first stable tool is this page's single paper spotlight. The tree above
+ * still lists every tool, and every other tool keeps its dark detail group.
+ */
+const spotlight = tools.find((tool) => tool.data.status === "stable");
+const spotlightDest = spotlight ? dest(spotlight.data) : undefined;
+const details = tools.filter((tool) => tool.id !== spotlight?.id);
+
+/**
+ * Depth ladder and entrance stagger.
+ *
+ *   tree overview     offset-r   depth 6  / rot 0.9   d 120ms
+ *   paper spotlight   offset-l   depth 10 / rot 2.4   d 240ms
+ *   dark details      offset-r   depth 9  / rot 1.3   d 360ms
+ *
+ * The tree rides shallow on purpose: its box-drawing column is the joke, and a
+ * monospaced column sliding under the cursor reads as a wobble, not as depth.
+ * Panel depth stays at 10 or less because mycelium.ts measures .panel-head with
+ * the transform applied and re-measures only on rebuild, so a deeper panel
+ * drifts off its filament branch tip. The spotlight gets its "front card" read
+ * from rotation, which pivots about the centre and barely moves the head.
+ *
+ * Entrances use .mask, not .reveal: html.anim .reveal writes
+ * transform: translateY(14px) at a higher specificity than .par, so an element
+ * carrying both loses its depth for good. Panel bodies keep their own viewport
+ * trigger, the [data-step] sequence driven by term-type.ts.
+ */
 ---
 
 <BaseLayout
@@ -29,7 +57,7 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/outils" class="reveal">
+        <TerminalPanel path="~/outils" depth={6} rot={0.9} d={120}>
           <TermCmd command={dict.outils.cmd} />
           <div class="out" data-step="fade">
             <p class="c intro">{dict.outils.intro}</p>
@@ -64,12 +92,70 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
     </div>
   </section>
 
-  <section class="sec offset-l" data-block>
+  {
+    spotlight && (
+      <section class="sec offset-l" data-block>
+        <div class="wrap">
+          <div class="sec-inner">
+            <TerminalPanel
+              path={`~/outils/${spotlight.data.name}`}
+              variant="paper"
+              depth={10}
+              rot={2.4}
+              d={240}
+             
+            >
+              <p class="paper-label">{dict.outils.spotlight}</p>
+              <h3>
+                {spotlightDest ? (
+                  <a href={spotlightDest} rel="noopener">
+                    {spotlight.data.name}
+                  </a>
+                ) : (
+                  spotlight.data.name
+                )}
+              </h3>
+              <p>{spotlight.data.blurb[locale]}</p>
+              <p class="pmeta">
+                <span class="badge">{spotlight.data.status}</span>
+              </p>
+              <div class="well">
+                <TermCmd command={`cat ${spotlight.data.name}/README.md`} />
+                <div class="out" data-step="fade">
+                  {spotlightDest && <p class="tdlink">{`-> ${spotlightDest}`}</p>}
+                  {spotlight.data.install && (
+                    <p class="install">
+                      <span class="idollar" aria-hidden="true">$</span>
+                      {" "}
+                      {spotlight.data.install}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {spotlightDest && (
+                <a
+                  class="paper-knob"
+                  href={spotlightDest}
+                  rel="noopener"
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <span>-&gt;</span>
+                </a>
+              )}
+            </TerminalPanel>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/outils" class="reveal">
+        <TerminalPanel path="~/outils" depth={9} rot={1.3} d={360}>
           {
-            tools.map((tool) => (
+            details.map((tool) => (
               <>
                 <TermCmd command={`cat ${tool.data.name}/README.md`} />
                 <div class="out" data-step="fade">
@@ -181,6 +267,7 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
   .tdlink {
     margin-top: 0.6rem;
     overflow-wrap: anywhere;
+    color: var(--accent);
   }
   .tdlink a {
     color: var(--accent);
@@ -198,6 +285,35 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
   }
   .idollar {
     color: var(--ink-3);
+  }
+
+  /* ---------- the one paper card on the page ---------- */
+  .pmeta {
+    margin-top: 1.1rem;
+  }
+  /* The status pill on the paper spotlight: gold on paper sits at 1.9:1, so the
+     light card gets its own dark-on-light pill. The ancestor is :global because
+     .paper lands on the panel root, outside this component's scope. */
+  :global(.paper) .badge {
+    background: rgba(38, 43, 32, 0.09);
+    color: var(--paper-well);
+  }
+  /* The well restores the terminal palette, so the echo and the install line
+     keep bone and gold. Only the top spacing changes: the command line above
+     already carries the group's air. */
+  /* The knob is absolute in the panel's bottom-right corner, so the last block
+     of a paper card must leave it room: body padding plus 40u clears a 46u knob
+     sitting 18u off the bottom edge. */
+  .well {
+    margin-bottom: max(30px, calc(40 * var(--u)));
+  }
+  .well .tdlink {
+    margin-top: 0.75rem;
+  }
+  .paper-knob span {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
   @media (max-width: 767px) {

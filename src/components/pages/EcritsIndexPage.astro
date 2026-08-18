@@ -2,7 +2,7 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import TerminalPanel from "@components/TerminalPanel.astro";
 import TermCmd from "@components/TermCmd.astro";
-import { type Locale, t, localePath, isoDate } from "@i18n/index";
+import { type Locale, t, localePath, isoDate, formatDate } from "@i18n/index";
 import { publishedWritings, baseSlug } from "@lib/writings";
 
 interface Props {
@@ -12,6 +12,11 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 const entries = await publishedWritings(locale);
+
+/* publishedWritings sorts newest first, so entries[0] is the promoted post.
+   It stays in the listing below: `ls` must show every file. */
+const featured = entries[0];
+const featuredSlug = featured ? baseSlug(featured) : "";
 ---
 
 <BaseLayout
@@ -23,16 +28,47 @@ const entries = await publishedWritings(locale);
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/ecrits" class="reveal">
+        {
+          featured && (
+            <div class="feat reveal">
+              <TerminalPanel
+                path={`~/ecrits/${featuredSlug}.md`}
+                variant="paper"
+                depth={10}
+                rot={2.2}
+                d={140}
+              >
+                <p class="paper-label">
+                  {dict.ecrits.published}{" "}
+                  {formatDate(featured.data.publishedAt, locale)}
+                </p>
+                <h2 class="feat-title">
+                  <a href={localePath(locale, `/ecrits/${featuredSlug}`)}>
+                    {featured.data.title}
+                  </a>
+                </h2>
+                <p class="feat-hook">{featured.data.description}</p>
+                <span class="paper-knob" aria-hidden="true">→</span>
+              </TerminalPanel>
+            </div>
+          )
+        }
+
+        <TerminalPanel path="~/ecrits" depth={4} rot={0} d={240}>
           <TermCmd command={dict.ecrits.cmd} />
           <div class="out" data-step="fade">
             <p class="c intro">{dict.ecrits.intro}</p>
             <div class="flist">
               {
-                entries.map((entry) => {
+                entries.map((entry, i) => {
                   const slug = baseSlug(entry);
                   return (
-                    <a class="frow" href={localePath(locale, `/ecrits/${slug}`)}>
+                    <a
+                      class="frow"
+                      data-spec
+                      style={`--d:${Math.min(i, 8) * 70}ms`}
+                      href={localePath(locale, `/ecrits/${slug}`)}
+                    >
                       <span class="fline">
                         <span class="fdir">ecrits/</span><span class="fname">{slug}.md</span><span class="lead" aria-hidden="true" /><span class="fdate">{isoDate(entry.data.publishedAt)}</span>
                       </span>
@@ -51,17 +87,50 @@ const entries = await publishedWritings(locale);
 </BaseLayout>
 
 <style>
-  /* ecrits index: dotted-leader TOC (ported from mockup D) */
+  /* ---------- promoted post: the page's single paper surface ---------- */
+  .feat {
+    margin-bottom: clamp(2rem, 4vw, 3.2rem);
+  }
+  /* The title carries the only link; the knob is decoration and the pseudo
+     element stretches the same link over the whole card. */
+  .feat-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .feat-title a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .feat-hook {
+    max-width: 52ch;
+    /* gutter for the knob: floored, because the knob itself is floored at 40px
+       and the narrow --u rebase would otherwise let the hook run under it */
+    padding-right: max(58px, calc(56 * var(--u)));
+  }
+  .feat .paper-knob {
+    font-size: max(14px, calc(17 * var(--u)));
+    line-height: 1;
+  }
+
+  /* ---------- ecrits index: dotted-leader TOC (ported from mockup D) ----------
+     The leader alignment rides the monospace grid: .fline keeps its baseline
+     flex row and the row padding is cancelled by an equal negative margin, so
+     every glyph stays on the same column as the rest of the panel. */
   .flist {
     display: grid;
-    gap: 2.1rem;
+    gap: 1.2rem;
   }
   .frow {
     display: grid;
     gap: 0.35rem;
     text-decoration: none;
     color: inherit;
+    border: 1px solid transparent;
     border-radius: var(--r-tile);
+    padding: 0.55rem 0.8rem;
+    margin-inline: calc(-0.8rem - 1px);
   }
   .fline {
     display: flex;
@@ -82,6 +151,7 @@ const entries = await publishedWritings(locale);
     min-width: 3ch;
     border-bottom: 1px dotted var(--hair);
     transform: translateY(-0.3em);
+    transform-origin: 0 50%;
   }
   .fdate {
     color: var(--ink-2);
@@ -95,6 +165,16 @@ const entries = await publishedWritings(locale);
   .fhook {
     max-width: 58ch;
   }
+
+  /* Row chrome: the same faked glass as the header dock, lit by the shared
+     specular driver through the data-spec attribute. */
+  .frow:hover,
+  .frow:focus-visible {
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
+    border-color: rgba(232, 226, 213, 0.11);
+  }
   .frow:hover .fname,
   .frow:focus-visible .fname {
     text-decoration: underline;
@@ -102,5 +182,44 @@ const entries = await publishedWritings(locale);
   .frow:hover .ftitle,
   .frow:focus-visible .ftitle {
     color: var(--accent-2);
+  }
+  :global(html.anim) .frow {
+    transition:
+      background 0.45s var(--ease),
+      border-color 0.45s var(--ease);
+  }
+
+  /* ---------- row stagger ----------
+     The panel mask is spent by the time this section is scrolled to, so the
+     rows ride term-type instead: they print with the `ls` output block, one
+     --d rung apart. Opacity only on the text; the dotted leader draws itself
+     with a scaleX, which is safe because it is decorative and aria-hidden.
+     Every row sets its own --d inline, so the panel's own delay never reaches
+     one, and .lead inherits its row's --d on purpose: the leader draws just
+     after the line it belongs to. Do not reset --d inside a row. */
+  :global(html.anim.armed) .frow {
+    opacity: 0;
+  }
+  :global(html.anim.armed) .frow .lead {
+    transform: translateY(-0.3em) scaleX(0);
+  }
+  :global(html.anim.armed) .out.on .frow {
+    opacity: 1;
+    transition: opacity 0.5s var(--ease) var(--d, 0ms);
+  }
+  :global(html.anim.armed) .out.on .frow .lead {
+    transform: translateY(-0.3em) scaleX(1);
+    transition: transform 0.8s var(--ease-out) calc(var(--d, 0ms) + 120ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.anim.armed) .frow {
+      opacity: 1;
+    }
+    :global(html.anim.armed) .frow .lead,
+    :global(html.anim.armed) .out.on .frow .lead {
+      transform: translateY(-0.3em);
+      transition: none;
+    }
   }
 </style>

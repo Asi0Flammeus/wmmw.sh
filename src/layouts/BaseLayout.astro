@@ -11,6 +11,7 @@ import Mycelium from "@components/Mycelium.astro";
 import Header from "@components/Header.astro";
 import Hero from "@components/Hero.astro";
 import Footer from "@components/Footer.astro";
+import Stage from "@components/Stage.astro";
 import AnnotationOverlay from "@components/AnnotationOverlay.astro";
 
 interface Props {
@@ -147,7 +148,9 @@ const absoluteOg = ogImage
   </head>
   <body>
     <a class="skip" href="#contenu">{dict.skip}</a>
+    <div class="guides" aria-hidden="true"><i></i><i></i><i></i></div>
     <Mycelium />
+    <Stage locale={locale} />
     <Header locale={locale} path={path} />
     <Hero locale={locale} variant={heroVariant} heading={heroTitle ?? title} />
     <main id="contenu">
@@ -158,11 +161,16 @@ const absoluteOg = ogImage
 
     <script>
       import { initTermTyping } from "@lib/term-type";
+      import { initPointer, stageEntrance } from "@lib/pointer";
+      import { initSpec } from "@lib/spec";
 
       let revealObserver: IntersectionObserver | undefined;
 
       const boot = (): void => {
         initTermTyping();
+        initPointer();
+        stageEntrance();
+        initSpec();
 
         revealObserver?.disconnect();
         const anim = document.documentElement.classList.contains("anim");

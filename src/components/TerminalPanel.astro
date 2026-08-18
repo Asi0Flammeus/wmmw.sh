@@ -4,32 +4,98 @@ import { TERM_USER } from "@lib/site";
 interface Props {
   path: string;
   class?: string;
+  /** "paper" is the one light card per page. Dark is the terminal default. */
+  variant?: "dark" | "paper";
+  /** Parallax depth: px of travel at full pointer deflection. 0 keeps the panel off the ladder. */
+  depth?: number;
+  /** Degrees of rotation at full deflection. Cards rotate more than text; defaults to depth * 0.11. */
+  rot?: number;
+  /** Entrance delay in ms for the clip-path wipe. */
+  d?: number;
 }
 
-const { path, class: className } = Astro.props;
+const { path, class: className, variant = "dark", depth = 0, rot, d } = Astro.props;
+
+const paper = variant === "paper";
+
+/* A panel on the ladder carries .par on the panel root itself. The entrance
+   animates clip-path and the parallax animates transform, so the two compose on
+   one node. Cost of the shared root: mycelium.ts measures .panel-head with
+   getBoundingClientRect, which includes the transform, so a deep panel drifts a
+   few px away from its filament branch tip. Keep panel depth at 10 or less. */
+const parallax = depth !== 0;
+
+const vars = [
+  parallax ? `--pd:${depth}` : "",
+  parallax ? `--pr:${rot ?? Math.round(depth * 11) / 100}` : "",
+  d === undefined ? "" : `--d:${d}ms`,
+]
+  .filter(Boolean)
+  .join(";");
 ---
 
-<div class:list={["panel", className]}>
-  <div class="panel-head"><span class="ph-path"><b>{TERM_USER}</b>:{path}</span></div>
+<div
+  class:list={["panel", "mask", paper && "paper", parallax && "par", className]}
+  style={vars || undefined}
+>
+  {/* No data-spec on paper: a bone conic rim on a light card reads as dirt. */}
+  <div class="panel-head" data-spec={paper ? undefined : ""}>
+    <span class="ph-path"><b>{TERM_USER}</b>:{path}</span>
+  </div>
   <div class="panel-body"><slot /></div>
 </div>
 
 <style>
-  /* ---------- terminal panel (component-owned structure) ---------- */
+  /* ---------- terminal panel (component-owned structure) ----------
+     Two surfaces, one shell. The dark panel is the terminal; the paper variant
+     borrows stage.css's .paper grammar for the single light card a page is
+     allowed. Structural hairlines stay a literal 1px at every viewport; only
+     shadows and radii scale with the composition unit u. */
   .panel {
+    position: relative; /* anchors .paper-knob and the specular rim */
+    --mr: var(--r-tile); /* the .mask wipe rounds to the panel's own radius */
+    border-radius: var(--r-tile);
+  }
+
+  /* A scoped selector (.panel + the astro cid attribute) outranks the .paper
+     utility, so the paper variant restates every surface property it needs. */
+  .panel:not(.paper) {
     background: var(--surf);
     border: 1px solid var(--hair-2);
-    border-radius: var(--r-tile);
-    overflow: hidden;
+    box-shadow: 0 calc(18 * var(--u)) calc(46 * var(--u)) rgba(8, 7, 5, 0.28);
   }
+
+  .panel.paper {
+    --mr: calc(34 * var(--u));
+    /* Every panel carries .mask, and the mask rules own the transition
+       property. --mask-also splices the card's own hover easing in ahead of
+       the clip, so .paper's box-shadow lift survives the intro. */
+    --mask-also: box-shadow 0.8s var(--ease);
+    border: 0;
+    border-radius: calc(34 * var(--u));
+    /* .paper pads itself for a bare card; here the head and body carry the
+       inset, so the utility's own padding would double it. */
+    padding: 0;
+  }
+
+  /* ---------- head: faked glass, never backdrop-filter ----------
+     The gradient and alphas are copied from .glass rather than reusing the
+     utility class: .glass carries a full 1px border and an outer drop shadow,
+     both wrong for a strip that sits inside the panel's own border. */
   .panel-head {
-    background: var(--surf-head);
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
     border-bottom: 1px solid var(--hair-2);
+    /* own radius, because the panel does not clip: the specular rim draws at
+       inset -1px and overflow:hidden would eat all of it but the bottom edge */
+    border-radius: calc(var(--r-tile) - 1px) calc(var(--r-tile) - 1px) 0 0;
+    box-shadow: inset 0 1px rgba(232, 226, 213, 0.06);
     padding: 0.55rem 1.1rem;
   }
   .ph-path {
     font-family: var(--mono);
-    font-size: 0.8rem;
+    font-size: max(11px, 0.8rem);
     letter-spacing: 0.01em;
     color: var(--ink-3);
   }
@@ -38,6 +104,10 @@ const { path, class: className } = Astro.props;
     font-weight: 500;
   }
   .panel-body {
+    /* The panel's own entrance delay stops at the shell. --d inherits, so
+       without this reset every masked or revealed slot child would silently
+       borrow the panel's stagger instead of its own. */
+    --d: 0ms;
     font-family: var(--mono);
     font-size: 0.95rem;
     line-height: 1.7;
@@ -47,6 +117,32 @@ const { path, class: className } = Astro.props;
     .panel-body {
       font-size: 0.9rem;
     }
+  }
+
+  /* ---------- paper variant: matte, dark on light ---------- */
+  .panel.paper .panel-head {
+    background: none;
+    border-bottom: 1px solid rgba(35, 38, 31, 0.12);
+    border-radius: calc(34 * var(--u)) calc(34 * var(--u)) 0 0;
+    box-shadow: none;
+    padding: max(14px, calc(20 * var(--u))) max(18px, calc(30 * var(--u)))
+      max(10px, calc(14 * var(--u)));
+  }
+  .panel.paper .ph-path {
+    color: var(--paper-label);
+  }
+  .panel.paper .ph-path b {
+    color: var(--paper-ink); /* gold on paper measures 1.9:1, so the user goes ink */
+    font-weight: 600;
+  }
+  /* Prose on paper, not mono. Mono stays opt-in through .cmdline and .well. */
+  .panel.paper .panel-body {
+    font-family: var(--body);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--paper-ink);
+    padding: max(18px, calc(26 * var(--u))) max(18px, calc(30 * var(--u)))
+      max(22px, calc(30 * var(--u)));
   }
 
   /* ---------- shared prompt / terminal glyphs (page-authored slot children) ---------- */
@@ -89,6 +185,71 @@ const { path, class: className } = Astro.props;
   .panel :global(.intro) {
     margin-bottom: 1.4rem;
   }
+
+  /* ---------- same glyphs, read on paper ---------- */
+  .panel.paper :global(.ps) {
+    color: var(--paper-label);
+  }
+  .panel.paper :global(.ps b),
+  .panel.paper :global(.cmdline) {
+    color: var(--paper-ink);
+  }
+  .panel.paper :global(.caret),
+  .panel.paper :global(.caret-final) {
+    background: var(--paper-ink);
+  }
+  .panel.paper :global(.c) {
+    color: var(--paper-label);
+  }
+  .panel.paper :global(.out) {
+    color: #464c40; /* 7.8:1 on --paper, same ink as .paper p */
+  }
+  /* Every focusable child of the light card gets the dark-on-light ring, not
+     just the links stage.css already covers. */
+  .panel.paper :global(:focus-visible) {
+    outline: 2px solid rgba(28, 34, 22, 0.9);
+    outline-offset: 3px;
+  }
+
+  /* ---------- the figure well: where paper opens back onto the terminal ---------- */
+  .panel.paper :global(.well) {
+    margin-top: max(14px, calc(18 * var(--u)));
+    padding: max(14px, calc(18 * var(--u))) max(14px, calc(20 * var(--u)));
+    border-radius: calc(18 * var(--u));
+    background: var(--paper-well);
+    color: var(--bone);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+  .panel.paper :global(.well h2),
+  .panel.paper :global(.well h3) {
+    color: var(--bone);
+  }
+  .panel.paper :global(.well p),
+  .panel.paper :global(.well .out) {
+    color: var(--ink-2);
+  }
+  /* --ink-3 is tuned for --surf and drops to 3.9:1 on the lighter well floor.
+     One step up the same bone ramp measures 5.3:1 and keeps the dim register. */
+  .panel.paper :global(.well .ps),
+  .panel.paper :global(.well .c) {
+    color: rgba(232, 226, 213, 0.62);
+  }
+  .panel.paper :global(.well .cmdline) {
+    color: var(--bone);
+  }
+  .panel.paper :global(.well .ps b),
+  .panel.paper :global(.well a) {
+    color: var(--accent); /* 6.3:1 on --paper-well */
+  }
+  .panel.paper :global(.well .caret),
+  .panel.paper :global(.well .caret-final) {
+    background: var(--accent);
+  }
+  .panel.paper :global(.well a) {
+    text-decoration-color: rgba(217, 162, 74, 0.4);
+  }
 </style>
 
 <style is:global>
@@ -96,7 +257,9 @@ const { path, class: className } = Astro.props;
      Bite once JS arms the sequence (html.anim.armed). Each step block (a
      command line or an output) stays hidden until its turn, then reveals as a
      whole block, so the next command appears only after the previous output.
-     No-JS and reduced-motion keep the markup fully visible. */
+     No-JS and reduced-motion keep the markup fully visible.
+     This composes with the panel's own .mask wipe: the shell wipes in first,
+     the steps type inside it afterwards. */
   html.anim.armed .panel [data-step] {
     opacity: 0;
     transform: translateY(5px);

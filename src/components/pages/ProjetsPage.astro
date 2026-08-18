@@ -18,6 +18,36 @@ const projects = (await getCollection("projects")).sort(
 
 /** Directory-style names carry a trailing slash; strip it for the panel path. */
 const dirName = (name: string) => name.replace(/\/$/, "");
+
+/** The first active project is this page's single paper spotlight. */
+const spotlightId = projects.find((p) => p.data.status === "actif")?.id;
+
+/**
+ * Depth ladder and entrance stagger.
+ *
+ *   intro comment   offset-l   --pd 12 / --pr 1   --d 60ms
+ *   project i even  offset-r   depth 9 / rot 1.3  d 120 + i * 110
+ *   project i odd   offset-l   depth 5 / rot 0.7  d 120 + i * 110
+ *   paper spotlight (whatever its parity)  depth 10 / rot 2.4
+ *
+ * Depth alternates with the offset side, so the page reads as two interleaved
+ * columns of depth rather than one ramp. Panel depth stays at 10 or less:
+ * mycelium.ts measures .panel-head with the transform applied and re-measures
+ * only on rebuild, so a deeper panel drifts off its filament branch tip. The
+ * spotlight gets its "front card" read from rotation instead, which pivots
+ * about the centre and barely moves the head.
+ *
+ * Entrances use .mask, not .reveal: html.anim .reveal writes
+ * transform: translateY(14px) at a higher specificity than .par, so an element
+ * carrying both loses its depth for good. Panel bodies keep their own viewport
+ * trigger, the [data-step] sequence driven by term-type.ts.
+ */
+const rung = (i: number, spot: boolean) => ({
+  right: i % 2 === 0,
+  depth: spot ? 10 : i % 2 === 0 ? 9 : 5,
+  rot: spot ? 2.4 : i % 2 === 0 ? 1.3 : 0.7,
+  d: 120 + i * 110,
+});
 ---
 
 <BaseLayout
@@ -29,39 +59,93 @@ const dirName = (name: string) => name.replace(/\/$/, "");
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <p class="intro-comment reveal">{dict.projets.intro}</p>
+        <p class="intro-comment par mask" style="--pd:12;--pr:1;--d:60ms">
+          {dict.projets.intro}
+        </p>
       </div>
     </div>
   </section>
 
   {
-    projects.map((project, i) => (
-      <section class:list={["sec", i % 2 === 0 ? "offset-r" : "offset-l"]} data-block>
-        <div class="wrap">
-          <div class="sec-inner">
-            <TerminalPanel path={`~/projets/${dirName(project.data.name)}`} class="reveal">
-              <TermCmd command="cat about.md" />
-              <div class="out" data-step="fade">
-                <p class="pbody">
-                  <strong>{project.data.title}</strong>
-                  {project.data.blurb[locale]}
-                </p>
-                <p class="pmeta">
-                  <span class="badge">{project.data.status}</span>
-                </p>
-                {project.data.url && (
-                  <p class="plink">
-                    <a href={project.data.url} rel="noopener">
-                      {`-> ${project.data.url}`}
-                    </a>
-                  </p>
+    projects.map((project, i) => {
+      const spot = project.id === spotlightId;
+      const { right, depth, rot, d } = rung(i, spot);
+      const url = project.data.url;
+      return (
+        <section class:list={["sec", right ? "offset-r" : "offset-l"]} data-block>
+          <div class="wrap">
+            <div class="sec-inner">
+              <TerminalPanel
+                path={`~/projets/${dirName(project.data.name)}`}
+                variant={spot ? "paper" : "dark"}
+                depth={depth}
+                rot={rot}
+                d={d}
+               
+              >
+                {spot ? (
+                  <>
+                    <p class="paper-label">{dict.projets.spotlight}</p>
+                    <h3>
+                      {url ? (
+                        <a href={url} rel="noopener">
+                          {project.data.title}
+                        </a>
+                      ) : (
+                        project.data.title
+                      )}
+                    </h3>
+                    <p>{project.data.blurb[locale]}</p>
+                    <p class="pmeta">
+                      <span class="badge">{project.data.status}</span>
+                    </p>
+                    {url && (
+                      <div class="well">
+                        <TermCmd command="cat about.md" />
+                        <div class="out" data-step="fade">
+                          <p class="plink">{`-> ${url}`}</p>
+                        </div>
+                      </div>
+                    )}
+                    {url && (
+                      <a
+                        class="paper-knob"
+                        href={url}
+                        rel="noopener"
+                        aria-hidden="true"
+                        tabindex="-1"
+                      >
+                        <span>-&gt;</span>
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TermCmd command="cat about.md" />
+                    <div class="out" data-step="fade">
+                      <p class="pbody">
+                        <strong>{project.data.title}</strong>
+                        {project.data.blurb[locale]}
+                      </p>
+                      <p class="pmeta">
+                        <span class="badge">{project.data.status}</span>
+                      </p>
+                      {url && (
+                        <p class="plink">
+                          <a href={url} rel="noopener">
+                            {`-> ${url}`}
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  </>
                 )}
-              </div>
-            </TerminalPanel>
+              </TerminalPanel>
+            </div>
           </div>
-        </div>
-      </section>
-    ))
+        </section>
+      );
+    })
   }
 </BaseLayout>
 
@@ -97,6 +181,13 @@ const dirName = (name: string) => name.replace(/\/$/, "");
     background: var(--accent-soft);
     color: var(--accent);
   }
+  /* The status pill on the paper spotlight: gold on paper sits at 1.9:1, so the
+     light card gets its own dark-on-light pill. The ancestor is :global because
+     .paper lands on the panel root, outside this component's scope. */
+  :global(.paper) .badge {
+    background: rgba(38, 43, 32, 0.09);
+    color: var(--paper-well);
+  }
 
   .plink {
     margin-top: 1rem;
@@ -109,5 +200,22 @@ const dirName = (name: string) => name.replace(/\/$/, "");
   .plink a:hover {
     color: var(--accent-2);
     text-decoration: underline;
+  }
+  /* Inside the paper card's dark well the terminal palette is back, so the echo
+     needs no extra margin above the command line. */
+  /* The knob is absolute in the panel's bottom-right corner, so the last block
+     of a paper card must leave it room: body padding plus 40u clears a 46u knob
+     sitting 18u off the bottom edge. */
+  .well {
+    margin-bottom: max(30px, calc(40 * var(--u)));
+  }
+  .well .plink {
+    margin-top: 0.6rem;
+  }
+
+  .paper-knob span {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 </style>

@@ -9,10 +9,12 @@ interface Props {
 const { locale, path } = Astro.props;
 const dict = t(locale);
 
+/* One glyph per section, for the narrow layout where the labels go silent.
+   Kept as raw path data so the dock stays a single file with no icon import. */
 const navItems = [
-  { key: "projets", href: "/projets" },
-  { key: "outils", href: "/outils" },
-  { key: "ecrits", href: "/ecrits" },
+  { key: "projets", href: "/projets", glyph: "M12 21v-8m0 0L6.5 6.5M12 13l5.5-6.5" },
+  { key: "outils", href: "/outils", glyph: "M6 8l4 4-4 4m7 0h5" },
+  { key: "ecrits", href: "/ecrits", glyph: "M6 7h12M6 12h12M6 17h7" },
 ] as const;
 
 /** Active when the logical path is the section root or nested under it. */
@@ -24,228 +26,375 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
 ---
 
 <header class="site-head">
-  <a
-    class="wordmark"
-    href={localePath(locale, "/")}
-    aria-label={dict.nav.home}
-    ><span class="br" aria-hidden="true">[</span><span class="lead">w</span
-    ><span class="rest" aria-hidden="true"><i>m</i><i>m</i><i>w</i></span
-    ><span class="br" aria-hidden="true">]</span></a
-  >
-  <nav class="site-nav" aria-label={dict.nav.ariaLabel}>
-    {
-      navItems.map((item) => {
-        const active = isActive(item.href);
-        return (
-          <a
-            href={localePath(locale, item.href)}
-            class:list={{ on: active }}
-            aria-current={active ? "page" : undefined}
-          >
-            {dict.nav[item.key]}
-          </a>
-        );
-      })
-    }
-  </nav>
-  <nav class="lang" aria-label={dict.lang.label}>
-    {
-      langHrefs.map((alt, i) => (
-        <>
-          {i > 0 && <span class="dot" aria-hidden="true">·</span>}
-          <a
-            href={alt.href}
-            hreflang={alt.locale}
-            class:list={{ on: alt.locale === locale }}
-            aria-current={alt.locale === locale ? "true" : undefined}
-            aria-label={dict.lang.switchTo[alt.locale]}
-            >{langLabel[alt.locale]}</a
-          >
-        </>
-      ))
-    }
-  </nav>
+  <!--
+    Two nodes on purpose. The wrapper owns the centring, the capsule owns the
+    parallax. One node cannot do both: .par writes `transform`, which would
+    replace a centring translate and slide the bar off axis. Flex centring is
+    layout, not transform, so the two never collide.
+    The wrapper is also mountDock's frame of reference: full width, fixed
+    height, so a magnified pill can never resize it.
+  -->
+  <div class="dock-wrap">
+    <!--
+      The capsule only fades in. A clip-path here would bound every descendant,
+      so the pills would be cut off the moment they magnify past the capsule
+      edge, and html.staged-done only drops clips once the intro has landed.
+    -->
+    <nav
+      class="dock glass par fade"
+      style="--pd:5"
+      aria-label={dict.nav.ariaLabel}
+      data-spec
+    >
+      <a
+        class="dock-item dock-mark mask-down"
+        style="--d:120ms"
+        href={localePath(locale, "/")}
+        aria-label={dict.nav.home}
+        data-spec
+        ><span class="br" aria-hidden="true">[</span><span class="lead">w</span
+        ><span class="rest" aria-hidden="true"><i>m</i><i>m</i><i>w</i></span
+        ><span class="br" aria-hidden="true">]</span></a
+      >
+      {
+        navItems.map((item, i) => {
+          const active = isActive(item.href);
+          return (
+            <a
+              href={localePath(locale, item.href)}
+              class:list={["dock-item", "dock-sec", "mask-down", { on: active }]}
+              style={`--d:${180 + i * 50}ms`}
+              aria-current={active ? "page" : undefined}
+              data-spec
+            >
+              <svg
+                class="ico"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <path d={item.glyph} />
+              </svg>
+              <span class="lbl">{dict.nav[item.key]}</span>
+            </a>
+          );
+        })
+      }
+      <div
+        class="dock-item dock-lang mask-down"
+        style="--d:330ms"
+        role="group"
+        aria-label={dict.lang.label}
+        data-spec
+      >
+        {
+          langHrefs.map((alt) => (
+            <a
+              href={alt.href}
+              hreflang={alt.locale}
+              class:list={{ on: alt.locale === locale }}
+              aria-current={alt.locale === locale ? "true" : undefined}
+              aria-label={dict.lang.switchTo[alt.locale]}
+            >
+              {langLabel[alt.locale]}
+            </a>
+          ))
+        }
+      </div>
+    </nav>
+  </div>
 </header>
 
 <style>
-  /* Always overlays the hero canvas, on every page: one consistent style. */
+  /* The dock floats over the hero on every page. No bar, no scrim: the glass
+     capsule carries its own ground. */
   .site-head {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     z-index: 20;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: "mark nav lang";
-    align-items: center;
-    gap: 1rem 2rem;
-    min-height: 4.25rem;
-    padding: 1.1rem var(--pad);
-  }
-  /* Soft top scrim for legibility over bright sim regions. No hard bar. */
-  .site-head::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: -2rem;
-    background: linear-gradient(
-      to bottom,
-      rgba(18, 16, 13, 0.75),
-      rgba(18, 16, 13, 0)
-    );
+    /* only the capsule takes hits, so the hero stays reachable underneath */
     pointer-events: none;
-    z-index: -1;
   }
 
-  .wordmark {
-    grid-area: mark;
+  .dock-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* fixed height: pill growth must never feed back into mountDock's measure */
+    height: max(76px, calc(92 * var(--u)));
+    padding-top: max(10px, calc(18 * var(--u)));
+    padding-inline: max(6px, calc(12 * var(--u)));
+    pointer-events: none;
+  }
+
+  .dock {
+    /* --d inherits, so the capsule holds it at zero: every pill states its own
+       stagger and no future child picks one up by accident. */
+    --d: 0ms;
+    --cap-r: max(11px, calc(14 * var(--u)));
+    --pill-r: max(8px, calc(10 * var(--u)));
+    pointer-events: auto;
+    display: flex;
+    /* flex-start, not center: a magnified pill grows DOWNWARD out of the bar
+       instead of ballooning in both directions. */
+    align-items: flex-start;
+    gap: max(2px, calc(4 * var(--u)));
+    /* Fixed height: a taller pill escapes the capsule, it does not stretch it.
+       The 50px floor is chosen so the pill inside stays exactly 40px tall from
+       901px up to 1440px: 50 - 2 (glass hairline) - 8 (padding floor) == 40,
+       and 52 - 2 - 10 == 40. */
+    height: max(50px, calc(52 * var(--u)));
+    max-width: 100%;
+    padding: max(4px, calc(5 * var(--u))) max(4px, calc(6 * var(--u)));
+    border-radius: var(--cap-r);
+  }
+
+  .dock-item {
+    --pill-pad: max(8px, calc(13 * var(--u)));
+    position: relative;
+    flex: none;
+    /* 100% of the capsule content box, so mountDock measures a real rest height */
+    height: 100%;
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    /* Reserve the full [wmmw] width so expanding the logo moves only its own
-       letters, never the (centered) nav or the grid columns. */
-    min-width: 6.2ch;
+    justify-content: center;
+    gap: 0.4em;
+    padding-inline: var(--pill-pad);
+    border: 1px solid transparent;
+    border-radius: var(--pill-r);
+    /* .mask-down wipes with --mr as its corner radius: match the pill */
+    --mr: var(--pill-r);
+    background: rgba(232, 226, 213, 0.04);
+    color: var(--ink-faint);
     font-family: var(--mono);
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-size: max(10px, calc(11 * var(--u)));
+    font-weight: 500;
     line-height: 1;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.136em;
+    text-transform: uppercase;
     text-decoration: none;
-    color: var(--bone);
-    border-radius: 8px;
+    white-space: nowrap;
+    /* the springs write transform; the origin keeps growth hanging from the bar */
+    transform-origin: 50% 0;
   }
-  .wordmark .br {
+
+  /* near state: the pill under the cursor, or the one holding keyboard focus */
+  .dock-item:hover,
+  .dock-item:focus-visible,
+  .dock-item:has(:focus-visible) {
+    background: rgba(31, 27, 21, 0.94);
+    border-color: rgba(232, 226, 213, 0.19);
+    color: var(--bone);
+  }
+
+  /* the current section keeps the gold, near or not: gold is the only accent */
+  .dock-item.on {
     color: var(--accent);
   }
-  .wordmark .rest {
+  .dock-item.on:hover,
+  .dock-item.on:focus-visible {
+    color: var(--accent-2);
+  }
+
+  /* trailing tracking pushes centred uppercase off by one letter gap */
+  .lbl {
+    margin-right: -0.136em;
+  }
+
+  .ico {
+    display: none;
+    width: max(17px, calc(18 * var(--u)));
+    height: max(17px, calc(18 * var(--u)));
+  }
+
+  /* --- wordmark tile: the palindrome earns the one paper surface up here --- */
+
+  .dock-mark {
+    background: #eef1e7;
+    color: var(--paper-ink);
+    border-color: rgba(35, 38, 31, 0.2);
+    font-weight: 700;
+    font-size: max(12px, calc(14 * var(--u)));
+    letter-spacing: 0.01em;
+    text-transform: none;
+    /* No gap: the wordmark is one word, not a row of items, so [w] reads tight
+       and the expanded [wmmw] still fits inside the reserved width below. */
+    gap: 0;
+    /* Reserve the full [wmmw] width, measured: 4 glyphs at 6.4ch plus the pill
+       padding. Expanding the logo then moves only its own letters, the pills
+       beside it never shift, and the width mountDock writes cannot clip them. */
+    min-width: calc(6.4ch + 2 * var(--pill-pad));
+  }
+  .dock-mark:hover,
+  .dock-mark:focus-visible {
+    background: #fff;
+    color: var(--paper-ink);
+    border-color: rgba(35, 38, 31, 0.3);
+  }
+  /* a gold dark enough to hold on paper */
+  .dock-mark .br {
+    color: #8a5c10;
+  }
+  .dock-mark .rest {
     display: inline-flex;
     overflow: hidden;
   }
-  .wordmark .rest i {
+  .dock-mark .rest i {
     font-style: normal;
     display: inline-block;
   }
-  .wordmark:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
 
-  /* Collapse to [w], expand to [wmmw] on hover/focus where hovering exists;
-     touch / no-hover devices always show the full [wmmw]. */
+  /* Collapse to [w], expand to [wmmw] on hover and focus where hovering exists;
+     touch and no-hover devices always show the full [wmmw]. */
   @media (hover: hover) {
-    .wordmark .rest {
+    .dock-mark .rest {
       max-width: 0;
     }
-    .wordmark .rest i {
+    .dock-mark .rest i {
       opacity: 0;
     }
-    .wordmark:hover .rest,
-    .wordmark:focus-visible .rest {
+    .dock-mark:hover .rest,
+    .dock-mark:focus-visible .rest {
       max-width: 3.2ch;
     }
-    .wordmark:hover .rest i,
-    .wordmark:focus-visible .rest i {
+    .dock-mark:hover .rest i,
+    .dock-mark:focus-visible .rest i {
       opacity: 1;
     }
   }
 
-  .site-nav {
-    grid-area: nav;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(1rem, 3vw, 2.2rem);
-    font-size: 0.92rem;
-    line-height: 1;
-  }
-  .site-nav a {
-    color: var(--ink-2);
-    text-decoration: none;
-  }
-  .site-nav a:hover,
-  .site-nav a.on {
-    color: var(--bone);
-  }
-  .site-nav a.on {
-    font-weight: 500;
-  }
+  /* --- language switcher: the trailing group -------------------------------- */
 
-  .lang {
-    grid-area: lang;
-    justify-self: end;
-    align-items: center;
-    font-family: var(--disp);
-    font-size: 0.78rem;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--ink-3);
-    display: flex;
-    gap: 0.45rem;
+  .dock-lang {
+    gap: 0;
+    padding-inline: max(3px, calc(4 * var(--u)));
+    /* one beat of air before the trailing group */
+    margin-left: max(4px, calc(8 * var(--u)));
   }
-  .lang a {
-    color: var(--ink-3);
+  .dock-lang a {
+    /* the pill carries --d:330ms; the links have no entrance of their own */
+    --d: 0ms;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-width: max(26px, calc(30 * var(--u)));
+    border-radius: calc(var(--pill-r) - 2px);
+    color: inherit;
     text-decoration: none;
   }
-  .lang a:hover {
+  .dock-lang a:hover {
     color: var(--bone);
   }
-  .lang a.on {
+  .dock-lang a.on {
     color: var(--accent);
   }
-  .lang .dot {
-    color: var(--ink-3);
-  }
 
-  :global(html.anim) .site-nav a,
-  :global(html.anim) .lang a {
-    transition: color 0.2s ease;
-  }
+  /* --- narrow: glyph-only targets, floored at 44px ------------------------- */
 
-  @media (max-width: 767px) {
-    .site-head {
-      grid-template-columns: auto auto;
-      grid-template-areas:
-        "mark lang"
-        "nav  nav";
-      row-gap: 0.8rem;
+  @media (max-width: 900px) {
+    .dock {
+      /* 54 - 2 (hairline) - 8 (padding floor) == 44, and 58 - 2 - 12 == 44:
+         a square 44px touch target across the whole narrow range. */
+      height: max(54px, calc(58 * var(--u)));
+      padding: max(4px, calc(6 * var(--u)));
     }
-    .site-nav {
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.88rem;
+    .dock-item {
+      --pill-pad: max(4px, calc(8 * var(--u)));
+    }
+    .dock-sec {
+      min-width: max(44px, calc(46 * var(--u)));
+    }
+    .dock-sec .ico {
+      display: block;
+    }
+    /* The label goes visually hidden, never display:none: it is the link's only
+       accessible name once the glyph takes over. */
+    .dock-sec .lbl {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+    .dock-mark {
+      font-size: max(11px, calc(13 * var(--u)));
+    }
+    .dock-lang a {
+      min-width: max(30px, calc(32 * var(--u)));
     }
   }
 
-  /* Motion only when the site has armed animation (respects reduced-motion). */
+  /* --- motion: colour only. The springs own width, height and transform. ---
+     .mask-down owns the `transition` property of every pill, so the colour
+     fades ride in through --mask-also instead of a competing rule. */
+
+  .dock-item {
+    --mask-also:
+      background-color 0.28s var(--ease),
+      border-color 0.28s var(--ease),
+      color 0.2s var(--ease);
+  }
+  :global(html.anim) .dock-lang a {
+    transition: color 0.2s var(--ease);
+  }
+
   @media (hover: hover) {
-    :global(html.anim) .wordmark .rest {
-      transition: max-width 0.44s cubic-bezier(0.2, 0.85, 0.25, 1);
+    :global(html.anim) .dock-mark .rest {
+      transition: max-width 0.44s var(--ease-out);
     }
-    :global(html.anim) .wordmark .rest i {
+    :global(html.anim) .dock-mark .rest i {
       transform: translateX(-0.28em);
       transition:
-        opacity 0.3s ease,
-        transform 0.4s cubic-bezier(0.2, 0.85, 0.25, 1);
+        opacity 0.3s var(--ease),
+        transform 0.4s var(--ease-out);
     }
-    :global(html.anim) .wordmark:hover .rest i,
-    :global(html.anim) .wordmark:focus-visible .rest i {
+    :global(html.anim) .dock-mark:hover .rest i,
+    :global(html.anim) .dock-mark:focus-visible .rest i {
       transform: none;
     }
-    :global(html.anim) .wordmark:hover .rest i:nth-child(1),
-    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(1) {
+    :global(html.anim) .dock-mark:hover .rest i:nth-child(1),
+    :global(html.anim) .dock-mark:focus-visible .rest i:nth-child(1) {
       transition-delay: 0.03s;
     }
-    :global(html.anim) .wordmark:hover .rest i:nth-child(2),
-    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(2) {
+    :global(html.anim) .dock-mark:hover .rest i:nth-child(2),
+    :global(html.anim) .dock-mark:focus-visible .rest i:nth-child(2) {
       transition-delay: 0.09s;
     }
-    :global(html.anim) .wordmark:hover .rest i:nth-child(3),
-    :global(html.anim) .wordmark:focus-visible .rest i:nth-child(3) {
+    :global(html.anim) .dock-mark:hover .rest i:nth-child(3),
+    :global(html.anim) .dock-mark:focus-visible .rest i:nth-child(3) {
       transition-delay: 0.15s;
     }
   }
 </style>
+
+<script>
+  import { mountDock, type DockHandle } from "@lib/dock";
+
+  let dock: DockHandle | undefined;
+
+  const mount = (): void => {
+    const nav = document.querySelector<HTMLElement>(".dock");
+    if (!nav || nav.dataset.dockOn === "1") return;
+    nav.dataset.dockOn = "1";
+    dock = mountDock(nav);
+  };
+
+  // ClientRouter replaces the document, so the handle must let go of the old
+  // nodes before the swap or the springs would write to a detached tree.
+  document.addEventListener("astro:before-swap", () => {
+    dock?.destroy();
+    dock = undefined;
+  });
+
+  document.addEventListener("astro:page-load", mount);
+</script>

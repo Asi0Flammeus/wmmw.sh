@@ -18,34 +18,35 @@ const rssHref = localePath(locale, "/rss.xml");
 <footer class="site-foot">
   <div class="wrap">
     <div class="sec-inner">
-      <TerminalPanel path="~" class="foot-panel">
-        <div>
+      <TerminalPanel path="~" class="foot-panel" depth={6} rot={0.6} d={140}>
+        <div class="fblock reveal">
           <TermCmd command={dict.footer.echoCmd} />
           <p class="out echoline" data-step="fade">{dict.footer.echoOut}</p>
         </div>
-        <div>
+        <div class="fblock reveal" style="--d:120ms">
           <TermCmd command={dict.footer.linksCmd} />
           <div class="out links" data-step="fade">
             <p class="total">total 0</p>
-            <p class="lrow">
+            <p class="lrow" data-spec="">
               <span class="perm">lrwxrwxrwx</span><a href={GITHUB_URL} rel="me"
                 >github <span class="tgt">-&gt; {githubHost}</span></a
               >
             </p>
-            <p class="lrow">
+            <p class="lrow" data-spec="">
               <span class="perm">lrwxrwxrwx</span><a href={rssHref}
                 >rss <span class="tgt">-&gt; {dict.footer.rss}</span></a
               >
             </p>
             {
               CONTACT_EMAIL ? (
-                <p class="lrow">
+                <p class="lrow" data-spec="">
                   <span class="perm">lrwxrwxrwx</span>
                   <a href={`mailto:${CONTACT_EMAIL}`}>
                     contact <span class="tgt">-&gt; {CONTACT_EMAIL}</span>
                   </a>
                 </p>
               ) : (
+                /* no address yet: the row stays a plain file, so it gets no rim */
                 <p class="lrow muted">
                   <span class="perm">-rw-------</span>
                   <span>
@@ -57,11 +58,14 @@ const rssHref = localePath(locale, "/rss.xml");
             }
           </div>
         </div>
-        <p class="cmdline" data-step="fade">
-          <span class="ps"><b>{TERM_USER}</b>:~$</span>
-          <span class="caret-final" aria-hidden="true"></span>
-        </p>
+        <div class="fblock reveal" style="--d:240ms">
+          <p class="cmdline" data-step="fade">
+            <span class="ps"><b>{TERM_USER}</b>:~$</span>
+            <span class="caret-final" aria-hidden="true"></span>
+          </p>
+        </div>
       </TerminalPanel>
+      <p class="foot-claim reveal" style="--d:360ms">{dict.footer.claim}</p>
     </div>
   </div>
 </footer>
@@ -71,6 +75,7 @@ const rssHref = localePath(locale, "/rss.xml");
     position: relative;
     z-index: 2;
     margin-top: clamp(4rem, 11vh, 8rem);
+    padding-bottom: clamp(2.5rem, 8vh, 5rem);
   }
   .foot-panel :global(.panel-body) {
     display: flex;
@@ -91,6 +96,11 @@ const rssHref = localePath(locale, "/rss.xml");
     gap: 2.5ch;
     align-items: baseline;
     overflow-wrap: anywhere;
+    /* padding pulled back by the same margin, so the rows still line up under
+       "total 0" while the specular rim has a box to trace */
+    padding: 0.3rem 0.6rem;
+    margin-inline: -0.6rem;
+    border-radius: 8px;
   }
   .perm {
     color: var(--ink-3);
@@ -119,15 +129,61 @@ const rssHref = localePath(locale, "/rss.xml");
     color: var(--ink-3);
   }
 
+  /* The rim itself comes from src/lib/spec.ts through data-spec. The row adds
+     the surface under it, on pointer and on keyboard alike. */
+  .lrow:hover,
+  .lrow:focus-within {
+    background: var(--accent-soft);
+  }
+
   :global(html.anim) .lrow a {
     transition: color 0.2s ease;
   }
+  :global(html.anim) .lrow {
+    transition: background 0.35s var(--ease);
+  }
+
+  /* Scroll entrance, staggered.
+     The .mask wipe fires once at page load from stageEntrance, so below the
+     fold it is already spent; the footer rides the .reveal observer instead and
+     only adds the delay. The transition shorthand is restated in full because a
+     bare transition-delay loses to global.css's own shorthand. */
+  :global(html.anim) .fblock,
+  :global(html.anim) .foot-claim {
+    transition:
+      opacity 0.7s ease var(--d, 0ms),
+      transform 0.7s var(--ease-out) var(--d, 0ms);
+  }
+
+  /* the closing note: the palindrome, said once, quietly */
+  .foot-claim {
+    margin: max(18px, calc(26 * var(--u))) 0 0;
+    font-family: var(--mono);
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
   @media (max-width: 767px) {
+    /* the perm column is gone here, so the row is free to grow into a real
+       touch target: 44px of link, not 20px of text */
     .lrow {
       gap: 1.5ch;
+      min-height: 44px;
+      align-items: center;
+    }
+    /* inline-block, not flex: a flex anchor drops the space between the name
+       and its "-> target", and that space is the whole ls -l look */
+    .lrow a {
+      display: inline-block;
+      padding-block: 0.7rem;
     }
     .perm {
       display: none;
+    }
+    .foot-claim {
+      letter-spacing: 0.22em;
     }
   }
 </style>

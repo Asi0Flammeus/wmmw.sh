@@ -31,11 +31,27 @@ const ecritsHref = localePath(locale, "/ecrits");
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <p class="crumb">
+        <p class="crumb mask" style="--d:60ms">
           <span class="ps"><b>{TERM_USER}</b>:~$</span>
           {" "}{dict.manifeste.readMore}
         </p>
-        <TerminalPanel path="~/manifeste" class="reveal">
+
+        {/* Pull-quote: the manifesto's own thesis, printed once on paper as the
+            page epigraph. The same two sentences run again inside <Content /> as
+            a blockquote, so this copy is aria-hidden: a screen reader should not
+            hear the thesis twice. */}
+        <aside
+          class="pull paper par fade"
+          style="--pd:8; --d:320ms"
+          aria-hidden="true"
+        >
+          <p class="pull-q">
+            <span class="pull-a">{dict.manifeste.heading}</span>{" "}
+            <span class="pull-b">{dict.manifeste.headingGold}</span>
+          </p>
+        </aside>
+
+        <TerminalPanel path="~/manifeste" d={420}>
           <div class="out manifesto" data-step="fade">
             <Content />
           </div>
@@ -65,6 +81,41 @@ const ecritsHref = localePath(locale, "/ecrits");
   .crumb .ps b {
     color: var(--accent);
     font-weight: 500;
+  }
+
+  /* ---------- paper epigraph: the one light surface on this page ----------
+     A shallow rung only. Anything deeper would sway the thesis while the eye
+     is already reading, and this page is a reading page first. */
+  .pull {
+    margin-bottom: clamp(2rem, 4vw, 3.2rem);
+    /* .fade owns this element's transition property, so .paper's own box-shadow
+       easing is spliced back in ahead of the entrance. */
+    --mask-also: box-shadow 0.8s var(--ease);
+  }
+  .pull-q {
+    margin: 0;
+    font-family: var(--disp);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 3.2vw, 2.3rem);
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  /* No gold on paper: the accent measures 1.9:1 here. The thesis takes full
+     ink instead and the setup line steps back to the label tone. */
+  .pull-a {
+    color: var(--paper-label);
+  }
+  .pull-b {
+    color: var(--paper-ink);
+  }
+
+  /* --d inherits: a wrapper's entrance delay stops at its own children, so the
+     long-form body never absorbs the epigraph's stagger. */
+  .crumb > :global(*),
+  .pull > :global(*),
+  .manifesto > :global(*) {
+    --d: 0ms;
   }
 
   /* markdown-flavoured long-form cat: readable body, mono heading tokens */

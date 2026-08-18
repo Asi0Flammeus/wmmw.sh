@@ -1,0 +1,79 @@
+---
+/**
+ * The WebGL hero stage: a procedural mycelial root (see @lib/stage3d).
+ * Rendered once per page by BaseLayout, above the physarum mycelium canvas
+ * (z 1) and below the hero copy (z 4). The canvas is transparent, so the
+ * mycelium paints through it.
+ *
+ * The wrapper persists across ClientRouter navigations (transition:persist)
+ * so the scene survives page swaps without rebuilding its 170k blades.
+ *
+ * Accessibility: the scene is named content, not decoration. The canvas
+ * carries role="img" and the localized scene label, and the wrapper stays
+ * un-hidden, because aria-hidden on an ancestor would void the label. If
+ * WebGL is unavailable the canvas is removed from the flow and nothing is
+ * announced.
+ */
+import { type Locale, t } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const label = t(locale).hero.sceneLabel;
+---
+
+<div class="stage-layer" transition:persist="stage">
+  <canvas class="stage-canvas" role="img" aria-label={label}></canvas>
+</div>
+
+<style>
+  /* Viewport-tall layer pinned to the document top, over the mycelium (z 1)
+     and under the hero copy (z 4). pointer-events: none keeps the copy and
+     the header interactive; the scene reads the shared pointer bus instead. */
+  .stage-layer {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 100dvh;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .stage-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { mountStage, type StageHandle } from "@lib/stage3d";
+
+  // The wrapper persists across ClientRouter swaps, so this module script
+  // runs once and the single scene instance stays alive. mountStage is
+  // idempotent per canvas; calling it on every astro:page-load is safe.
+  let handle: StageHandle | null = null;
+
+  function onLoad(): void {
+    const host = document.querySelector<HTMLElement>(".stage-layer");
+    const canvas = host?.querySelector<HTMLCanvasElement>(".stage-canvas");
+    if (!host || !canvas) return;
+    handle = mountStage(canvas, host);
+  }
+
+  // Full teardown only when the incoming document cannot adopt the persisted
+  // wrapper (a page without the stage). While every page carries the stage,
+  // the scene rides through swaps untouched.
+  function onBeforeSwap(e: Event): void {
+    const next = (e as Event & { newDocument?: Document }).newDocument;
+    if (next?.querySelector('[data-astro-transition-persist="stage"]')) return;
+    handle?.destroy();
+    handle = null;
+  }
+
+  document.addEventListener("astro:page-load", onLoad);
+  document.addEventListener("astro:before-swap", onBeforeSwap);
+  onLoad();
+</script>

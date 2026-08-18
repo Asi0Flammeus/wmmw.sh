@@ -22,6 +22,10 @@ const byType = (type: "livre" | "film" | "video") =>
 const livres = byType("livre");
 const films = byType("film");
 const videos = byType("video");
+
+/* The first book carries the page's single paper surface. It stays in the
+   listing below: `cat -n` must print the whole file. */
+const featured = livres[0];
 ---
 
 <BaseLayout
@@ -33,7 +37,25 @@ const videos = byType("video");
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/nourritures" class="reveal">
+        {
+          featured && (
+            <div class="feat reveal">
+              <TerminalPanel
+                path="~/nourritures/livres.txt"
+                variant="paper"
+                depth={10}
+                rot={2.2}
+                d={140}
+              >
+                <p class="paper-label">{dict.nourritures.featured}</p>
+                <h2 class="feat-title">{featured.data.title}</h2>
+                <p class="feat-author">{featured.data.author}</p>
+              </TerminalPanel>
+            </div>
+          )
+        }
+
+        <TerminalPanel path="~/nourritures" depth={5} rot={0} d={240}>
           <p class="c intro">{dict.nourritures.intro}</p>
 
           <div class="tabs" data-tabs data-tabs-label={dict.nourritures.heading}>
@@ -106,6 +128,17 @@ const videos = byType("video");
 </BaseLayout>
 
 <style>
+  /* ---------- promoted book: the page's single paper surface ---------- */
+  .feat {
+    margin-bottom: clamp(2rem, 4vw, 3.2rem);
+  }
+  .feat-title {
+    font-style: italic;
+  }
+  .feat-author {
+    max-width: 40ch;
+  }
+
   .intro {
     margin-bottom: 0.4rem;
   }
@@ -122,31 +155,52 @@ const videos = byType("video");
     margin-top: 0.8rem;
   }
 
-  /* enhanced tablist (built by the script; scoped via the authored .tabs
-     container since the generated nodes carry no astro scope attribute) */
+  /* ---------- enhanced tablist: a small dock of glass pills ----------
+     Built by the script below, so the selectors go through the authored .tabs
+     container: generated nodes carry no astro scope attribute. The pills are
+     lit by the shared specular driver through data-spec, set in the script.
+     Sizes are floored so the narrow --u rebase cannot shrink a control below
+     a usable touch target or a readable label. */
   .tabs :global(.tablist) {
     display: flex;
-    gap: 0.5rem;
-    margin: 1.3rem 0 1.5rem;
     flex-wrap: wrap;
+    gap: max(6px, calc(8 * var(--u)));
+    margin: 1.4rem 0 1.6rem;
   }
   .tabs :global(.tab) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: max(14px, calc(18 * var(--u)));
     font-family: var(--mono);
-    font-size: 0.82rem;
-    background: none;
-    color: var(--ink-3);
-    padding: 0.3rem 0.9rem;
+    font-size: max(10px, calc(11 * var(--u)));
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
     cursor: pointer;
-    border: 1px solid var(--hair);
     border-radius: var(--r-pill);
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
+    border: 1px solid rgba(232, 226, 213, 0.11);
+    box-shadow:
+      0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(8, 7, 5, 0.34),
+      inset 0 1px rgba(232, 226, 213, 0.06);
   }
   .tabs :global(.tab:hover) {
     color: var(--bone);
+    border-color: rgba(232, 226, 213, 0.2);
   }
   .tabs :global(.tab[aria-selected="true"]) {
     color: var(--accent);
     border-color: var(--accent);
     background: var(--accent-soft);
+  }
+  :global(html.anim) .tabs :global(.tab) {
+    transition:
+      color 0.4s var(--ease),
+      border-color 0.4s var(--ease),
+      background 0.4s var(--ease);
   }
 
   .books {
@@ -207,6 +261,9 @@ const videos = byType("video");
       btn.textContent = head ? head.textContent : key;
       btn.setAttribute("role", "tab");
       btn.setAttribute("aria-controls", `panel-${key}`);
+      /* Specular rim: initSpec() collects [data-spec] on astro:page-load,
+         which fires after this script, so the fresh pills are picked up. */
+      btn.setAttribute("data-spec", "");
 
       sec.id = `panel-${key}`;
       sec.setAttribute("role", "tabpanel");

@@ -22,6 +22,16 @@ const tools = (await getCollection("tools")).sort(
 );
 const writings = (await publishedWritings(locale)).slice(0, 3);
 
+/**
+ * The newest writing is the page's single paper spotlight; the other two stay
+ * in the dark listing below it, so the post never appears twice.
+ */
+const spotlight = writings[0];
+const listed = writings.slice(1);
+const spotlightHref = spotlight
+  ? localePath(locale, `/ecrits/${baseSlug(spotlight)}`)
+  : "";
+
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
@@ -30,6 +40,33 @@ const jsonLd = {
   url: SITE_URL,
   sameAs: [GITHUB_URL],
 };
+
+/**
+ * Depth ladder and entrance stagger for this page.
+ *
+ *   section         offset  heading --pd/--pr/--d   panel depth/rot/d
+ *   manifeste       l       18 / 1.2 / 60ms         6 / 0.9 / 200ms
+ *   projets         r       14 / 1.0 / 150ms        9 / 1.3 / 290ms
+ *   outils          l       18 / 1.2 / 240ms        6 / 0.9 / 380ms
+ *   ecrits          r       14 / 1.0 / 330ms        paper 10 / 2.4 / 470ms
+ *                                                   list  9 / 1.3 / 560ms
+ *
+ * Two rules behind those numbers:
+ *  - Long text and the monospaced tree ride shallow (6): a listing whose glyph
+ *    column slides under the cursor reads as a wobble, not as depth. Card grids
+ *    ride deeper (9), the paper spotlight deepest.
+ *  - Panel depth stays at 10 or less because mycelium.ts measures .panel-head
+ *    with the transform applied and only re-measures on rebuild, so a deeper
+ *    panel drifts off its filament branch tip. The spotlight gets its "front
+ *    card" read from rotation (2.4deg) instead, which pivots about the centre
+ *    and barely moves the head.
+ *
+ * Entrances use the clip-path grammar (.mask on panels, .rise > i on headings)
+ * rather than .reveal: html.anim .reveal writes transform: translateY(14px) at
+ * a higher specificity than .par, so an element carrying both loses its depth
+ * for good. Panel bodies keep their own viewport trigger, the [data-step]
+ * sequence driven by term-type.ts and woken by the filament.
+ */
 
 /**
  * Home-only manifeste teaser. This prose is home-page content (not chrome and
@@ -101,11 +138,13 @@ const tz = teaser[locale];
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">
-          {chrome.manifeste.heading}{" "}
-          <span class="gold">{chrome.manifeste.headingGold}</span>
+        <h2 class="disp-h par rise" style="--pd:18;--pr:1.2;--d:60ms">
+          <i>
+            {chrome.manifeste.heading}{" "}
+            <span class="gold">{chrome.manifeste.headingGold}</span>
+          </i>
         </h2>
-        <TerminalPanel path="~/manifeste" class="reveal">
+        <TerminalPanel path="~/manifeste" depth={6} rot={0.9} d={200}>
           <TermCmd command={chrome.manifeste.cmd} />
           <div class="out md" data-step="fade">
             <p class="h"><span class="tok"># </span>{tz.title}</p>
@@ -126,7 +165,11 @@ const tz = teaser[locale];
           </div>
           <p class="cmdline chipline" data-step="fade">
             <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a class="cta-chip" href={localePath(locale, "/manifeste")}>
+            <a
+              class="cta-chip glass"
+              data-spec
+              href={localePath(locale, "/manifeste")}
+            >
               {chrome.manifeste.readMore}
             </a>
           </p>
@@ -138,8 +181,10 @@ const tz = teaser[locale];
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.projets.heading}</h2>
-        <TerminalPanel path="~/projets" class="reveal">
+        <h2 class="disp-h par rise" style="--pd:14;--pr:1;--d:150ms">
+          <i>{chrome.projets.heading}</i>
+        </h2>
+        <TerminalPanel path="~/projets" depth={9} rot={1.3} d={290}>
           <TermCmd command={chrome.projets.cmd} />
           <div class="out" data-step="fade">
             <p class="c intro">{chrome.projets.intro}</p>
@@ -165,7 +210,13 @@ const tz = teaser[locale];
           </div>
           <p class="cmdline morelink" data-step="fade">
             <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/projets")}>{chrome.projets.all}</a>
+            <a
+              class="morechip glass"
+              data-spec
+              href={localePath(locale, "/projets")}
+            >
+              {chrome.projets.all}
+            </a>
           </p>
         </TerminalPanel>
       </div>
@@ -175,8 +226,10 @@ const tz = teaser[locale];
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.outils.heading}</h2>
-        <TerminalPanel path="~/outils" class="reveal">
+        <h2 class="disp-h par rise" style="--pd:18;--pr:1.2;--d:240ms">
+          <i>{chrome.outils.heading}</i>
+        </h2>
+        <TerminalPanel path="~/outils" depth={6} rot={0.9} d={380}>
           <TermCmd command={chrome.outils.cmd} />
           <div class="out" data-step="fade">
             <p class="c intro">{chrome.outils.intro}</p>
@@ -206,7 +259,13 @@ const tz = teaser[locale];
           </div>
           <p class="cmdline morelink" data-step="fade">
             <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/outils")}>{chrome.outils.all}</a>
+            <a
+              class="morechip glass"
+              data-spec
+              href={localePath(locale, "/outils")}
+            >
+              {chrome.outils.all}
+            </a>
           </p>
         </TerminalPanel>
       </div>
@@ -216,14 +275,44 @@ const tz = teaser[locale];
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.ecrits.heading}</h2>
-        <TerminalPanel path="~/ecrits" class="reveal">
+        <h2 class="disp-h par rise" style="--pd:14;--pr:1;--d:330ms">
+          <i>{chrome.ecrits.heading}</i>
+        </h2>
+        {
+          spotlight && (
+            <div class="spot">
+              <TerminalPanel
+                path={`~/ecrits/${baseSlug(spotlight)}.md`}
+                variant="paper"
+                depth={10}
+                rot={2.4}
+                d={470}
+               
+              >
+                <p class="paper-label">
+                  {chrome.ecrits.published} {isoDate(spotlight.data.publishedAt)}
+                </p>
+                <h3><a href={spotlightHref}>{spotlight.data.title}</a></h3>
+                <p class="hook">{spotlight.data.description}</p>
+                <a
+                  class="paper-knob"
+                  href={spotlightHref}
+                  aria-hidden="true"
+                  tabindex="-1"
+                >
+                  <span>-&gt;</span>
+                </a>
+              </TerminalPanel>
+            </div>
+          )
+        }
+        <TerminalPanel path="~/ecrits" depth={9} rot={1.3} d={560}>
           <TermCmd command={chrome.ecrits.cmd} />
           <div class="out" data-step="fade">
             <p class="c intro">{chrome.ecrits.intro}</p>
             <div class="flist">
               {
-                writings.map((entry) => {
+                listed.map((entry) => {
                   const slug = baseSlug(entry);
                   return (
                     <a
@@ -248,7 +337,13 @@ const tz = teaser[locale];
           </div>
           <p class="cmdline morelink" data-step="fade">
             <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/ecrits")}>{chrome.ecrits.all}</a>
+            <a
+              class="morechip glass"
+              data-spec
+              href={localePath(locale, "/ecrits")}
+            >
+              {chrome.ecrits.all}
+            </a>
           </p>
         </TerminalPanel>
       </div>
@@ -257,6 +352,34 @@ const tz = teaser[locale];
 </BaseLayout>
 
 <style>
+  /* ---------- composed display scale ----------
+     56u is 56px on the 1440 reference frame, which is above the old 2.9rem cap.
+     max() keeps the rem clamp as the floor, so nothing shrinks at 320px. The
+     u term is scoped above 900px on purpose: below it tokens.css re-bases u to
+     100vw/760 for the hero furniture, which would jump a section heading from
+     34px to 66px across the breakpoint. */
+  @media (min-width: 901px) {
+    .disp-h {
+      font-size: max(clamp(1.9rem, 3.8vw, 2.9rem), calc(56 * var(--u)));
+    }
+  }
+
+  /* the one paper card on the page, and the air it needs above the dark list */
+  .spot {
+    margin-bottom: clamp(1.6rem, 3vw, 2.6rem);
+  }
+  /* The knob is absolute in the panel's bottom-right corner, so the last block
+     of a paper card must leave it room: body padding plus 40u clears a 46u knob
+     sitting 18u off the bottom edge. */
+  .hook {
+    margin-bottom: max(30px, calc(40 * var(--u)));
+  }
+  .paper-knob span {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
   /* ---------- manifeste : markdown-ish cat (ported from mockup D) ---------- */
   .md {
     display: flex;
@@ -288,25 +411,40 @@ const tz = teaser[locale];
     font-weight: 600;
   }
 
-  /* readMore chip line */
-  .chipline {
+  /* ---------- trailing action rows ----------
+     Both the readMore chip and the quiet "cd <dir>" links wear the header dock
+     treatment: .glass for the surface, data-spec for the rim (src/lib/spec.ts
+     drives every [data-spec] from the shared pointer bus). Neither rule below
+     may set background or border, or it would outrank .glass and flatten it. */
+  .chipline,
+  .morelink {
     margin-top: 1.8rem;
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: center;
     gap: 0.9ch;
   }
-  .cta-chip {
-    display: inline-block;
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-decoration: none;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border: 1px solid rgba(217, 162, 74, 0.5);
-    padding: 0.5em 0.95em;
+  .cta-chip,
+  .morechip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.95em;
     border-radius: var(--r-tile);
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .cta-chip {
+    color: var(--accent);
+  }
+  .morechip {
+    font-weight: 500;
+    color: var(--ink-3);
+  }
+  html.anim .cta-chip,
+  html.anim .morechip {
     transition:
       color 0.2s ease,
       background-color 0.2s ease;
@@ -316,22 +454,13 @@ const tz = teaser[locale];
     background: var(--accent);
     color: var(--bg);
   }
-  .cta-chip:active {
-    transform: translateY(1px);
-  }
-
-  /* quiet trailing "cd <dir>" links */
-  .morelink {
-    margin-top: 1.8rem;
-  }
-  .morelink a {
-    color: var(--ink-3);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-  .morelink a:hover,
-  .morelink a:focus-visible {
+  .morechip:hover,
+  .morechip:focus-visible {
     color: var(--accent);
+  }
+  .cta-chip:active,
+  .morechip:active {
+    transform: translateY(1px);
   }
 
   /* ---------- projets : aligned 2-col ls ---------- */

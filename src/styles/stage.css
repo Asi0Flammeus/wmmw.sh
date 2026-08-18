@@ -1,0 +1,374 @@
+/* ---------------------------------------------------------------------------
+   Sylva-grade composition grammar, shared by every page.
+
+   Three rules the whole site obeys:
+   1. Reveal with clip-path. Animate position with transform. Never both on the
+      same element, or the parallax fights the entrance.
+   2. One pointer, two custom properties (--px / --py on <html>), per-layer
+      depth via --pd / --pr. Zero per-element JS.
+   3. No backdrop-filter. Glass is a top-lit gradient plus a pointer-tracking
+      conic rim. backdrop-filter over a canvas that repaints every frame costs
+      a full extra pass and drops the page to ~20fps.
+   Every rule here is gated on html.anim, so no-JS and reduced-motion users get
+   the finished, fully visible markup.
+--------------------------------------------------------------------------- */
+
+/* --- entrance: clip-path masks with a per-element inline --d stagger ------ */
+
+/* These rules own the `transition` property of whatever element carries the
+   class, and they outrank a plain class rule. An element that also wants its
+   own transition declares it in `--mask-also`, which is spliced in ahead of the
+   clip so the clip still wins for clip-path:
+     .my-card { --mask-also: box-shadow 0.8s var(--ease); }
+   The default `all 0s` is inert and matches an element with no transitions. */
+
+html.anim .mask {
+  clip-path: inset(100% 0 0 0 round var(--mr, 0px));
+}
+
+html.anim.staged .mask {
+  clip-path: inset(0 0 0 0 round var(--mr, 0px));
+  transition: var(--mask-also, all 0s), clip-path 1.05s var(--ease-out) var(--d, 0ms);
+}
+
+html.anim .mask-down {
+  clip-path: inset(0 0 105% 0 round var(--mr, 0px));
+}
+
+html.anim.staged .mask-down {
+  clip-path: inset(0 0 -30% 0 round var(--mr, 0px));
+  transition: var(--mask-also, all 0s), clip-path 0.9s var(--ease-out) var(--d, 0ms);
+}
+
+html.anim .mask-circle {
+  clip-path: circle(0% at 50% 50%);
+}
+
+html.anim.staged .mask-circle {
+  clip-path: circle(76% at 50% 50%);
+  transition: var(--mask-also, all 0s), clip-path 1.1s var(--ease-out) var(--d, 0ms);
+}
+
+html.anim .fade {
+  opacity: 0;
+}
+
+html.anim.staged .fade {
+  opacity: 1;
+  transition: var(--mask-also, all 0s), opacity 1.3s var(--ease) var(--d, 0ms);
+}
+
+html.anim .rise > i {
+  display: block;
+  opacity: 0;
+  transform: translateY(calc(16 * var(--u)));
+}
+
+html.anim.staged .rise > i {
+  opacity: 1;
+  transform: none;
+  transition:
+    var(--mask-also, all 0s),
+    opacity 1.05s var(--ease) var(--d, 0ms),
+    transform 1.25s var(--ease-out) var(--d, 0ms);
+}
+
+/* A live clip-path opens a stacking context, which would trap layers below the
+   WebGL canvas forever. Drop every clip once the intro has landed. */
+/* Specificity matters here: html.anim.staged .mask is 0-3-0, so this rule needs
+   the same three classes or the clip-path stays live and the stacking context
+   with it. */
+html.anim.staged.staged-done .mask,
+html.anim.staged.staged-done .mask-down,
+html.anim.staged.staged-done .mask-circle {
+  clip-path: none;
+  transition: var(--mask-also, all 0s);
+}
+
+/* --- pointer parallax ---------------------------------------------------- */
+
+.par {
+  transform: perspective(1400px)
+    translate3d(
+      calc(var(--px, 0) * var(--pd, 0) * -1px),
+      calc(var(--py, 0) * var(--pd, 0) * -0.62px),
+      0
+    )
+    rotateY(calc(var(--px, 0) * var(--pr, 0) * 1deg))
+    rotateX(calc(var(--py, 0) * var(--pr, 0) * -0.7deg));
+}
+
+html:not(.anim) .par {
+  transform: none;
+}
+
+/* --- faked glass + pointer-tracking specular rim ------------------------- */
+
+.glass {
+  background:
+    linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+    rgba(26, 23, 18, 0.74);
+  border: 1px solid rgba(232, 226, 213, 0.11);
+  box-shadow:
+    0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(8, 7, 5, 0.34),
+    inset 0 1px rgba(232, 226, 213, 0.06);
+}
+
+[data-spec] {
+  --spec-angle: 2.4rad;
+  --spec-bright: 0;
+  position: relative;
+}
+
+[data-spec]::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--spec-bright);
+  background: conic-gradient(
+    from var(--spec-angle) at 50% 50%,
+    rgba(240, 230, 205, 0) 0deg,
+    rgba(240, 230, 205, 0.08) 42deg,
+    rgba(250, 244, 228, 0.95) 96deg,
+    rgba(240, 230, 205, 0.16) 150deg,
+    rgba(240, 230, 205, 0) 220deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* --- column guides: three fixed hairlines, the page's silent grid --------- */
+
+.guides {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.guides i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--rule) 12%,
+    var(--rule) 78%,
+    transparent
+  );
+}
+
+.guides i:nth-child(1) {
+  left: calc(360 * var(--u));
+}
+
+.guides i:nth-child(2) {
+  left: calc(720 * var(--u));
+}
+
+.guides i:nth-child(3) {
+  left: calc(1080 * var(--u));
+}
+
+@media (max-width: 900px) {
+  .guides i:nth-child(1) {
+    left: calc(253 * var(--u));
+  }
+
+  .guides i:nth-child(2) {
+    left: calc(506 * var(--u));
+  }
+
+  .guides i:nth-child(3) {
+    display: none;
+  }
+}
+
+/* --- ghost wordmark: the palindrome, oversized and barely there ---------- */
+
+.ghost {
+  position: absolute;
+  left: calc(6 * var(--u));
+  bottom: calc(-58 * var(--u));
+  z-index: 0;
+  margin: 0;
+  font-family: var(--disp);
+  font-weight: 400;
+  font-size: calc(268 * var(--u));
+  line-height: 0.78;
+  letter-spacing: calc(22 * var(--u));
+  color: rgba(232, 226, 213, 0.055);
+  user-select: none;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* --- paper: the one light surface, one spotlight per page ----------------- */
+
+.paper {
+  position: relative;
+  background: var(--paper);
+  color: var(--paper-ink);
+  border-radius: calc(34 * var(--u));
+  padding: calc(30 * var(--u));
+  box-shadow: 0 calc(30 * var(--u)) calc(70 * var(--u)) rgba(8, 7, 5, 0.34);
+  transition: box-shadow 0.8s var(--ease);
+}
+
+.paper:hover {
+  box-shadow: 0 calc(38 * var(--u)) calc(84 * var(--u)) rgba(8, 7, 5, 0.4);
+}
+
+.paper .paper-label {
+  margin: 0 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--paper-label);
+}
+
+.paper h2,
+.paper h3 {
+  margin: 0 0 0.6rem;
+  font-family: var(--disp);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--paper-ink);
+}
+
+.paper p {
+  margin: 0;
+  color: #464c40;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.paper a {
+  color: #2f3a24;
+  text-decoration-color: rgba(47, 58, 36, 0.4);
+  text-underline-offset: 3px;
+}
+
+.paper a:focus-visible {
+  outline: 2px solid rgba(28, 34, 22, 0.9);
+  outline-offset: 3px;
+}
+
+/* the knob: a paper card's action, lifted so it can sit above the canvas */
+.paper-knob {
+  position: absolute;
+  right: calc(18 * var(--u));
+  bottom: calc(18 * var(--u));
+  width: calc(46 * var(--u));
+  height: calc(46 * var(--u));
+  min-width: 40px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fbfcf8;
+  color: #3f453a;
+  box-shadow: 0 calc(6 * var(--u)) calc(16 * var(--u)) rgba(8, 7, 5, 0.2);
+}
+
+html.anim .paper-knob {
+  transition: transform 0.5s var(--ease-out), background 0.5s var(--ease);
+}
+
+.paper:hover .paper-knob {
+  background: #fff;
+  transform: scale(1.1) rotate(8deg);
+}
+
+/* --- scroll cue ---------------------------------------------------------- */
+
+.scroll-cue {
+  position: absolute;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  font-family: var(--mono);
+  font-size: max(10px, calc(11 * var(--u)));
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(232, 226, 213, 0.5);
+  writing-mode: vertical-rl;
+}
+
+.scroll-cue .track {
+  position: relative;
+  width: 1px;
+  height: calc(64 * var(--u));
+  min-height: 40px;
+  background: rgba(232, 226, 213, 0.18);
+  overflow: hidden;
+}
+
+.scroll-cue .track::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 42%;
+  background: rgba(232, 226, 213, 0.75);
+}
+
+html.anim .scroll-cue .track::after {
+  animation: cue-trickle 2.6s var(--ease) infinite;
+}
+
+@keyframes cue-trickle {
+  0% {
+    transform: translateY(-105%);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(255%);
+    opacity: 0;
+  }
+}
+
+/* --- reduced motion: one screen, fully composed, nothing moving ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mask,
+  .mask-down,
+  .mask-circle,
+  .fade,
+  .rise > i {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .par {
+    transform: none !important;
+  }
+
+  .scroll-cue .track::after {
+    animation: none;
+  }
+
+  [data-spec]::after {
+    opacity: 0.18;
+  }
+}

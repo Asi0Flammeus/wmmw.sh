@@ -15,10 +15,10 @@ const dict = t(locale);
   description={dict.meta.notFound}
   path="/404"
 >
-  <section class="sec offset-l" data-block>
+  <section class="sec offset-l nf" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~" class="reveal">
+        <TerminalPanel path="~" depth={6} rot={1} d={140}>
           <p class="cmdline">
             <span class="ps"><b>{TERM_USER}</b>:~$</span>
             {" "}cat <span id="nf-path">404</span>
@@ -44,6 +44,24 @@ const dict = t(locale);
 </script>
 
 <style>
+  /* One glass surface on this page. Three notes on this selector:
+     the .glass recipe is restated because TerminalPanel's own scoped
+     .panel:not(.paper) rule outranks the utility class; the panel is reached
+     through .sec-inner because a class passed to a component never carries this
+     page's scope attribute; and only the border colour is touched, so the
+     panel keeps its literal 1px hairline.
+     No .ghost here: BaseLayout's hero already prints the palindrome one screen
+     above, and two wordmarks on a page this short read as noise, not as grid. */
+  .nf .sec-inner :global(.panel) {
+    background:
+      linear-gradient(180deg, rgba(232, 226, 213, 0.055), rgba(232, 226, 213, 0) 42%),
+      rgba(26, 23, 18, 0.74);
+    border-color: rgba(232, 226, 213, 0.11);
+    box-shadow:
+      0 calc(8 * var(--u)) calc(22 * var(--u)) rgba(8, 7, 5, 0.34),
+      inset 0 1px rgba(232, 226, 213, 0.06);
+  }
+
   .endline {
     margin-top: 1.4rem;
   }

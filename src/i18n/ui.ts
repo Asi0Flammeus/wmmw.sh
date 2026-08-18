@@ -24,6 +24,9 @@ const fr = {
     h1b: "y revient.",
     sub: "William. Physicien de formation, tisseur de réseaux par nature. Je fais circuler le code, le savoir et la valeur.",
     cta: "./lire-manifeste.sh",
+    eyebrow: "richesse mycélique",
+    scrollCue: "descendre",
+    sceneLabel: "Racine mycélienne, scène animée",
   },
   manifeste: {
     heading: "La forêt n'a pas besoin d'un arbre de plus.",
@@ -36,6 +39,7 @@ const fr = {
     heading: "Projets",
     cmd: "ls projets/",
     intro: "# Les arbres que le réseau nourrit.",
+    spotlight: "projet phare",
     all: "cd projets/",
   },
   outils: {
@@ -45,6 +49,7 @@ const fr = {
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
     repoPrivate: "repo privé, ouverture prochaine",
+    spotlight: "outil phare",
     install: "installation",
   },
   ecrits: {
@@ -65,6 +70,7 @@ const fr = {
     intro: "# Ce qui me nourrit. Le sol d'où tout pousse.",
     tabs: { livres: "Livres", films: "Films", videos: "Vidéos" },
     empty: "# vide pour le moment. bientôt.",
+    featured: "premier de la liste",
   },
   footer: {
     echoCmd: 'echo "$WMMW"',
@@ -73,6 +79,7 @@ const fr = {
     linksCmd: "ls -l liens/",
     rss: "flux rss",
     contactSoon: "courriel, bientôt",
+    claim: "w m m w · le même mot dans les deux sens",
   },
   notFound: {
     output: "cat: aucun fichier ou dossier de ce type",
@@ -123,6 +130,9 @@ const en: Dict = {
     h1b: "comes back.",
     sub: "William. Physicist by training, network weaver by nature. I keep code, knowledge and value in circulation.",
     cta: "./read-manifesto.sh",
+    eyebrow: "mycelic wealth",
+    scrollCue: "scroll",
+    sceneLabel: "Mycelial root, animated scene",
   },
   manifeste: {
     heading: "The forest does not need one more tree.",
@@ -135,6 +145,7 @@ const en: Dict = {
     heading: "Projects",
     cmd: "ls projets/",
     intro: "# The trees the network feeds.",
+    spotlight: "flagship project",
     all: "cd projets/",
   },
   outils: {
@@ -144,6 +155,7 @@ const en: Dict = {
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
     repoPrivate: "private repo, opening soon",
+    spotlight: "flagship tool",
     install: "install",
   },
   ecrits: {
@@ -164,6 +176,7 @@ const en: Dict = {
     intro: "# What feeds me. The soil everything grows from.",
     tabs: { livres: "Books", films: "Films", videos: "Videos" },
     empty: "# empty for now. soon.",
+    featured: "first on the list",
   },
   footer: {
     echoCmd: 'echo "$WMMW"',
@@ -172,6 +185,7 @@ const en: Dict = {
     linksCmd: "ls -l liens/",
     rss: "rss feed",
     contactSoon: "email, soon",
+    claim: "w m m w · the same word both ways",
   },
   notFound: {
     output: "cat: no such file or directory",
@@ -213,6 +227,9 @@ const es: Dict = {
     h1b: "vuelve.",
     sub: "William. Físico de formación, tejedor de redes por naturaleza. Hago circular el código, el saber y el valor.",
     cta: "./leer-manifiesto.sh",
+    eyebrow: "riqueza micélica",
+    scrollCue: "bajar",
+    sceneLabel: "Raíz micelial, escena animada",
   },
   manifeste: {
     heading: "El bosque no necesita un árbol más.",
@@ -225,6 +242,7 @@ const es: Dict = {
     heading: "Proyectos",
     cmd: "ls projets/",
     intro: "# Los árboles que la red alimenta.",
+    spotlight: "proyecto destacado",
     all: "cd projets/",
   },
   outils: {
@@ -234,6 +252,7 @@ const es: Dict = {
     all: "cd outils/",
     treeSummary: (n: number) => `${n} directories, 0 files`,
     repoPrivate: "repo privado, se abrirá pronto",
+    spotlight: "herramienta destacada",
     install: "instalación",
   },
   ecrits: {
@@ -254,6 +273,7 @@ const es: Dict = {
     intro: "# Lo que me nutre. El suelo del que todo crece.",
     tabs: { livres: "Libros", films: "Películas", videos: "Vídeos" },
     empty: "# vacío por ahora. pronto.",
+    featured: "primero de la lista",
   },
   footer: {
     echoCmd: 'echo "$WMMW"',
@@ -262,6 +282,7 @@ const es: Dict = {
     linksCmd: "ls -l liens/",
     rss: "canal rss",
     contactSoon: "correo, pronto",
+    claim: "w m m w · la misma palabra en los dos sentidos",
   },
   notFound: {
     output: "cat: no existe el fichero o el directorio",
