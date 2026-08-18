@@ -1714,22 +1714,31 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
     });
     scene.add(nearRoot.group);
 
-    /* ---- far ridge: same builder, pushed back and washed into dark air ---- */
-    const farRoot = assembleRoot(buildFarLimbs(), {
-      aspect: FAR_ASPECT,
-      haze: 0.16,
-      /* 0.88 left about 15 percent of the lit rind showing, which on this dark
-         page read as a solid brown mass rather than as distance. */
-      fog: 0.96,
-      /* 1.0: distant air lifts its darks all the way, so the ridge carries no
-         silhouette of its own and only shifts the value of the air. */
-      hazeLift: 1.0,
-      blades: bladesFar,
-      order: 0,
-      mouse: uMouseFar,
-      mouseR: 1.4,
-    });
-    scene.add(farRoot.group);
+    /* ---- far ridge: same builder, pushed back and washed into dark air ----
+       Skipped on a narrow screen. At 390px the ridge covers a third of the
+       frame, so the haze that makes it read as distance on a wide screen turns
+       it into a flat brown slab instead. Dropping it also returns its blade
+       budget and its draw calls to the phone. */
+    const farRoot = narrow
+      ? null
+      : assembleRoot(buildFarLimbs(), {
+          aspect: FAR_ASPECT,
+          haze: 0.16,
+          /* 0.88 left about 15 percent of the lit rind showing, which on this
+             dark page read as a solid brown mass rather than as distance. */
+          fog: 0.96,
+          /* 1.0: distant air lifts its darks all the way, so the ridge carries
+             no silhouette of its own and only shifts the value of the air. */
+          hazeLift: 1.0,
+          blades: bladesFar,
+          order: 0,
+          mouse: uMouseFar,
+          mouseR: 1.4,
+        });
+    /* An empty group keeps every c.far reference valid with no branch in the
+       frame loop. */
+    const farGroup = farRoot ? farRoot.group : new Group();
+    scene.add(farGroup);
 
     /* ---- ambient motes: spores adrift, animated wholly from uTime ---- */
     const sprite = radialTexture(64, [
@@ -1815,8 +1824,8 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
       scene,
       camera,
       near: nearRoot.group,
-      far: farRoot.group,
-      shells: [nearRoot.shell, farRoot.shell],
+      far: farGroup,
+      shells: farRoot ? [nearRoot.shell, farRoot.shell] : [nearRoot.shell],
       uTime,
       uScanO,
       uScanR,
