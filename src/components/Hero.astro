@@ -23,15 +23,17 @@ const h1aHasEm = emAt >= 0;
 const subCut = sub.lastIndexOf(". ");
 const subLead = subCut >= 0 ? sub.slice(0, subCut + 1) : sub;
 const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
+
+/* One masthead, three type steps. A page title must carry a full viewport, so
+   a short word starts at the top of the ramp. Titles come from content too, and
+   an article title set at word scale would run off the band, so the step comes
+   down with the character count. Measured at build time, no layout probe. */
+const bandStep =
+  heading.length <= 12 ? "band-xl" : heading.length <= 24 ? "band-lg" : "band-md";
 ---
 
 <section class:list={["hero", variant]}>
   <div class="hero-veil" aria-hidden="true"></div>
-  <!--
-    The palindrome as the silent grid mark. It is brand, not decoration: wmmw
-    read backwards is wmmw, which is the whole thesis of the site.
-  -->
-  <p class="ghost par fade" style="--pd:3; --d:1150ms" aria-hidden="true">wmmw</p>
   <div class="hero-copy">
     {
       variant === "full" ? (
@@ -83,10 +85,15 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
         </>
       ) : (
         <>
-          <p class="hero-eyebrow par fade" style="--pd:12; --d:160ms">
-            {eyebrow}
+          {/* The masthead anchor. The hairline enters from off the left edge,
+              carries the eyebrow as its label, and runs out to the right pad,
+              so the page title hangs off the frame instead of floating in it.
+              A tick drops from the rule to the title's own left edge. */}
+          <p class="band-mark par fade" style="--pd:10; --d:160ms">
+            <span>{eyebrow}</span>
+            <i class="rule"></i>
           </p>
-          <h1 class="band-h par" style="--pd:18; --pr:1.2">
+          <h1 class:list={["band-h", bandStep, "par"]} style="--pd:18; --pr:1.2">
             <span class="rise" style="--d:280ms">
               <i>{heading}</i>
             </span>
@@ -94,6 +101,18 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
         </>
       )
     }
+    <!--
+      The palindrome as the mark that signs the block. It is brand, not
+      decoration: wmmw read backwards is wmmw, which is the whole thesis of the
+      site. Oversized and bled off an edge it broke into four orphan letters
+      across the copy band, so it now sits in the copy column, in flow, as a
+      tracked baseline stamp under the block it signs. It stays the largest type
+      in the hero and stays barely there, and being in flow it can neither cross
+      the copy nor widen the page.
+    -->
+    <p class="ghost par fade" style="--pd:3; --d:1150ms" aria-hidden="true">
+      wmmw
+    </p>
   </div>
   <a class="scroll-cue par fade" style="--pd:9; --d:1040ms" href="#contenu">
     <span>{scrollCue}</span>
@@ -109,7 +128,7 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     align-items: flex-end;
     justify-content: flex-end;
     /* clip, not hidden: clip opens no scroll container, and it keeps the
-       oversized ghost wordmark from ever widening the page on any viewport. */
+       hairline that bleeds off the left edge from ever widening the page. */
     overflow: clip;
     /* one hero size everywhere; the homepage is the reference. mycelium.ts
        measures this element for its bloom zone, so 100dvh is load bearing. */
@@ -144,13 +163,9 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.3) 16%, #000 40%);
   }
 
-  /* Above the veil, below the copy. At the stage.css default of z-index 0 the
-     bottom fondu would erase it, which is not a ghost, it is nothing. */
-  .hero .ghost {
-    z-index: 2;
-  }
-
-  /* copy block lives on the RIGHT, away from the left-weighted bloom */
+  /* copy block lives on the RIGHT, away from the left-weighted bloom. It also
+     carries the ghost wordmark now, so nothing in the hero can land on top of
+     the copy: the column stacks above the veil and every layer is in flow. */
   .hero-copy {
     position: relative;
     z-index: 4;
@@ -210,10 +225,74 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     color: var(--accent);
   }
 
+  /* --- band hero: the page-title masthead --------------------------------- */
+
+  /* The band hero holds one title, so it is composed, not floated. The rule
+     lands at a fixed 46dvh on every page, the title hangs under it, and the
+     palindrome closes the block. The whole viewport then reads as one frame:
+     empty top, anchored middle, mark at the base, cue in the outer gutter. */
+  .hero.band {
+    align-items: flex-start;
+    padding-top: 46dvh;
+  }
+
+  .band-mark {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: max(10px, calc(18 * var(--u)));
+    font-family: var(--mono);
+    font-size: max(10px, calc(11 * var(--u)));
+    font-weight: 500;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  /* left arm: enters from off the viewport edge, so the label reads as a stop
+     on a line that crosses the whole frame. .hero clips it, so it can never
+     widen the page. */
+  .band-mark::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -100vw;
+    right: calc(100% + max(10px, calc(18 * var(--u))));
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--hair-2) 62%, var(--hair));
+  }
+  /* the drop tick, from the rule down to the title's left edge */
+  .band-mark::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(100% + max(3px, calc(5 * var(--u))));
+    width: 1px;
+    height: max(13px, calc(22 * var(--u)));
+    background: linear-gradient(to bottom, var(--hair), transparent);
+  }
+  /* right arm: fills to the frame's right pad */
+  .band-mark .rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: linear-gradient(to right, var(--hair), rgba(232, 226, 213, 0) 94%);
+  }
+
   .hero .band-h {
-    font-size: max(1.9rem, calc(46 * var(--u)));
-    line-height: 1.06;
+    margin-top: max(18px, calc(32 * var(--u)));
+    line-height: 1.02;
+    letter-spacing: calc(-1.1 * var(--u));
     color: var(--bone);
+  }
+  .hero .band-xl {
+    font-size: max(2.6rem, calc(106 * var(--u)));
+    max-width: 13ch;
+  }
+  .hero .band-lg {
+    font-size: max(2.15rem, calc(74 * var(--u)));
+    max-width: 17ch;
+  }
+  .hero .band-md {
+    font-size: max(1.85rem, calc(54 * var(--u)));
     max-width: 24ch;
   }
 
@@ -271,7 +350,9 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     transform: translateY(1px);
   }
 
-  /* pinned bottom-left, in the gutter the copy never uses */
+  /* pinned in the frame's free gutter, which the copy never uses. Above 900px
+     that is the left one; below it the copy column fills the width and the
+     wordmark stamp reaches the left pad, so the cue swaps sides. */
   .hero .scroll-cue {
     left: max(8px, calc(16 * var(--u)));
     bottom: max(18px, calc(30 * var(--u)));
@@ -283,25 +364,41 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     .hero h1 {
       font-size: max(2rem, calc(62 * var(--u)));
     }
-    .hero .band-h {
-      font-size: max(1.75rem, calc(44 * var(--u)));
+    /* --u grows below 900px (100vw / 760), so the band steps come down to keep
+       a two-line title inside the band. */
+    .hero .band-xl {
+      font-size: max(2.6rem, calc(88 * var(--u)));
+    }
+    .hero .band-lg {
+      font-size: max(2.15rem, calc(66 * var(--u)));
+    }
+    .hero .band-md {
+      font-size: max(1.85rem, calc(48 * var(--u)));
     }
     .hero-sub {
       max-width: min(100%, calc(620 * var(--u)));
       font-size: max(1.05rem, calc(19 * var(--u)));
       line-height: max(1.6rem, calc(27 * var(--u)));
     }
-    /* the ghost is allowed to bleed off the left edge, never to widen the page */
+    .hero .scroll-cue {
+      left: auto;
+      right: max(8px, calc(16 * var(--u)));
+    }
+    /* the stamp keeps its share of the column, never more */
     .hero .ghost {
-      font-size: max(96px, calc(190 * var(--u)));
-      letter-spacing: calc(10 * var(--u));
+      font-size: max(58px, calc(132 * var(--u)));
     }
   }
 
   @media (max-width: 767px) {
     .hero.full {
-      /* room for the scroll cue under the copy block */
+      /* keep the foot of the frame open under the copy block */
       padding-bottom: clamp(4.5rem, 12vh, 7rem);
+    }
+    /* a phone frame is taller than it is wide, so the anchor comes up to stay
+       optically centred */
+    .hero.band {
+      padding-top: 42dvh;
     }
   }
 

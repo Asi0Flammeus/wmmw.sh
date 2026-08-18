@@ -115,19 +115,22 @@ const HAZE_COL = scaled(T_ACCENT, 0.07).add(scaled(T_SURF, 0.5));
 /* The fur ramp: dark wet humus at the blade root, lit gold at the tip.
    Scale factors mirror the reference ramp's relative luminances (its deep
    to tipHi span was roughly 1:20), re-hued through the accent tokens. */
-const FUR_DEEP = glsl3(scaled(T_SURF, 0.55));
-const FUR_MID = glsl3(scaled(T_ACCENT, 0.14));
-const FUR_TIP = glsl3(scaled(T_ACCENT, 0.38));
-const FUR_TIPHI = glsl3(scaled(T_ACCENT2, 0.62));
+const FUR_DEEP = glsl3(scaled(T_SURF, 0.8));
+const FUR_MID = glsl3(scaled(T_ACCENT, 0.22));
+const FUR_TIP = glsl3(scaled(T_ACCENT, 0.55));
+const FUR_TIPHI = glsl3(scaled(T_ACCENT2, 0.85));
 
 /* The rind (the reference's bark slot): raked pale fibre over damp umber,
-   near-black in the splits, with a dusting of pale gold where it faces up. */
-const RIND_LO = glsl3(scaled(T_SURF, 0.6));
-const RIND_FIBRE = glsl3(scaled(T_INK2, 0.28));
-const RIND_UMBER = glsl3(scaled(T_ACCENT, 0.22));
-const GOLD_DUST = glsl3(scaled(T_ACCENT2, 0.3));
-const HUMUS_LO = glsl3(scaled(T_SURF, 0.45));
-const HUMUS_HI = glsl3(scaled(T_ACCENT, 0.1));
+   darkest in the splits, with a dusting of pale gold where it faces up.
+   The reference could hold a near-black bark against its olive page; on
+   #12100d the same values vanish. The whole ramp sits well above the page
+   background so the tube keeps a silhouette even with the fur stripped. */
+const RIND_LO = glsl3(scaled(T_SURF, 2.4));
+const RIND_FIBRE = glsl3(scaled(T_INK2, 0.4));
+const RIND_UMBER = glsl3(scaled(T_ACCENT, 0.5));
+const GOLD_DUST = glsl3(scaled(T_ACCENT2, 0.55));
+const HUMUS_LO = glsl3(scaled(T_SURF, 1.7));
+const HUMUS_HI = glsl3(scaled(T_ACCENT, 0.26));
 
 /* ==================================================================== *
  * GLSL chunks - lifted from the reference, masks removed (this scene
@@ -285,9 +288,12 @@ void main(){
   vec3 lit = litSurface(N, col, ao);
 
   vec3 V = normalize(cameraPosition - vW);
-  lit += col * uAmbCol * pow(1.0 - max(dot(N, V), 0.0), 4.0) * 0.85;
-  float spec = pow(max(dot(reflect(-uKeyDir, N), V), 0.0), 20.0);
-  lit += uKeyCol * spec * 0.045 * (1.0 - m) * ao;
+  /* Wet-bark rim: the key light catches the lit edge and holds the
+     silhouette against the dark page. */
+  float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+  lit += (col * 1.6 + vec3(0.010, 0.007, 0.004)) * uKeyCol * rim * ao;
+  float spec = pow(max(dot(reflect(-uKeyDir, N), V), 0.0), 24.0);
+  lit += uKeyCol * spec * 0.10 * (1.0 - 0.7 * m) * ao;
 
   gl_FragColor = vec4(aerial(lit, vH), uAlpha);
   #include <tonemapping_fragment>
@@ -684,7 +690,7 @@ function makeLimb(
     moss: m,
     /* Hypha length rides the cushion depth; the offset keeps a short fuzz
        alive even where the cushion thins, so bald edges stay fibrous. */
-    blade: spec.blade ?? ((t) => m(t) * 0.085 + 0.018),
+    blade: spec.blade ?? ((t) => m(t) * 0.055 + 0.012),
     fr: transportFrames(curve, spec.segs),
     len: curve.getLength(),
     grid: null,
@@ -896,7 +902,7 @@ function plantBlades(L: Limb, count: number, bag: FurBag, rng: Rng): number {
     /* About one blade in sixteen is a long stray. Uniform-length fur cuts a
        hard edge against the background; the strays make the silhouette read
        as mycelium rather than a hedge trimmed with shears. */
-    const stray = rng() < 0.06 ? rand(rng, 1.4, 1.9) : 1.0;
+    const stray = rng() < 0.06 ? rand(rng, 1.25, 1.55) : 1.0;
     bag.rnd.push(
       rng() * TAU /* yaw */,
       L.blade((i + v) / S) * (0.45 + 0.6 * cap2) * (0.58 + 0.5 * rng()) * stray,
@@ -934,7 +940,7 @@ function makeOffshoot(rng: Rng, start: Vector3, dir: Vector3, len: number, r0: n
        a twig that simply stops shows a flat hollow cap hanging in the air. */
     rw: (t) => rr(t) * (1 - 0.86 * sstep(0.9, 1.0, t)),
     moss: (t) => rr(t) * 0.95 * (1 - 0.55 * t),
-    blade: (t) => rr(t) * 0.3 * (1 - 0.55 * t) + 0.035,
+    blade: (t) => rr(t) * 0.22 * (1 - 0.55 * t) + 0.02,
     fr: transportFrames(curve, 16),
     len: curve.getLength(),
     grid: null,
@@ -944,38 +950,38 @@ function makeOffshoot(rng: Rng, start: Vector3, dir: Vector3, len: number, r0: n
 }
 
 /* ==================================================================== *
- * the two roots. Composition brief: fibrous crown lower-left, the arch
- * lifting off it and opening toward the right, where the hero copy lives.
+ * the two roots. Composition brief, in box fractions that layout() maps
+ * roughly one-to-one onto the wide viewport: a limb rises from the lower
+ * left, crests near x 0.35 and comes back down inside the frame; a crown
+ * mound carries the fur under the crest; a thick ground root bleeds off
+ * the left and bottom edges; thin strands leave the frame. Everything
+ * stays left of x 0.45 below y 0.45, where the hero copy sits.
  * ==================================================================== */
 
 function buildNearLimbs(): Limb[] {
   const P = makeP(NEAR_ASPECT);
   const limbs: Limb[] = [];
 
-  /* the carrying root: enters low left under the crown, crests at 22%,
-     then runs out thinning through the right edge, under the copy */
+  /* the ground root: enters at the left edge, runs under the crown and
+     dives off the bottom edge, thinning as it goes */
   limbs.push(
     makeLimb(
       P,
       [
-        [-0.08, 0.78, -0.55],
-        [0.02, 0.72, -0.25],
-        [0.12, 0.64, 0.1],
-        [0.22, 0.6, 0.32],
-        [0.32, 0.63, 0.3],
-        [0.44, 0.7, 0.12],
-        [0.56, 0.74, -0.06],
-        [0.68, 0.7, 0.08],
-        [0.8, 0.66, 0.02],
-        [0.92, 0.645, -0.22],
-        [1.06, 0.635, -0.5],
+        [-0.08, 0.7, -0.4],
+        [0.02, 0.76, -0.1],
+        [0.12, 0.8, 0.15],
+        [0.24, 0.84, 0.3],
+        [0.34, 0.9, 0.22],
+        [0.42, 0.99, 0.05],
+        [0.46, 1.08, -0.1],
       ],
       {
-        segs: 260,
+        segs: 200,
         radial: 24,
-        vScale: 28,
-        /* deepest cushion over the crown, tapering as it exits right */
-        rt: [0.56, 0.63, 0.7, 0.74, 0.68, 0.58, 0.5, 0.45, 0.41, 0.37, 0.33],
+        vScale: 22,
+        /* deepest cushion under the crown, tapering into the exit */
+        rt: [0.44, 0.5, 0.54, 0.52, 0.45, 0.38, 0.32],
         sink: 0.5,
       },
     ),
@@ -983,19 +989,20 @@ function buildNearLimbs(): Limb[] {
 
   /* The arch is two legs fused at the apex, not one bent hoop: the crown
      of an arch built as a single tube goes degenerate in the transport
-     frame right where it matters most. Ascending leg first. */
-  const legUpRw = table([0.3, 0.285, 0.265, 0.245, 0.225, 0.205]);
-  const legUpMoss = table([0.26, 0.25, 0.235, 0.22, 0.2, 0.185]);
+     frame right where it matters most. Ascending leg first: it lifts out
+     of the crown mass and crests at about a third of the frame width. */
+  const legUpRw = table([0.28, 0.265, 0.25, 0.235, 0.215, 0.195]);
+  const legUpMoss = table([0.24, 0.23, 0.215, 0.2, 0.185, 0.17]);
   limbs.push(
     makeLimb(
       P,
       [
-        [0.15, 0.74, 0.16],
-        [0.2, 0.6, 0.26],
-        [0.27, 0.45, 0.32],
-        [0.35, 0.32, 0.3],
-        [0.43, 0.235, 0.2],
-        [0.5, 0.21, 0.06],
+        [0.08, 0.87, 0.3],
+        [0.12, 0.72, 0.34],
+        [0.17, 0.56, 0.34],
+        [0.235, 0.41, 0.28],
+        [0.3, 0.29, 0.18],
+        [0.355, 0.245, 0.06],
       ],
       {
         segs: 120,
@@ -1007,20 +1014,22 @@ function buildNearLimbs(): Limb[] {
     ),
   );
 
-  /* descending leg: interpenetrates the first at the apex, plants right */
-  const legDnRw = table([0.2, 0.21, 0.23, 0.25, 0.275, 0.3, 0.32]);
-  const legDnMoss = table([0.18, 0.175, 0.17, 0.165, 0.16, 0.15, 0.14]);
+  /* descending leg: interpenetrates the first at the apex, bows a little
+     to the right and lands back in the crown, fully inside the frame */
+  const legDnRw = table([0.2, 0.205, 0.215, 0.225, 0.24, 0.255, 0.27]);
+  const legDnMoss = table([0.17, 0.165, 0.16, 0.155, 0.15, 0.145, 0.14]);
   limbs.push(
     makeLimb(
       P,
       [
-        [0.475, 0.225, 0.02],
-        [0.535, 0.235, -0.06],
-        [0.6, 0.32, -0.13],
-        [0.655, 0.46, -0.16],
-        [0.695, 0.62, -0.12],
-        [0.72, 0.78, -0.02],
-        [0.735, 0.88, 0.08],
+        [0.335, 0.25, 0.04],
+        [0.39, 0.255, -0.04],
+        [0.405, 0.33, -0.1],
+        [0.415, 0.45, -0.12],
+        [0.4, 0.59, -0.09],
+        [0.385, 0.73, -0.02],
+        [0.35, 0.87, 0.08],
+        [0.33, 0.97, 0.15],
       ],
       {
         segs: 130,
@@ -1032,45 +1041,66 @@ function buildNearLimbs(): Limb[] {
     ),
   );
 
-  /* the crown mound: short, thick, in front, lower-left mass */
+  /* the crown mound: short, thick, in front, under the crest */
   limbs.push(
     makeLimb(
       P,
       [
-        [0.0, 0.88, 0.28],
-        [0.08, 0.78, 0.42],
-        [0.18, 0.71, 0.46],
-        [0.28, 0.72, 0.32],
-        [0.37, 0.78, 0.12],
+        [0.04, 0.92, 0.35],
+        [0.12, 0.83, 0.45],
+        [0.21, 0.78, 0.44],
+        [0.3, 0.8, 0.3],
+        [0.38, 0.87, 0.12],
       ],
       {
         segs: 110,
         radial: 20,
         vScale: 18,
-        rt: [0.46, 0.56, 0.62, 0.56, 0.44, 0.34],
+        rt: [0.38, 0.48, 0.52, 0.45, 0.35, 0.27],
         sink: 0.5,
       },
     ),
   );
 
-  /* one thin hyphal strand trailing out of the crown over the main root:
-     the fibre that says mycelium rather than driftwood */
+  /* one thin hyphal strand off the crest, exiting through the right edge
+     high above the copy: the fibre that says mycelium, not driftwood */
   limbs.push(
     makeLimb(
       P,
       [
-        [0.1, 0.62, 0.42],
-        [0.2, 0.53, 0.4],
-        [0.31, 0.5, 0.3],
-        [0.43, 0.52, 0.16],
-        [0.54, 0.57, 0.05],
+        [0.36, 0.28, 0.0],
+        [0.48, 0.235, -0.1],
+        [0.62, 0.19, -0.18],
+        [0.78, 0.155, -0.22],
+        [0.95, 0.115, -0.3],
+        [1.07, 0.09, -0.38],
       ],
       {
-        segs: 90,
+        segs: 110,
         radial: 12,
-        vScale: 14,
-        rw: (t) => 0.085 * (1 - 0.8 * sstep(0.88, 1, t)) * knot(t, 0.06, 0.03),
-        moss: (t) => 0.1 * (1 - 0.4 * t),
+        vScale: 16,
+        rw: (t) => 0.075 * (1 - 0.3 * t) * knot(t, 0.06, 0.03),
+        moss: (t) => 0.09 * (1 - 0.4 * t),
+      },
+    ),
+  );
+
+  /* and one out of the crown, off the lower left corner */
+  limbs.push(
+    makeLimb(
+      P,
+      [
+        [0.16, 0.82, 0.5],
+        [0.1, 0.9, 0.52],
+        [0.03, 0.97, 0.5],
+        [-0.05, 1.06, 0.45],
+      ],
+      {
+        segs: 60,
+        radial: 10,
+        vScale: 10,
+        rw: (t) => 0.06 * (1 - 0.25 * t) * knot(t, 0.06, 0.03),
+        moss: (t) => 0.075 * (1 - 0.4 * t),
       },
     ),
   );
@@ -1098,7 +1128,7 @@ function buildFarLimbs(): Limb[] {
         segs: 200,
         radial: 18,
         vScale: 26,
-        rt: [0.72, 0.82, 0.88, 0.92, 0.86, 0.9, 0.96, 1.0, 1.06, 1.14, 1.22],
+        rt: [0.4, 0.45, 0.5, 0.52, 0.48, 0.5, 0.54, 0.56, 0.6, 0.64, 0.68],
         sink: 0.5,
       },
     ),
@@ -1201,7 +1231,8 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
   let inView = false;
   let scanPending = false;
   let scanning = false;
-  let scanT = 0;
+  /** Pulse start, wall-clock ms. See frame(): the bus clamps dt. */
+  let scanT0 = 0;
   /** Reduced motion renders exactly one designed still, then stops. */
   let needStill = true;
   let pointerLive = false;
@@ -1252,29 +1283,37 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
     c.camera.updateProjectionMatrix();
 
     const narrow = W < 760;
+    const portrait = !narrow && H > W;
 
-    /* Near root: the crown point (frac 0.20, 0.66 of its box) pins to the
-       lower-left of the hero. Narrow screens grow the box past the viewport
-       so the root bleeds off both edges instead of shrinking to a trinket. */
-    const boxW = Math.min(Math.max(narrow ? W * 1.5 : W * 0.92, 900), 1720);
+    /* Near root: the arch crest (frac 0.355, 0.245 of its box) pins near
+       the top-left third of the hero, so the authored fractions land about
+       one-to-one on a wide viewport. Portrait viewports stack the copy
+       full-width below the fold line, so the box shrinks and rides high,
+       above the text. Narrow screens grow the box past the viewport so the
+       root bleeds off the edges instead of shrinking to a trinket. */
+    const wf = narrow ? 1.9 : portrait ? 0.85 : 0.95;
+    const boxW = Math.min(Math.max(W * wf, narrow ? 700 : 640), 1720);
     const s = boxW / BOXW;
-    /* crown pin, local units: frac (0.20, 0.66) of the near box */
-    const pinX = (0.2 - 0.5) * BOXW;
-    const pinY = (0.5 - 0.66) * (BOXW / NEAR_ASPECT);
-    const px = narrow ? W * 0.34 : W * 0.26;
-    const py = narrow ? H * 0.76 : H * 0.72;
+    /* crest pin, local units: frac (0.355, 0.245) of the near box */
+    const pinX = (0.355 - 0.5) * BOXW;
+    const pinY = (0.5 - 0.245) * (BOXW / NEAR_ASPECT);
+    const px = narrow ? W * 0.46 : W * 0.34;
+    const py = narrow ? H * 0.3 : portrait ? H * 0.17 : H * 0.26;
     c.near.scale.setScalar(s);
     c.near.position.set(px - W / 2 - pinX * s, H / 2 - py - pinY * s, 0);
 
     /* Far ridge: pushed back, scaled by k so its apparent size and pin both
-       survive the perspective shrink. */
+       survive the perspective shrink. It is atmosphere, not a second subject.
+       At 0.62 of the box and fog 0.88 it read as a hard-edged brown stain in
+       the top corner, so it is smaller now and sits on a horizon line rather
+       than in a corner. */
     const kz = (DIST - FAR_Z) / DIST;
-    const fs = ((boxW * 1.35) / BOXW) * kz;
+    const fs = ((boxW * 0.46) / BOXW) * kz;
     /* crest pin, local units: frac (0.40, 0.50) of the far box */
     const fpinX = (0.4 - 0.5) * BOXW;
     const fpinY = (0.5 - 0.5) * (BOXW / FAR_ASPECT);
-    const fx = W * 0.55;
-    const fy = H * 0.3;
+    const fx = W * 0.78;
+    const fy = H * 0.18;
     c.far.scale.setScalar(fs);
     c.far.position.set((fx - W / 2) * kz - fpinX * fs, (H / 2 - fy) * kz - fpinY * fs, FAR_Z);
     c.scene.updateMatrixWorld(true);
@@ -1455,14 +1494,16 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
     if (scanPending) {
       scanPending = false;
       scanning = true;
-      scanT = 0;
+      scanT0 = performance.now();
       c.uScanR.value = 0;
       c.uWire.value = 0;
       buildCages(c);
     }
     if (scanning) {
-      scanT += dt / SCAN_DUR;
-      const e = Math.min(1, scanT);
+      /* Wall clock, not summed dt: the bus clamps dt to 1/30 s, so on a
+         slow GPU the summed clock falls behind real time and the cage
+         never burns off. The pulse must end on schedule regardless. */
+      const e = Math.min(1, (performance.now() - scanT0) / (SCAN_DUR * 1000));
       c.uScanR.value = (1 - Math.pow(1 - e, 1.35)) * c.scanMax;
       /* the cage snaps on, rides the front, then burns off behind it */
       c.uWire.value = Math.min(1, e / 0.06) * (1 - sstep(0.72, 1.0, e));
@@ -1497,7 +1538,7 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
     const qn = q?.[1];
     if (qn) {
       bladesNear = Number(qn);
-      bladesFar = Math.round(bladesNear * 0.31);
+      bladesFar = Math.round(bladesNear * 0.2);
     }
 
     let renderer: WebGLRenderer;
@@ -1677,9 +1718,12 @@ export function mountStage(canvas: HTMLCanvasElement, host: HTMLElement): StageH
     const farRoot = assembleRoot(buildFarLimbs(), {
       aspect: FAR_ASPECT,
       haze: 0.16,
-      fog: 0.3,
-      /* near 1: distant air lifts its darks; that is what air does there */
-      hazeLift: 0.92,
+      /* 0.88 left about 15 percent of the lit rind showing, which on this dark
+         page read as a solid brown mass rather than as distance. */
+      fog: 0.96,
+      /* 1.0: distant air lifts its darks all the way, so the ridge carries no
+         silhouette of its own and only shifts the value of the air. */
+      hazeLift: 1.0,
       blades: bladesFar,
       order: 0,
       mouse: uMouseFar,

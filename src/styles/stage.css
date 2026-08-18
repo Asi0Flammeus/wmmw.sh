@@ -195,20 +195,26 @@ html:not(.anim) .par {
   }
 }
 
-/* --- ghost wordmark: the palindrome, oversized and barely there ---------- */
+/* --- ghost wordmark: the palindrome as a tracked baseline stamp ----------- */
 
+/* It lives in flow, at the foot of the block it signs, not pinned to the frame.
+   Pinned and oversized it split into four orphan letters that crossed the copy
+   and clipped into nonsense; in flow it is one word, legible as a palindrome,
+   and it cannot cross its neighbours or widen the page. Tracking is in em so
+   the word keeps the same rhythm at every viewport. */
 .ghost {
-  position: absolute;
-  left: calc(6 * var(--u));
-  bottom: calc(-58 * var(--u));
+  position: relative;
   z-index: 0;
-  margin: 0;
+  margin: max(20px, calc(34 * var(--u))) 0 0;
   font-family: var(--disp);
   font-weight: 400;
-  font-size: calc(268 * var(--u));
-  line-height: 0.78;
-  letter-spacing: calc(22 * var(--u));
-  color: rgba(232, 226, 213, 0.055);
+  font-size: max(58px, calc(160 * var(--u)));
+  /* 0.68 drops the box bottom onto the baseline, so the stamp sits flush with
+     the foot of the block. 0.03em is the widest tracking that still reads as
+     one word: past it the four letters break apart again. */
+  line-height: 0.68;
+  letter-spacing: 0.03em;
+  color: rgba(232, 226, 213, 0.075);
   user-select: none;
   pointer-events: none;
   white-space: nowrap;
