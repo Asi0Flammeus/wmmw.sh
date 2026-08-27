@@ -37,4 +37,18 @@
   --disp: "Space Grotesk Variable", "Space Grotesk", sans-serif;
   --body: "Instrument Sans Variable", "Instrument Sans", sans-serif;
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+
+  /* type scale (editorial; body 1.0625rem is the base) */
+  --fs-meta: 0.8rem;
+  --fs-small: 0.92rem;
+  --fs-lead: clamp(1.15rem, 1.8vw, 1.3rem);
+  --fs-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --fs-h2: clamp(1.9rem, 3.8vw, 2.9rem);
+
+  /* motion (semantic tokens; every use gated by html.anim or reduced-motion) */
+  --t-fast: 0.16s;
+  --t-base: 0.24s;
+  --t-slow: 0.5s;
+  --ease-out: cubic-bezier(0.22, 0.6, 0.2, 1);
+  --ease-swift: cubic-bezier(0.2, 0.85, 0.25, 1);
 }

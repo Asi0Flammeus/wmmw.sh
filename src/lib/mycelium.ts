@@ -762,7 +762,7 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     }
     const defs: BDef[] = [];
     const heads = Array.prototype.slice.call(
-      document.querySelectorAll(".panel-head"),
+      document.querySelectorAll("[data-myc-anchor], .panel-head"),
     ) as HTMLElement[];
     for (let idx = 0; idx < heads.length; idx++) {
       const head = heads[idx]!;
@@ -829,7 +829,17 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       const pathEl = document.createElementNS(SVGNS, "path");
       pathEl.setAttribute("d", d);
       brg!.appendChild(pathEl);
-      defs.push({ sx, sy, c1x, c1y, c2x, c2y, tx, ty, panel: head.closest<HTMLElement>(".panel") });
+      defs.push({
+        sx,
+        sy,
+        c1x,
+        c1y,
+        c2x,
+        c2y,
+        tx,
+        ty,
+        panel: head.closest<HTMLElement>(".panel") ?? head,
+      });
     }
 
     // ---- grid carry-over ----

@@ -1,8 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import TerminalPanel from "@components/TerminalPanel.astro";
-import TermCmd from "@components/TermCmd.astro";
 import { type Locale, t } from "@i18n/index";
 
 interface Props {
@@ -19,9 +17,11 @@ const byType = (type: "livre" | "film" | "video") =>
     .filter((entry) => entry.data.type === type)
     .sort((a, b) => a.data.order - b.data.order);
 
-const livres = byType("livre");
-const films = byType("film");
-const videos = byType("video");
+const groups = [
+  { key: "livres", label: tabs.livres, entries: byType("livre") },
+  { key: "films", label: tabs.films, entries: byType("film") },
+  { key: "videos", label: tabs.videos, entries: byType("video") },
+];
 ---
 
 <BaseLayout
@@ -33,93 +33,58 @@ const videos = byType("video");
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/nourritures" class="reveal">
-          <p class="c intro">{dict.nourritures.intro}</p>
+        <p class="sec-intro reveal">{dict.nourritures.intro}</p>
 
-          <div class="tabs" data-tabs data-tabs-label={dict.nourritures.heading}>
-            <section class="tabsec" data-tab="livres">
-              <h2 class="tabhead">{tabs.livres}</h2>
-              <TermCmd command={dict.nourritures.cmdBooks} />
-              <div class="out" data-step="fade">
-                <ol class="books">
-                  {
-                    livres.map((entry, i) => (
+        <div
+          class="tabs reveal"
+          data-tabs
+          data-tabs-label={dict.nourritures.heading}
+        >
+          {
+            groups.map((group) => (
+              <section class="tabsec" data-tab={group.key}>
+                <h2 class="tabhead">{group.label}</h2>
+                {group.entries.length === 0 ? (
+                  <p class="empty">{dict.nourritures.empty}</p>
+                ) : (
+                  <ol class="books">
+                    {group.entries.map((entry, i) => (
                       <li>
-                        <span class="n" aria-hidden="true">{i + 1}</span>
+                        <span class="n" aria-hidden="true">
+                          {i + 1}
+                        </span>
                         <span class="a">{entry.data.author},</span>{" "}
                         <em>{entry.data.title}</em>
                       </li>
-                    ))
-                  }
-                </ol>
-              </div>
-            </section>
-
-            <section class="tabsec" data-tab="films">
-              <h2 class="tabhead">{tabs.films}</h2>
-              <TermCmd command="ls nourritures/films/" />
-              <div class="out" data-step="fade">
-                {
-                  films.length === 0 ? (
-                    <p class="c">{dict.nourritures.empty}</p>
-                  ) : (
-                    <ol class="books">
-                      {films.map((entry, i) => (
-                        <li>
-                          <span class="n" aria-hidden="true">{i + 1}</span>
-                          <span class="a">{entry.data.author},</span>{" "}
-                          <em>{entry.data.title}</em>
-                        </li>
-                      ))}
-                    </ol>
-                  )
-                }
-              </div>
-            </section>
-
-            <section class="tabsec" data-tab="videos">
-              <h2 class="tabhead">{tabs.videos}</h2>
-              <TermCmd command="ls nourritures/videos/" />
-              <div class="out" data-step="fade">
-                {
-                  videos.length === 0 ? (
-                    <p class="c">{dict.nourritures.empty}</p>
-                  ) : (
-                    <ol class="books">
-                      {videos.map((entry, i) => (
-                        <li>
-                          <span class="n" aria-hidden="true">{i + 1}</span>
-                          <span class="a">{entry.data.author},</span>{" "}
-                          <em>{entry.data.title}</em>
-                        </li>
-                      ))}
-                    </ol>
-                  )
-                }
-              </div>
-            </section>
-          </div>
-        </TerminalPanel>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            ))
+          }
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .intro {
-    margin-bottom: 0.4rem;
+  .tabs {
+    margin-top: 2.2rem;
   }
 
-  /* no-JS / reduced fallback: stacked sections with mono headers */
+  /* no-JS / reduced fallback: stacked sections with plain headers */
   .tabhead {
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    font-weight: 600;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.01em;
     color: var(--bone);
-    margin-top: 1.8rem;
+    margin-top: 2.2rem;
+    margin-bottom: 1.2rem;
   }
   .tabsec:first-of-type .tabhead {
-    margin-top: 0.8rem;
+    margin-top: 0;
   }
 
   /* enhanced tablist (built by the script; scoped via the authored .tabs
@@ -127,15 +92,16 @@ const videos = byType("video");
   .tabs :global(.tablist) {
     display: flex;
     gap: 0.5rem;
-    margin: 1.3rem 0 1.5rem;
+    margin: 0 0 1.8rem;
     flex-wrap: wrap;
   }
   .tabs :global(.tab) {
-    font-family: var(--mono);
-    font-size: 0.82rem;
+    font-family: var(--disp);
+    font-size: 0.88rem;
+    font-weight: 500;
     background: none;
     color: var(--ink-3);
-    padding: 0.3rem 0.9rem;
+    padding: 0.35rem 1rem;
     cursor: pointer;
     border: 1px solid var(--hair);
     border-radius: var(--r-pill);
@@ -149,20 +115,29 @@ const videos = byType("video");
     background: var(--accent-soft);
   }
 
+  .empty {
+    color: var(--ink-3);
+  }
+
   .books {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
   }
   .books li {
     color: var(--ink-2);
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--hair-2);
+  }
+  .books li:last-child {
+    border-bottom: 1px solid var(--hair-2);
   }
   .books .n {
     display: inline-block;
-    width: 4ch;
-    text-align: right;
-    margin-right: 2.5ch;
+    width: 3ch;
+    margin-right: 1.5ch;
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
     color: var(--ink-3);
   }
   .books .a {
@@ -172,22 +147,13 @@ const videos = byType("video");
     color: var(--bone);
     font-style: italic;
   }
-
-  @media (max-width: 767px) {
-    .books .n {
-      width: 3ch;
-      margin-right: 1.5ch;
-    }
-  }
 </style>
 
 <script>
   /* Nourritures tabs: progressive enhancement to an ARIA tablist.
      No-JS keeps every section stacked and visible. */
   document.querySelectorAll<HTMLElement>("[data-tabs]").forEach((root) => {
-    const secs = Array.from(
-      root.querySelectorAll<HTMLElement>("[data-tab]"),
-    );
+    const secs = Array.from(root.querySelectorAll<HTMLElement>("[data-tab]"));
     if (secs.length === 0) return;
 
     const tablist = document.createElement("div");
@@ -220,21 +186,6 @@ const videos = byType("video");
 
     root.insertBefore(tablist, root.firstChild);
 
-    /* When a panel is revealed, force any pending typing/fade to its final
-       state: the shared typing engine may have run (or blanked commands)
-       while the panel was hidden. */
-    const finalize = (sec: HTMLElement) => {
-      sec
-        .querySelectorAll<HTMLElement>(".cmd-text")
-        .forEach((span) => {
-          if (span.dataset.full != null) span.textContent = span.dataset.full;
-        });
-      sec.querySelectorAll<HTMLElement>("[data-step]").forEach((el) => {
-        el.classList.remove("typing");
-        el.classList.add("on", "done");
-      });
-    };
-
     const select = (idx: number, focus: boolean) => {
       btns.forEach((btn, i) => {
         const on = i === idx;
@@ -243,8 +194,6 @@ const videos = byType("video");
         const sec = secs[i];
         if (sec) sec.hidden = !on;
       });
-      const shown = secs[idx];
-      if (shown) finalize(shown);
       const active = btns[idx];
       if (focus && active) active.focus();
     };

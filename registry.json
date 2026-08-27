@@ -1,0 +1,183 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "wmmw",
+  "homepage": "https://wmmw.sh",
+  "items": [
+    {
+      "name": "tokens",
+      "type": "registry:item",
+      "title": "wmmw design tokens",
+      "description": "Palette humus/bone/or, type scale, spacing, radii and motion tokens (vanilla CSS custom properties). The base every other item assumes.",
+      "files": [
+        {
+          "path": "src/styles/tokens.css",
+          "type": "registry:file",
+          "target": "src/styles/tokens.css"
+        },
+        {
+          "path": "src/styles/reset.css",
+          "type": "registry:file",
+          "target": "src/styles/reset.css"
+        }
+      ]
+    },
+    {
+      "name": "editorial-css",
+      "type": "registry:item",
+      "title": "Editorial primitives",
+      "description": "Section heads with mycelium filament underline, sec-intro, arrow links, ruled rows, meta labels. Global CSS on top of the tokens (add the tokens item first).",
+      "files": [
+        {
+          "path": "src/styles/global.css",
+          "type": "registry:file",
+          "target": "src/styles/global.css"
+        }
+      ]
+    },
+    {
+      "name": "terminal-panel",
+      "type": "registry:item",
+      "title": "Terminal panel (legacy)",
+      "description": "Dark surface panel with a mono path header and shell-style typed reveal. Retired from site chrome; kept for articles that quote shell sessions.",
+      "files": [
+        {
+          "path": "src/components/TerminalPanel.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/TerminalPanel.astro"
+        },
+        {
+          "path": "src/components/TermCmd.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/TermCmd.astro"
+        },
+        {
+          "path": "src/lib/term-type.ts",
+          "type": "registry:file",
+          "target": "src/lib/term-type.ts"
+        }
+      ]
+    },
+    {
+      "name": "timeline",
+      "type": "registry:item",
+      "title": "Timeline",
+      "description": "Vertical timeline for long-form posts; steps carry optional image banners.",
+      "files": [
+        {
+          "path": "src/components/blog/Timeline.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Timeline.astro"
+        }
+      ]
+    },
+    {
+      "name": "poll",
+      "type": "registry:item",
+      "title": "Poll",
+      "description": "Local-first single-question poll (localStorage, no backend), trilingual labels.",
+      "files": [
+        {
+          "path": "src/components/blog/Poll.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Poll.astro"
+        }
+      ]
+    },
+    {
+      "name": "math",
+      "type": "registry:item",
+      "title": "Math",
+      "description": "KaTeX formula rendering (display and inline) for MDX posts.",
+      "dependencies": ["katex"],
+      "files": [
+        {
+          "path": "src/components/blog/Math.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Math.astro"
+        }
+      ]
+    },
+    {
+      "name": "zen-countdown",
+      "type": "registry:item",
+      "title": "Zen countdown",
+      "description": "One-minute breathing overlay trigger, trilingual.",
+      "files": [
+        {
+          "path": "src/components/blog/ZenCountdown.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/ZenCountdown.astro"
+        }
+      ]
+    },
+    {
+      "name": "periodic-table",
+      "type": "registry:item",
+      "title": "Periodic table",
+      "description": "Full periodic table with highlightable elements.",
+      "files": [
+        {
+          "path": "src/components/blog/PeriodicTable.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/PeriodicTable.astro"
+        }
+      ]
+    },
+    {
+      "name": "periodic-column",
+      "type": "registry:item",
+      "title": "Periodic column IVA",
+      "description": "Column IVA extract (carbon to flerovium), trilingual labels.",
+      "files": [
+        {
+          "path": "src/components/blog/PeriodicColumn.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/PeriodicColumn.astro"
+        }
+      ]
+    },
+    {
+      "name": "annotation-overlay",
+      "type": "registry:item",
+      "title": "Annotation overlay",
+      "description": "Element-click QA feedback overlay (Alt+Y) with its JSONL API endpoint. Gate behind ANNOTATION_SYSTEM=true.",
+      "dependencies": ["zod"],
+      "files": [
+        {
+          "path": "src/components/AnnotationOverlay.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/AnnotationOverlay.astro"
+        },
+        {
+          "path": "src/pages/api/prototype-feedback.ts",
+          "type": "registry:file",
+          "target": "src/pages/api/prototype-feedback.ts"
+        }
+      ]
+    },
+    {
+      "name": "reports-api",
+      "type": "registry:item",
+      "title": "UUID report publishing",
+      "description": "Bearer-token POST endpoint storing self-contained HTML reports served at /r/<uuid> with noindex. Needs REPORTS_TOKEN and a REPORTS_DIR volume.",
+      "dependencies": ["zod"],
+      "files": [
+        {
+          "path": "src/lib/reports.ts",
+          "type": "registry:file",
+          "target": "src/lib/reports.ts"
+        },
+        {
+          "path": "src/pages/api/reports.ts",
+          "type": "registry:file",
+          "target": "src/pages/api/reports.ts"
+        },
+        {
+          "path": "src/pages/r/[id].ts",
+          "type": "registry:file",
+          "target": "src/pages/r/[id].ts"
+        }
+      ]
+    }
+  ]
+}

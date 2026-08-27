@@ -1,8 +1,6 @@
 ---
 import { type Locale, t, localePath } from "@i18n/index";
-import { GITHUB_URL, CONTACT_EMAIL, TERM_USER } from "@lib/site";
-import TerminalPanel from "@components/TerminalPanel.astro";
-import TermCmd from "@components/TermCmd.astro";
+import { GITHUB_URL, CONTACT_EMAIL } from "@lib/site";
 
 interface Props {
   locale: Locale;
@@ -11,57 +9,25 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 
-const githubHost = GITHUB_URL.replace(/^https?:\/\//, "");
 const rssHref = localePath(locale, "/rss.xml");
 ---
 
 <footer class="site-foot">
   <div class="wrap">
-    <div class="sec-inner">
-      <TerminalPanel path="~" class="foot-panel">
-        <div>
-          <TermCmd command={dict.footer.echoCmd} />
-          <p class="out echoline" data-step="fade">{dict.footer.echoOut}</p>
-        </div>
-        <div>
-          <TermCmd command={dict.footer.linksCmd} />
-          <div class="out links" data-step="fade">
-            <p class="total">total 0</p>
-            <p class="lrow">
-              <span class="perm">lrwxrwxrwx</span><a href={GITHUB_URL} rel="me"
-                >github <span class="tgt">-&gt; {githubHost}</span></a
-              >
-            </p>
-            <p class="lrow">
-              <span class="perm">lrwxrwxrwx</span><a href={rssHref}
-                >rss <span class="tgt">-&gt; {dict.footer.rss}</span></a
-              >
-            </p>
-            {
-              CONTACT_EMAIL ? (
-                <p class="lrow">
-                  <span class="perm">lrwxrwxrwx</span>
-                  <a href={`mailto:${CONTACT_EMAIL}`}>
-                    contact <span class="tgt">-&gt; {CONTACT_EMAIL}</span>
-                  </a>
-                </p>
-              ) : (
-                <p class="lrow muted">
-                  <span class="perm">-rw-------</span>
-                  <span>
-                    contact{" "}
-                    <span class="tgt">-&gt; {dict.footer.contactSoon}</span>
-                  </span>
-                </p>
-              )
-            }
-          </div>
-        </div>
-        <p class="cmdline" data-step="fade">
-          <span class="ps"><b>{TERM_USER}</b>:~$</span>
-          <span class="caret-final" aria-hidden="true"></span>
-        </p>
-      </TerminalPanel>
+    <div class="foot-inner">
+      <p class="foot-mark" aria-hidden="true">w·m·m·w</p>
+      <p class="foot-thesis">{dict.footer.thesis}</p>
+      <nav class="foot-links">
+        <a href={GITHUB_URL} rel="me">GitHub</a>
+        <a href={rssHref}>{dict.footer.rss}</a>
+        {
+          CONTACT_EMAIL ? (
+            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+          ) : (
+            <span class="soon">{dict.footer.contactSoon}</span>
+          )
+        }
+      </nav>
     </div>
   </div>
 </footer>
@@ -71,63 +37,51 @@ const rssHref = localePath(locale, "/rss.xml");
     position: relative;
     z-index: 2;
     margin-top: clamp(4rem, 11vh, 8rem);
+    border-top: 1px solid var(--hair-2);
   }
-  .foot-panel :global(.panel-body) {
+  .foot-inner {
+    padding-block: clamp(2.5rem, 6vh, 4rem);
     display: flex;
     flex-direction: column;
-    gap: 2.2rem;
+    gap: 1.4rem;
   }
-  .echoline {
-    max-width: 64ch;
-    color: var(--bone);
-  }
-  .links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-  }
-  .lrow {
-    display: flex;
-    gap: 2.5ch;
-    align-items: baseline;
-    overflow-wrap: anywhere;
-  }
-  .perm {
-    color: var(--ink-3);
-    white-space: pre;
-  }
-  .lrow a {
+  .foot-mark {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    letter-spacing: 0.35em;
     color: var(--accent);
-    font-weight: 600;
-    text-decoration: none;
   }
-  .lrow a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
-  }
-  .lrow .tgt {
+  .foot-thesis {
+    max-width: 52ch;
     color: var(--ink-2);
-    font-weight: 400;
+    font-size: var(--fs-small);
+    text-wrap: pretty;
   }
-  .lrow.muted span {
+  .foot-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 1.6rem;
+  }
+  .foot-links a {
+    color: var(--bone);
+    font-size: var(--fs-small);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hair);
+    padding-bottom: 0.1em;
+  }
+  .foot-links a:hover,
+  .foot-links a:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .foot-links .soon {
     color: var(--ink-3);
+    font-size: var(--fs-small);
   }
-  .lrow.muted .tgt {
-    color: var(--ink-3);
-  }
-  .total {
-    color: var(--ink-3);
-  }
-
-  :global(html.anim) .lrow a {
-    transition: color 0.2s ease;
-  }
-  @media (max-width: 767px) {
-    .lrow {
-      gap: 1.5ch;
-    }
-    .perm {
-      display: none;
-    }
+  :global(html.anim) .foot-links a {
+    transition:
+      color var(--t-base) ease,
+      border-color var(--t-base) ease;
   }
 </style>

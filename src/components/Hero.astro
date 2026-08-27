@@ -1,6 +1,5 @@
 ---
 import { type Locale, t, localePath } from "@i18n/index";
-import { TERM_USER } from "@lib/site";
 
 interface Props {
   locale: Locale;
@@ -54,12 +53,25 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
               </>
             )}
           </p>
-          <p class="hero-cmd">
-            <span class="ps">
-              <b>{TERM_USER}</b>:~$
-            </span>{" "}
+          <p class="hero-cta-row">
             <a class="cta-chip" href={localePath(locale, "/manifeste")}>
               {cta}
+              <svg
+                class="cta-arrow"
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 8h10m0 0L9 4m4 4l-4 4"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </a>
           </p>
         </>
@@ -161,42 +173,38 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     font-size: clamp(1rem, 1.4vw, 1.15rem);
     color: var(--ink-2);
   }
-  .hero-cmd {
+  .hero-cta-row {
     margin-top: 2.1rem;
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.9ch;
-  }
-  .ps {
-    color: var(--ink-3);
-    font-weight: 400;
-    white-space: nowrap;
-  }
-  .ps b {
-    color: var(--accent);
-    font-weight: 500;
   }
   .cta-chip {
-    display: inline-block;
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
     text-decoration: none;
     color: var(--accent);
     background: var(--accent-soft);
     border: 1px solid rgba(217, 162, 74, 0.5);
-    padding: 0.5em 0.95em;
-    border-radius: var(--r-tile);
+    padding: 0.6em 1.15em;
+    border-radius: var(--r-pill);
   }
-  .cta-chip:hover {
+  .cta-chip:hover,
+  .cta-chip:focus-visible {
     background: var(--accent);
     color: var(--bg);
   }
   .cta-chip:active {
     transform: translateY(1px);
+  }
+  html.anim .cta-chip .cta-arrow {
+    transition: transform var(--t-base) var(--ease-swift);
+  }
+  .cta-chip:hover .cta-arrow,
+  .cta-chip:focus-visible .cta-arrow {
+    transform: translateX(3px);
   }
 
   @media (min-width: 768px) {

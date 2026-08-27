@@ -1,8 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import TerminalPanel from "@components/TerminalPanel.astro";
-import TermCmd from "@components/TermCmd.astro";
 import { type Locale, t } from "@i18n/index";
 
 interface Props {
@@ -15,9 +13,6 @@ const dict = t(locale);
 const tools = (await getCollection("tools")).sort(
   (a, b) => a.data.order - b.data.order,
 );
-
-/** Public destination for the tree name: repo when open, product url otherwise. */
-const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
 ---
 
 <BaseLayout
@@ -26,142 +21,77 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
   description={dict.meta.outils}
   path="/outils"
 >
-  <section class="sec offset-r" data-block>
-    <div class="wrap">
-      <div class="sec-inner">
-        <TerminalPanel path="~/outils" class="reveal">
-          <TermCmd command={dict.outils.cmd} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{dict.outils.intro}</p>
-            <div class="tree">
-              <p class="troot">outils/</p>
-              {
-                tools.map((tool, i) => {
-                  const glyph = i === tools.length - 1 ? "└── " : "├── ";
-                  const href = dest(tool.data);
-                  return (
-                    <div class="trow">
-                      <span class="tname">
-                        <span class="tg">{glyph}</span>
-                        {href ? (
-                          <a href={href} rel="noopener">
-                            {tool.data.name}
-                          </a>
-                        ) : (
-                          tool.data.name
-                        )}
-                      </span>
-                      <span class="tdesc">{tool.data.blurb[locale]}</span>
-                    </div>
-                  );
-                })
-              }
-            </div>
-            <p class="tsum">{dict.outils.treeSummary(tools.length)}</p>
-          </div>
-        </TerminalPanel>
-      </div>
-    </div>
-  </section>
-
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/outils" class="reveal">
+        <p class="sec-intro reveal">{dict.outils.intro}</p>
+        <div class="rows reveal">
           {
-            tools.map((tool) => (
-              <>
-                <TermCmd command={`cat ${tool.data.name}/README.md`} />
-                <div class="out" data-step="fade">
-                  <p class="tdhead">
-                    <strong>{tool.data.name}</strong>
-                    <span class="badge">{tool.data.status}</span>
-                  </p>
-                  <p class="tddesc">{tool.data.blurb[locale]}</p>
-                  {tool.data.repo ? (
-                    <p class="tdlink">
-                      <a href={tool.data.repo} rel="noopener">
-                        {`-> ${tool.data.repo}`}
-                      </a>
-                    </p>
-                  ) : (
-                    tool.data.url && (
-                      <p class="tdlink">
-                        <span class="c">{dict.outils.repoPrivate}</span>{" "}
-                        <a href={tool.data.url} rel="noopener">
-                          {`-> ${tool.data.url}`}
+            tools.map((tool) => {
+              const mainHref = tool.data.repo ?? tool.data.url;
+              return (
+                <article class="row-item tool">
+                  <div class="tool-head">
+                    <h2 class="tool-name">
+                      {mainHref ? (
+                        <a href={mainHref} rel="noopener">
+                          {tool.data.name}
                         </a>
-                      </p>
-                    )
+                      ) : (
+                        tool.data.name
+                      )}
+                    </h2>
+                    <span class="badge">{tool.data.status}</span>
+                  </div>
+                  <p class="tool-blurb">{tool.data.blurb[locale]}</p>
+                  {!tool.data.repo && tool.data.url && (
+                    <p class="tool-note">{dict.outils.repoPrivate}</p>
                   )}
                   {tool.data.install && (
-                    <p class="install">
-                      <span class="idollar" aria-hidden="true">$</span>
-                      {" "}
-                      {tool.data.install}
+                    <p class="tool-install">
+                      <code>{tool.data.install}</code>
                     </p>
                   )}
-                </div>
-              </>
-            ))
+                </article>
+              );
+            })
           }
-        </TerminalPanel>
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* tree overview */
-  .tree {
+  .rows {
+    margin-top: 2.6rem;
+  }
+  .tool {
+    padding-block: 1.9rem;
+  }
+  .tool-head {
     display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-  .troot {
-    color: var(--bone);
-    font-weight: 700;
-  }
-  .trow {
-    display: grid;
-    grid-template-columns: 26ch 1fr;
-    column-gap: 2ch;
     align-items: baseline;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
-  .tg {
-    color: var(--ink-3);
+  .tool-name {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.01em;
+    color: var(--bone);
   }
-  .tname {
-    color: var(--accent);
-    font-weight: 600;
-    white-space: pre;
-  }
-  .tname a {
-    color: var(--accent);
+  .tool-name a {
+    color: inherit;
     text-decoration: none;
   }
-  .tname a:hover {
-    color: var(--accent-2);
-    text-decoration: underline;
-  }
-  .tdesc {
-    color: var(--ink-2);
-  }
-  .tsum {
-    margin-top: 1.3rem;
-    color: var(--ink-3);
-  }
-
-  /* per-tool detail groups */
-  .tdhead {
-    display: flex;
-    align-items: baseline;
-    gap: 1ch;
-    flex-wrap: wrap;
-  }
-  .tdhead strong {
+  .tool-name a:hover,
+  .tool-name a:focus-visible {
     color: var(--accent);
-    font-weight: 700;
+  }
+  :global(html.anim) .tool-name a {
+    transition: color var(--t-base) ease;
   }
   .badge {
     display: inline-block;
@@ -173,40 +103,29 @@ const dest = (data: (typeof tools)[number]["data"]) => data.repo ?? data.url;
     background: var(--accent-soft);
     color: var(--accent);
   }
-  .tddesc {
+  .tool-blurb {
+    margin-top: 0.6rem;
     color: var(--ink-2);
-    max-width: 62ch;
-    margin-top: 0.35rem;
+    max-width: 58ch;
+    text-wrap: pretty;
   }
-  .tdlink {
-    margin-top: 0.6rem;
-    overflow-wrap: anywhere;
-  }
-  .tdlink a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-  .tdlink a:hover {
-    color: var(--accent-2);
-    text-decoration: underline;
-  }
-  .install {
-    margin-top: 0.6rem;
-    color: var(--bone);
-    font-weight: 500;
-    overflow-wrap: anywhere;
-  }
-  .idollar {
+  .tool-note {
+    margin-top: 0.5rem;
     color: var(--ink-3);
+    font-size: var(--fs-small);
   }
-
-  @media (max-width: 767px) {
-    .trow {
-      grid-template-columns: 1fr;
-      row-gap: 0.1rem;
-    }
-    .trow .tdesc {
-      padding-left: 4ch;
-    }
+  .tool-install {
+    margin-top: 0.9rem;
+  }
+  .tool-install code {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--bone);
+    background: var(--surf);
+    border: 1px solid var(--hair-2);
+    border-radius: 6px;
+    padding: 0.4em 0.8em;
+    overflow-wrap: anywhere;
   }
 </style>

@@ -1,11 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import { type Locale, t, localePath, isoDate } from "@i18n/index";
-import { SITE_URL, GITHUB_URL, TERM_USER } from "@lib/site";
+import { SITE_URL, GITHUB_URL } from "@lib/site";
 import { publishedWritings, baseSlug } from "@lib/writings";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import TerminalPanel from "@components/TerminalPanel.astro";
-import TermCmd from "@components/TermCmd.astro";
 
 interface Props {
   locale: Locale;
@@ -101,36 +99,31 @@ const tz = teaser[locale];
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">
-          {chrome.manifeste.heading}{" "}
-          <span class="gold">{chrome.manifeste.headingGold}</span>
-        </h2>
-        <TerminalPanel path="~/manifeste" class="reveal">
-          <TermCmd command={chrome.manifeste.cmd} />
-          <div class="out md" data-step="fade">
-            <p class="h"><span class="tok"># </span>{tz.title}</p>
-            <p>{tz.body}</p>
-            <p class="quote"><span class="tok">&gt; </span>{tz.quote}</p>
-            <p class="h"><span class="tok">## </span>{tz.dimsHeading}</p>
-            <ul>
-              {
-                tz.dims.map((d) => (
-                  <li>
-                    <span class="tok">- **</span>
-                    <span class="term">{d.term}</span>
-                    <span class="tok">**</span> : {d.desc}
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-          <p class="cmdline chipline" data-step="fade">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a class="cta-chip" href={localePath(locale, "/manifeste")}>
+        <div class="sec-head reveal" data-myc-anchor>
+          <h2 class="disp-h">
+            {chrome.manifeste.heading}{" "}
+            <span class="gold">{chrome.manifeste.headingGold}</span>
+          </h2>
+        </div>
+        <div class="manifeste reveal">
+          <p class="man-body">{tz.body}</p>
+          <h3 class="man-dims-h">{tz.dimsHeading}</h3>
+          <dl class="dims">
+            {
+              tz.dims.map((d) => (
+                <div class="dim">
+                  <dt>{d.term}</dt>
+                  <dd>{d.desc}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="sec-more">
+            <a class="arrow-link" href={localePath(locale, "/manifeste")}>
               {chrome.manifeste.readMore}
             </a>
           </p>
-        </TerminalPanel>
+        </div>
       </div>
     </div>
   </section>
@@ -138,36 +131,31 @@ const tz = teaser[locale];
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.projets.heading}</h2>
-        <TerminalPanel path="~/projets" class="reveal">
-          <TermCmd command={chrome.projets.cmd} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{chrome.projets.intro}</p>
-            <div class="plist">
-              {
-                projects.map((p) => (
-                  <div class="prow">
-                    <span class="pname">{p.data.name}</span>
-                    <p class="pbody">
-                      <strong>
-                        {p.data.url ? (
-                          <a href={p.data.url}>{p.data.title}</a>
-                        ) : (
-                          p.data.title
-                        )}
-                      </strong>{" "}
-                      {p.data.blurb[locale]}
-                    </p>
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-          <p class="cmdline morelink" data-step="fade">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/projets")}>{chrome.projets.all}</a>
-          </p>
-        </TerminalPanel>
+        <div class="sec-head reveal" data-myc-anchor>
+          <h2 class="disp-h">{chrome.projets.heading}</h2>
+          <p class="sec-intro">{chrome.projets.intro}</p>
+        </div>
+        <div class="rows reveal">
+          {
+            projects.map((p) => (
+              <div class="row-item proj">
+                <p class="proj-name">
+                  {p.data.url ? (
+                    <a href={p.data.url}>{p.data.title}</a>
+                  ) : (
+                    p.data.title
+                  )}
+                </p>
+                <p class="proj-blurb">{p.data.blurb[locale]}</p>
+              </div>
+            ))
+          }
+        </div>
+        <p class="sec-more reveal">
+          <a class="arrow-link" href={localePath(locale, "/projets")}>
+            {chrome.projets.all}
+          </a>
+        </p>
       </div>
     </div>
   </section>
@@ -175,40 +163,30 @@ const tz = teaser[locale];
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.outils.heading}</h2>
-        <TerminalPanel path="~/outils" class="reveal">
-          <TermCmd command={chrome.outils.cmd} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{chrome.outils.intro}</p>
-            <div class="tree">
-              <p class="troot">outils/</p>
-              {
-                tools.map((tool, i) => {
-                  const glyph = i === tools.length - 1 ? "└── " : "├── ";
-                  const href = tool.data.repo ?? tool.data.url;
-                  return (
-                    <div class="trow">
-                      <span class="tname">
-                        <span class="tg">{glyph}</span>
-                        {href ? (
-                          <a href={href}>{tool.data.name}</a>
-                        ) : (
-                          tool.data.name
-                        )}
-                      </span>
-                      <span class="tdesc">{tool.data.blurb[locale]}</span>
-                    </div>
-                  );
-                })
-              }
-            </div>
-            <p class="tsum">{chrome.outils.treeSummary(tools.length)}</p>
-          </div>
-          <p class="cmdline morelink" data-step="fade">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/outils")}>{chrome.outils.all}</a>
-          </p>
-        </TerminalPanel>
+        <div class="sec-head reveal" data-myc-anchor>
+          <h2 class="disp-h">{chrome.outils.heading}</h2>
+          <p class="sec-intro">{chrome.outils.intro}</p>
+        </div>
+        <div class="rows reveal">
+          {
+            tools.map((tool) => {
+              const href = tool.data.repo ?? tool.data.url;
+              return (
+                <div class="row-item tool">
+                  <p class="tool-name">
+                    {href ? <a href={href}>{tool.data.name}</a> : tool.data.name}
+                  </p>
+                  <p class="tool-blurb">{tool.data.blurb[locale]}</p>
+                </div>
+              );
+            })
+          }
+        </div>
+        <p class="sec-more reveal">
+          <a class="arrow-link" href={localePath(locale, "/outils")}>
+            {chrome.outils.all}
+          </a>
+        </p>
       </div>
     </div>
   </section>
@@ -216,261 +194,183 @@ const tz = teaser[locale];
   <section class="sec offset-r" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <h2 class="disp-h reveal">{chrome.ecrits.heading}</h2>
-        <TerminalPanel path="~/ecrits" class="reveal">
-          <TermCmd command={chrome.ecrits.cmd} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{chrome.ecrits.intro}</p>
-            <div class="flist">
-              {
-                writings.map((entry) => {
-                  const slug = baseSlug(entry);
-                  return (
-                    <a
-                      class="frow"
-                      href={localePath(locale, `/ecrits/${slug}`)}
-                    >
-                      <p class="fline">
-                        <span class="fdir">ecrits/</span>
-                        <span class="fname">{slug}.md</span>
-                        <span class="lead" aria-hidden="true" />
-                        <span class="fdate">
-                          {isoDate(entry.data.publishedAt)}
-                        </span>
-                      </p>
-                      <p class="ftitle">{entry.data.title}</p>
-                      <p class="fhook c">{entry.data.description}</p>
-                    </a>
-                  );
-                })
-              }
-            </div>
-          </div>
-          <p class="cmdline morelink" data-step="fade">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>{" "}
-            <a href={localePath(locale, "/ecrits")}>{chrome.ecrits.all}</a>
-          </p>
-        </TerminalPanel>
+        <div class="sec-head reveal" data-myc-anchor>
+          <h2 class="disp-h">{chrome.ecrits.heading}</h2>
+          <p class="sec-intro">{chrome.ecrits.intro}</p>
+        </div>
+        <div class="rows reveal">
+          {
+            writings.map((entry) => {
+              const slug = baseSlug(entry);
+              return (
+                <a
+                  class="row-item writing"
+                  href={localePath(locale, `/ecrits/${slug}`)}
+                >
+                  <p class="meta-label">
+                    <time datetime={isoDate(entry.data.publishedAt)}>
+                      {isoDate(entry.data.publishedAt)}
+                    </time>
+                  </p>
+                  <p class="writing-title">{entry.data.title}</p>
+                  <p class="writing-hook">{entry.data.description}</p>
+                </a>
+              );
+            })
+          }
+        </div>
+        <p class="sec-more reveal">
+          <a class="arrow-link" href={localePath(locale, "/ecrits")}>
+            {chrome.ecrits.all}
+          </a>
+        </p>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* ---------- manifeste : markdown-ish cat (ported from mockup D) ---------- */
-  .md {
+  /* ---------- manifeste : editorial prose + pull quote + definition rows ---------- */
+  .manifeste {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 2rem;
   }
-  .md .h {
+  .man-body {
+    max-width: 62ch;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+  .man-dims-h {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.05rem;
     color: var(--bone);
-    font-weight: 700;
   }
-  .md .tok {
-    color: var(--ink-3);
-  }
-  .md .quote {
-    color: var(--accent);
-    font-weight: 600;
-  }
-  .md ul {
-    list-style: none;
+  .dims {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
   }
-  .md ul li {
+  .dim {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.4rem 2rem;
+    align-items: baseline;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--hair-2);
+  }
+  .dim:last-child {
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .dim dt {
+    font-family: var(--disp);
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .dim dd {
     color: var(--ink-2);
   }
-  .md ul .term {
-    color: var(--accent);
-    font-weight: 600;
+
+  .sec-more {
+    margin-top: 2rem;
   }
 
-  /* readMore chip line */
-  .chipline {
-    margin-top: 1.8rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.9ch;
-  }
-  .cta-chip {
-    display: inline-block;
-    font-family: var(--mono);
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-decoration: none;
-    color: var(--accent);
-    background: var(--accent-soft);
-    border: 1px solid rgba(217, 162, 74, 0.5);
-    padding: 0.5em 0.95em;
-    border-radius: var(--r-tile);
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
-  }
-  .cta-chip:hover,
-  .cta-chip:focus-visible {
-    background: var(--accent);
-    color: var(--bg);
-  }
-  .cta-chip:active {
-    transform: translateY(1px);
-  }
-
-  /* quiet trailing "cd <dir>" links */
-  .morelink {
-    margin-top: 1.8rem;
-  }
-  .morelink a {
-    color: var(--ink-3);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-  .morelink a:hover,
-  .morelink a:focus-visible {
-    color: var(--accent);
-  }
-
-  /* ---------- projets : aligned 2-col ls ---------- */
-  .plist {
+  /* ---------- projets : name over blurb, ruled ---------- */
+  .proj {
     display: grid;
-    gap: 1.9rem;
-  }
-  .prow {
-    display: grid;
-    grid-template-columns: 22ch 1fr;
-    column-gap: 2.5ch;
+    grid-template-columns: minmax(12rem, 16rem) 1fr;
+    gap: 0.4rem 2.5rem;
     align-items: baseline;
   }
-  .pname {
-    color: var(--accent);
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-  .pbody {
-    color: var(--ink-2);
-  }
-  .pbody strong {
-    display: block;
+  .proj-name {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.01em;
     color: var(--bone);
-    font-weight: 700;
   }
-  .pbody strong a,
-  .tname a {
+  .proj-name a,
+  .tool-name a {
     color: inherit;
     text-decoration: none;
-    border-bottom: 1px solid var(--hair);
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease;
   }
-  .pbody strong a:hover,
-  .pbody strong a:focus-visible,
-  .tname a:hover,
-  .tname a:focus-visible {
+  .proj-name a:hover,
+  .proj-name a:focus-visible,
+  .tool-name a:hover,
+  .tool-name a:focus-visible {
     color: var(--accent);
-    border-color: var(--accent);
   }
-
-  /* ---------- outils : box-drawing tree ---------- */
-  .tree {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-  }
-  .troot {
-    color: var(--bone);
-    font-weight: 700;
-  }
-  .trow {
-    display: grid;
-    grid-template-columns: 26ch 1fr;
-    column-gap: 2ch;
-    align-items: baseline;
-  }
-  .tg {
-    color: var(--ink-3);
-  }
-  .tname {
-    color: var(--accent);
-    font-weight: 600;
-    white-space: pre;
-  }
-  .tdesc {
+  .proj-blurb,
+  .tool-blurb {
     color: var(--ink-2);
-  }
-  .tsum {
-    margin-top: 1.3rem;
-    color: var(--ink-3);
+    max-width: 52ch;
+    text-wrap: pretty;
   }
 
-  /* ---------- ecrits : dotted leader + right-aligned dates ---------- */
-  .flist {
+  /* ---------- outils : compact rows ---------- */
+  .tool {
     display: grid;
-    gap: 2.1rem;
+    grid-template-columns: minmax(12rem, 16rem) 1fr;
+    gap: 0.4rem 2.5rem;
+    align-items: baseline;
+    padding-block: 1.1rem;
   }
-  .frow {
+  .tool-name {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--bone);
+  }
+
+  /* ---------- écrits : date, title, hook; whole row clickable ---------- */
+  .writing {
     display: block;
     text-decoration: none;
     color: inherit;
   }
-  .frow:focus-visible {
+  .writing:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 4px;
     border-radius: 2px;
   }
-  .fline {
-    display: flex;
-    align-items: baseline;
-    gap: 1ch;
-    min-width: 0;
-  }
-  .fdir {
-    color: var(--ink-3);
-  }
-  .fname {
-    color: var(--accent);
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-  .lead {
-    flex: 1;
-    min-width: 3ch;
-    border-bottom: 1px dotted var(--hair);
-    transform: translateY(-0.3em);
-  }
-  .fdate {
-    color: var(--ink-2);
-  }
-  .ftitle {
+  .writing-title {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.01em;
     color: var(--bone);
-    font-weight: 700;
-    margin-top: 0.3rem;
-    transition: color 0.2s ease;
+    margin-top: 0.45rem;
+    max-width: 30ch;
+    text-wrap: balance;
   }
-  .frow:hover .ftitle,
-  .frow:focus-visible .ftitle {
+  .writing:hover .writing-title,
+  .writing:focus-visible .writing-title {
     color: var(--accent);
   }
-  .fhook {
+  .writing-hook {
+    margin-top: 0.4rem;
+    color: var(--ink-2);
     max-width: 58ch;
+    text-wrap: pretty;
+  }
+  :global(html.anim) .writing-title,
+  :global(html.anim) .proj-name a,
+  :global(html.anim) .tool-name a {
+    transition: color var(--t-base) ease;
   }
 
   /* ---------- single-column collapse ---------- */
   @media (max-width: 767px) {
-    .prow {
+    .proj,
+    .tool {
       grid-template-columns: 1fr;
-      row-gap: 0.25rem;
+      row-gap: 0.3rem;
     }
-    .trow {
+    .dim {
       grid-template-columns: 1fr;
-      row-gap: 0.1rem;
-    }
-    .trow .tdesc {
-      padding-left: 4ch;
+      row-gap: 0.2rem;
     }
   }
 </style>

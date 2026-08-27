@@ -42,6 +42,45 @@ Content lives in the repo under `src/content/`:
 Schemas are defined in `src/content.config.ts`. UI chrome strings live in the
 typed dictionary under `src/i18n/`.
 
+## Design
+
+Pivot éditorial 2026-08-27 (see `docs/specs/2026-08-27-pivot-editorial-lego.md`):
+the terminal grammar left the chrome; the site reads as an editorial surface on
+the humus/bone/gold palette, with the physarum mycelium as the signature. Mono
+is reserved for dates, labels and code. `PRODUCT.md` carries the strategic
+brief; motion tokens live in `src/styles/tokens.css`, and the transitions.dev
+skill is vendored under `.agents/skills/` for motion work.
+
+## Component registry (the house lego)
+
+`registry.json` at the repo root follows the shadcn registry protocol and
+distributes the site's own tokens, editorial CSS and `.astro` components.
+Agents (from any project) install items with:
+
+```sh
+npx shadcn@latest add Asi0Flammeus/wmmw.sh/<item>
+```
+
+The unlisted gallery at `/lego` (noindex, out of the sitemap) renders every
+item live; asi0 validates and annotates components there.
+
+## Agent reports (UUID pages)
+
+Agents publish self-contained HTML reports (Fold-first formats, see the
+html-deliverable skill) without a rebuild:
+
+```sh
+curl -X POST https://wmmw.sh/api/reports \
+  -H "Authorization: Bearer $REPORTS_TOKEN" \
+  -H "Content-Type: text/html" \
+  --data-binary @report.html
+# -> { "id": "<uuid>", "url": "https://wmmw.sh/r/<uuid>" }
+```
+
+Pages under `/r/<uuid>` are unlisted, noindex, and served from the
+`wmmw-reports` docker volume. `GET /api/reports` (same token) lists them;
+`DELETE /r/<uuid>` removes one.
+
 ## Deployment
 
 Containerized: a multi-stage `Dockerfile` builds with bun and runs the Astro
@@ -58,8 +97,9 @@ vhost (`/etc/nginx/sites-enabled/wmmw.sh`) reverse-proxies `wmmw.sh` and
 - `./deploy.sh rollback`   restore the previous image
 - `./deploy.sh down`       stop containers
 
-v1 needs no build-time or runtime secrets: content is in-repo and the contact
-link is the GitHub profile. See `.env.example` for the runtime variables.
+Content is in-repo and the contact link is the GitHub profile. The only secret
+is `REPORTS_TOKEN` (agent report publishing); `ANNOTATION_SYSTEM=true` enables
+the QA overlay during design-review rounds. See `.env.example`.
 
 CI (`.github/workflows/ci.yml`) gates every pull request and push to `main`:
 `bun install`, `bun run check`, `bun run build`, plus a Docker image build smoke

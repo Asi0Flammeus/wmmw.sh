@@ -104,18 +104,113 @@ button:focus-visible,
   margin-left: auto;
 }
 
-/* scroll reveal (page agents add .reveal; visible fallback without JS) */
-html.anim .reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.22, 0.6, 0.2, 1);
+/* section head: display heading + filament underline drawn when the mycelium
+   branch reaches it (myc:reach adds .myc-touched; .in + delay is the safety
+   net; no-JS and reduced-motion show it fully drawn) */
+.sec-head {
+  position: relative;
+  margin-bottom: 2.2rem;
+}
+.sec-head .disp-h {
+  margin-bottom: 0.9rem;
+}
+.sec-head::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 2px;
+  margin-top: 1.1rem;
+  background: var(--accent);
+  border-radius: 1px;
+  transform-origin: left center;
+}
+html.anim .sec-head::after {
+  transform: scaleX(0);
+  transition: transform 0.9s var(--ease-swift);
+}
+html.anim .sec-head.in::after {
+  transform: scaleX(1);
+  transition-delay: 2.8s;
+}
+html.anim .sec-head.myc-touched::after {
+  transform: scaleX(1);
+  transition-delay: 0s;
 }
 
-html.anim .reveal.in {
-  opacity: 1;
-  transform: none;
+/* section intro line */
+.sec-intro {
+  font-size: var(--fs-lead);
+  color: var(--ink-2);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+/* editorial arrow link ("Tous les projets", back links) */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--disp);
+  font-weight: 500;
+  font-size: 0.98rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.arrow-link::after {
+  content: "";
+  width: 0.9em;
+  height: 0.9em;
+  background: currentColor;
+  mask: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8h10m0 0L9 4m4 4l-4 4' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.arrow-link:hover,
+.arrow-link:focus-visible {
+  color: var(--accent-2);
+}
+html.anim .arrow-link::after {
+  transition: transform var(--t-base) var(--ease-swift);
+}
+.arrow-link:hover::after,
+.arrow-link:focus-visible::after {
+  transform: translateX(3px);
+}
+
+/* ruled editorial list rows (projects, tools, writings) */
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+.row-item {
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--hair-2);
+}
+.row-item:last-child {
+  border-bottom: 1px solid var(--hair-2);
+}
+
+/* mono micro-label (dates, statuses; the only mono left in chrome) */
+.meta-label {
+  font-family: var(--mono);
+  font-size: var(--fs-meta);
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+}
+
+/* scroll reveal: CSS scroll-driven, so content never gates on JS. Browsers
+   without animation-timeline (and reduced motion) simply show everything. */
+@supports (animation-timeline: view()) {
+  html.anim .reveal {
+    animation: reveal-in both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 45%;
+  }
+}
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
 
 /* single-column collapse */

@@ -1,8 +1,6 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import TerminalPanel from "@components/TerminalPanel.astro";
 import { t } from "@i18n/index";
-import { TERM_USER } from "@lib/site";
 
 /* Astro emits a single /404.html; chrome is FR only, no [lang] variants. */
 const locale = "fr" as const;
@@ -18,17 +16,11 @@ const dict = t(locale);
   <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~" class="reveal">
-          <p class="cmdline">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>
-            {" "}cat <span id="nf-path">404</span>
-          </p>
-          <p class="out">{dict.notFound.output}</p>
-          <p class="cmdline endline">
-            <span class="ps"><b>{TERM_USER}</b>:~$</span>
-            {" "}<a class="cd" href="/">{dict.notFound.hint}</a>
-          </p>
-        </TerminalPanel>
+        <p class="nf-path meta-label reveal"><span id="nf-path">404</span></p>
+        <p class="nf-out reveal">{dict.notFound.output}</p>
+        <p class="nf-hint reveal">
+          <a class="arrow-link" href="/">{dict.notFound.hint}</a>
+        </p>
       </div>
     </div>
   </section>
@@ -44,14 +36,19 @@ const dict = t(locale);
 </script>
 
 <style>
-  .endline {
-    margin-top: 1.4rem;
+  .nf-path {
+    overflow-wrap: anywhere;
   }
-  .endline .cd {
-    color: var(--accent);
-    text-decoration: none;
+  .nf-out {
+    margin-top: 1rem;
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    color: var(--bone);
+    max-width: 30ch;
+    text-wrap: balance;
   }
-  .endline .cd:hover {
-    text-decoration: underline;
+  .nf-hint {
+    margin-top: 2rem;
   }
 </style>

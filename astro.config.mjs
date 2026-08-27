@@ -10,7 +10,13 @@ export default defineConfig({
   output: "static",
   trailingSlash: "never",
   adapter: node({ mode: "standalone" }),
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      // /lego is the unlisted component gallery; /r/* are unlisted reports.
+      filter: (page) => !page.includes("/lego"),
+    }),
+  ],
   i18n: {
     defaultLocale: "fr",
     locales: ["fr", "en", "es"],

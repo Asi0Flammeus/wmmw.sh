@@ -1,7 +1,5 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import TerminalPanel from "@components/TerminalPanel.astro";
-import TermCmd from "@components/TermCmd.astro";
 import { type Locale, t, localePath, isoDate } from "@i18n/index";
 import { publishedWritings, baseSlug } from "@lib/writings";
 
@@ -20,87 +18,73 @@ const entries = await publishedWritings(locale);
   description={dict.meta.ecrits}
   path="/ecrits"
 >
-  <section class="sec offset-r" data-block>
+  <section class="sec offset-l" data-block>
     <div class="wrap">
       <div class="sec-inner">
-        <TerminalPanel path="~/ecrits" class="reveal">
-          <TermCmd command={dict.ecrits.cmd} />
-          <div class="out" data-step="fade">
-            <p class="c intro">{dict.ecrits.intro}</p>
-            <div class="flist">
-              {
-                entries.map((entry) => {
-                  const slug = baseSlug(entry);
-                  return (
-                    <a class="frow" href={localePath(locale, `/ecrits/${slug}`)}>
-                      <span class="fline">
-                        <span class="fdir">ecrits/</span><span class="fname">{slug}.md</span><span class="lead" aria-hidden="true" /><span class="fdate">{isoDate(entry.data.publishedAt)}</span>
-                      </span>
-                      <span class="ftitle">{entry.data.title}</span>
-                      <span class="fhook c">{entry.data.description}</span>
-                    </a>
-                  );
-                })
-              }
-            </div>
-          </div>
-        </TerminalPanel>
+        <p class="sec-intro reveal">{dict.ecrits.intro}</p>
+        <div class="rows reveal">
+          {
+            entries.map((entry) => {
+              const slug = baseSlug(entry);
+              return (
+                <a
+                  class="row-item writing"
+                  href={localePath(locale, `/ecrits/${slug}`)}
+                >
+                  <p class="meta-label">
+                    <time datetime={isoDate(entry.data.publishedAt)}>
+                      {isoDate(entry.data.publishedAt)}
+                    </time>
+                  </p>
+                  <h2 class="writing-title">{entry.data.title}</h2>
+                  <p class="writing-hook">{entry.data.description}</p>
+                </a>
+              );
+            })
+          }
+        </div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* ecrits index: dotted-leader TOC (ported from mockup D) */
-  .flist {
-    display: grid;
-    gap: 2.1rem;
+  .rows {
+    margin-top: 2.6rem;
   }
-  .frow {
-    display: grid;
-    gap: 0.35rem;
+  .writing {
+    display: block;
     text-decoration: none;
     color: inherit;
-    border-radius: var(--r-tile);
+    padding-block: 1.9rem;
   }
-  .fline {
-    display: flex;
-    align-items: baseline;
-    gap: 1ch;
-    min-width: 0;
+  .writing:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 2px;
   }
-  .fdir {
-    color: var(--ink-3);
-  }
-  .fname {
-    color: var(--accent);
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-  .lead {
-    flex: 1;
-    min-width: 3ch;
-    border-bottom: 1px dotted var(--hair);
-    transform: translateY(-0.3em);
-  }
-  .fdate {
-    color: var(--ink-2);
-    white-space: nowrap;
-  }
-  .ftitle {
+  .writing-title {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h2);
+    letter-spacing: -0.02em;
+    line-height: 1.12;
     color: var(--bone);
-    font-weight: 700;
-    margin-top: 0.3rem;
+    margin-top: 0.5rem;
+    max-width: 26ch;
+    text-wrap: balance;
   }
-  .fhook {
+  .writing:hover .writing-title,
+  .writing:focus-visible .writing-title {
+    color: var(--accent);
+  }
+  :global(html.anim) .writing-title {
+    transition: color var(--t-base) ease;
+  }
+  .writing-hook {
+    margin-top: 0.6rem;
+    color: var(--ink-2);
     max-width: 58ch;
-  }
-  .frow:hover .fname,
-  .frow:focus-visible .fname {
-    text-decoration: underline;
-  }
-  .frow:hover .ftitle,
-  .frow:focus-visible .ftitle {
-    color: var(--accent-2);
+    text-wrap: pretty;
   }
 </style>

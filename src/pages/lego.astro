@@ -1,0 +1,333 @@
+---
+/**
+ * /lego : galerie non listée de tous les composants du registre maison.
+ * Sert de page de validation/annotation pour asi0 (Alt+Y) et de vitrine
+ * technique pour les agents (chaque bloc porte son id de registre).
+ * noindex + exclue du sitemap.
+ */
+import BaseLayout from "@layouts/BaseLayout.astro";
+import TerminalPanel from "@components/TerminalPanel.astro";
+import TermCmd from "@components/TermCmd.astro";
+import Timeline from "@components/blog/Timeline.astro";
+import Poll from "@components/blog/Poll.astro";
+import Math from "@components/blog/Math.astro";
+import ZenCountdown from "@components/blog/ZenCountdown.astro";
+import PeriodicColumn from "@components/blog/PeriodicColumn.astro";
+import "@styles/crqpt-compat.css";
+
+const locale = "fr" as const;
+
+const swatches = [
+  { name: "--bg", value: "#12100d" },
+  { name: "--surf", value: "#1a1712" },
+  { name: "--bone", value: "#e8e2d5" },
+  { name: "--ink-2", value: "#b6ae9e" },
+  { name: "--ink-3", value: "#8d8472" },
+  { name: "--accent", value: "#d9a24a" },
+];
+---
+
+<BaseLayout
+  locale={locale}
+  title="Lego"
+  description="Galerie des composants du registre wmmw."
+  path="/lego"
+  heroTitle="Le lego"
+  noindex
+>
+  <section class="sec" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <p class="sec-intro reveal">
+          Chaque brique du site, rendue en vrai. Annote ce qui cloche (Alt+Y).
+          Les agents installent chaque item via
+          <code>npx shadcn@latest add Asi0Flammeus/wmmw.sh/&lt;item&gt;</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" data-block>
+    <div class="wrap">
+      <div class="sec-inner">
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/tokens · palette</p>
+          <div class="swatches">
+            {
+              swatches.map((s) => (
+                <div class="swatch">
+                  <span class="chip" style={`background:${s.value}`} />
+                  <span class="meta-label">{s.name}</span>
+                </div>
+              ))
+            }
+          </div>
+          <div class="type-specimen">
+            <p class="spec-disp">Space Grotesk, le titrage.</p>
+            <p class="spec-body">
+              Instrument Sans porte le corps de texte, lisible et calme.
+            </p>
+            <p class="spec-mono">JetBrains Mono : dates, labels, code.</p>
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/editorial-css · sec-head + filament</p>
+          <div class="sec-head" data-myc-anchor>
+            <h2 class="disp-h">Un titre de section <span class="gold">avec son or</span></h2>
+            <p class="sec-intro">L'intro qui pose la section en une phrase.</p>
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/editorial-css · liens & chips</p>
+          <p class="demo-row">
+            <a class="arrow-link" href="/lego">Un lien fléché</a>
+            <span class="badge">stable</span>
+            <span class="meta-label">2026-08-27</span>
+          </p>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/editorial-css · rangées réglées (écrit)</p>
+          <div class="rows">
+            <a class="row-item l-writing" href="/lego">
+              <p class="meta-label"><time datetime="2026-08-27">2026-08-27</time></p>
+              <p class="l-writing-title">Le titre d'un écrit, en Space Grotesk</p>
+              <p class="l-writing-hook">
+                L'accroche en une ou deux phrases, qui donne envie sans tout
+                dire.
+              </p>
+            </a>
+            <a class="row-item l-writing" href="/lego">
+              <p class="meta-label"><time datetime="2026-07-12">2026-07-12</time></p>
+              <p class="l-writing-title">Un second écrit pour la rangée</p>
+              <p class="l-writing-hook">Le rythme des hairlines entre les entrées.</p>
+            </a>
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/editorial-css · pull-quote + dimensions</p>
+          <blockquote class="l-quote">
+            La forêt n'a pas besoin d'un arbre de plus. Elle a besoin de
+            mycélium.
+          </blockquote>
+          <dl class="l-dims">
+            <div class="l-dim">
+              <dt>Financière</dt>
+              <dd>des liquidités pour soutenir le vivant.</dd>
+            </div>
+            <div class="l-dim">
+              <dt>Relationnelle</dt>
+              <dd>la confiance, tissée lien par lien.</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/timeline</p>
+          <div class="prose crqpt-compat">
+            <Timeline
+              items={[
+                { n: 1, when: "juillet 2026", title: "Le site naît", desc: "Mockup D, mycélium validé." },
+                { n: 2, when: "août 2026", title: "Pivot éditorial", desc: "Le terminal sort du chrome, le lego arrive." },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/poll</p>
+          <div class="prose crqpt-compat">
+            <Poll
+              id="lego-demo"
+              question="Cette galerie te sert ?"
+              options={["Oui, je valide dessus", "Bof", "À revoir"]}
+              lang={locale}
+            />
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/math</p>
+          <div class="prose crqpt-compat">
+            <Math formula="S = k_B \ln \Omega" />
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/zen-countdown</p>
+          <div class="prose crqpt-compat">
+            <ZenCountdown lang={locale} />
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/periodic-column</p>
+          <div class="prose crqpt-compat">
+            <PeriodicColumn lang={locale} />
+          </div>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/terminal-panel · héritage, pour citer du shell</p>
+          <TerminalPanel path="~/demo">
+            <TermCmd command="echo un panneau terminal, quand un article en a besoin" />
+            <p class="out" data-step="fade">
+              un panneau terminal, quand un article en a besoin
+            </p>
+          </TerminalPanel>
+        </div>
+
+        <div class="demo reveal">
+          <p class="demo-id meta-label">wmmw/reports-api · publication agent</p>
+          <p class="l-doc">
+            POST un HTML autonome sur <code>/api/reports</code> (Bearer
+            REPORTS_TOKEN), la réponse donne l'URL <code>/r/&lt;uuid&gt;</code>,
+            non listée et noindex. Formats Fold : cover, déplié, laptop.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .demo {
+    padding-block: 2.6rem;
+    border-top: 1px solid var(--hair-2);
+  }
+  .demo:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .demo-id {
+    display: block;
+    margin-bottom: 1.6rem;
+    color: var(--accent);
+  }
+  .demo-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.4rem;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.85em;
+    background: var(--surf);
+    border: 1px solid var(--hair-2);
+    border-radius: 6px;
+    padding: 0.15em 0.4em;
+  }
+
+  .swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .chip {
+    width: 4.2rem;
+    height: 2.8rem;
+    border-radius: var(--r-tile);
+    border: 1px solid var(--hair-2);
+  }
+  .type-specimen {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .spec-disp {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.015em;
+    color: var(--bone);
+  }
+  .spec-body {
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+  .spec-mono {
+    font-family: var(--mono);
+    font-size: var(--fs-small);
+    color: var(--ink-3);
+  }
+
+  .l-writing {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .l-writing-title {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    letter-spacing: -0.01em;
+    color: var(--bone);
+    margin-top: 0.45rem;
+  }
+  .l-writing:hover .l-writing-title {
+    color: var(--accent);
+  }
+  .l-writing-hook {
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+    max-width: 58ch;
+  }
+
+  .l-quote {
+    font-family: var(--disp);
+    font-weight: 500;
+    font-size: var(--fs-h3);
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+    color: var(--accent);
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+  .l-dims {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-direction: column;
+  }
+  .l-dim {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.4rem 2rem;
+    align-items: baseline;
+    padding-block: 0.85rem;
+    border-top: 1px solid var(--hair-2);
+  }
+  .l-dim:last-child {
+    border-bottom: 1px solid var(--hair-2);
+  }
+  .l-dim dt {
+    font-family: var(--disp);
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .l-dim dd {
+    color: var(--ink-2);
+  }
+
+  .l-doc {
+    color: var(--ink-2);
+    max-width: 62ch;
+  }
+
+  @media (max-width: 767px) {
+    .l-dim {
+      grid-template-columns: 1fr;
+      row-gap: 0.2rem;
+    }
+  }
+</style>

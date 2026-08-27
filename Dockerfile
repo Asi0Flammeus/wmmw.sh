@@ -6,6 +6,9 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
+# ANNOTATION_SYSTEM is read via import.meta.env, so it must be baked at build.
+ARG ANNOTATION_SYSTEM=false
+ENV ANNOTATION_SYSTEM=$ANNOTATION_SYSTEM
 RUN bun run build
 
 # Stage 2: Runtime

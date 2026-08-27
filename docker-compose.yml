@@ -4,6 +4,9 @@ services:
     container_name: wmmw
     build:
       context: .
+      args:
+        # QA overlay (Alt+Y). Set in .env.prod during design review rounds.
+        - ANNOTATION_SYSTEM=${ANNOTATION_SYSTEM:-false}
     ports:
       # host 4327 -> container 4321 (4321-4326 already taken; wmmw uses 4327)
       - "4327:4321"
@@ -11,6 +14,11 @@ services:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=4321
+      - REPORTS_DIR=/data/reports
+      - REPORTS_TOKEN=${REPORTS_TOKEN:-}
+    volumes:
+      - wmmw-reports:/data/reports
+      - wmmw-feedback:/app/.prototype-feedback
     healthcheck:
       test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4321/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 30s
@@ -18,3 +26,7 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
+
+volumes:
+  wmmw-reports:
+  wmmw-feedback:

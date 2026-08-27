@@ -24,6 +24,8 @@ interface Props {
   /** Display heading for the band hero; defaults to `title`. */
   heroTitle?: string;
   jsonLd?: Record<string, unknown>;
+  /** Unlisted pages (/lego): robots noindex, excluded from the sitemap via astro.config. */
+  noindex?: boolean;
 }
 
 const {
@@ -35,6 +37,7 @@ const {
   heroVariant = "band",
   heroTitle,
   jsonLd,
+  noindex = false,
 } = Astro.props;
 
 /** QA annotation overlay — opt-in via ANNOTATION_SYSTEM=true (or PUBLIC_ variant). */
@@ -91,6 +94,7 @@ const absoluteOg = ogImage
     <meta name="theme-color" content="#12100d" />
 
     <title>{pageTitle}</title>
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
@@ -160,6 +164,18 @@ const absoluteOg = ogImage
       import { initTermTyping } from "@lib/term-type";
 
       let revealObserver: IntersectionObserver | undefined;
+
+      // The mycelium dispatches myc:reach on its branch targets (non-bubbling);
+      // a capture listener still sees it. Editorial section heads react with a
+      // drawn filament underline.
+      document.addEventListener(
+        "myc:reach",
+        (event) => {
+          const el = event.target;
+          if (el instanceof HTMLElement) el.classList.add("myc-touched");
+        },
+        true,
+      );
 
       const boot = (): void => {
         initTermTyping();
