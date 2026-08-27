@@ -4,6 +4,7 @@ import { mkdir, readdir, stat, writeFile } from "fs/promises";
 import { join } from "path";
 import { z } from "zod";
 import { REPORTS_DIR, reportsAuthorized, REPORT_ID_RE } from "@lib/reports";
+import { SITE_URL } from "@lib/site";
 
 export const prerender = false;
 
@@ -26,6 +27,8 @@ const json = (body: unknown, status = 200) =>
  * Responds `{ id, url }`; the page is served at /r/<id>, noindex, unlisted.
  */
 export const POST: APIRoute = async ({ request, url }) => {
+  // Behind the nginx TLS proxy url.origin reads http; local dev keeps its origin.
+  const origin = url.hostname === "wmmw.sh" ? SITE_URL : url.origin;
   if (!reportsAuthorized(request)) return json({ error: "Unauthorized" }, 401);
 
   let html: string;
@@ -51,7 +54,7 @@ export const POST: APIRoute = async ({ request, url }) => {
 
   await mkdir(REPORTS_DIR, { recursive: true });
   await writeFile(join(REPORTS_DIR, `${id}.html`), html, "utf8");
-  return json({ id, url: new URL(`/r/${id}`, url.origin).toString() }, 201);
+  return json({ id, url: new URL(`/r/${id}`, origin).toString() }, 201);
 };
 
 /** Management listing (token-protected): id, size, mtime per report. */
