@@ -79,7 +79,8 @@ curl -X POST https://wmmw.sh/api/reports \
 
 Pages under `/r/<uuid>` are unlisted, noindex, and served from the
 `wmmw-reports` docker volume. `GET /api/reports` (same token) lists them;
-`DELETE /r/<uuid>` removes one.
+`DELETE /r/<uuid>` removes one (send `Content-Type: application/json` so the
+request passes Astro's cross-site form check).
 
 ## Deployment
 
