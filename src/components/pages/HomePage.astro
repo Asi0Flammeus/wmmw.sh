@@ -100,7 +100,7 @@ const tz = teaser[locale];
     <div class="wrap">
       <div class="sec-inner">
         <div class="sec-head reveal" data-myc-anchor>
-          <h2 class="disp-h">
+          <h2 class="disp-h man-h">
             {chrome.manifeste.heading}{" "}
             <span class="gold">{chrome.manifeste.headingGold}</span>
           </h2>
@@ -151,11 +151,6 @@ const tz = teaser[locale];
             ))
           }
         </div>
-        <p class="sec-more reveal">
-          <a class="arrow-link" href={localePath(locale, "/projets")}>
-            {chrome.projets.all}
-          </a>
-        </p>
       </div>
     </div>
   </section>
@@ -231,6 +226,10 @@ const tz = teaser[locale];
 
 <style>
   /* ---------- manifeste : editorial prose + pull quote + definition rows ---------- */
+  /* The gold clause breaks onto its own line (asi0 review, 2026-09-04). */
+  .man-h .gold {
+    display: block;
+  }
   .manifeste {
     display: flex;
     flex-direction: column;

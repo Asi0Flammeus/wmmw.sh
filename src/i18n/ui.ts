@@ -20,10 +20,10 @@ const fr = {
     switchTo: { fr: "Français", en: "English", es: "Español" },
   },
   hero: {
-    h1a: "Ce qui sort du réseau",
-    h1aEm: "réseau",
-    h1b: "y revient.",
-    sub: "William. Physicien de formation, tisseur de réseaux par nature. Je fais circuler le code, le savoir et la valeur.",
+    h1a: "William Mycelic",
+    h1aEm: "Mycelic",
+    h1b: "",
+    sub: "Physicien de formation, DevOps indépendant et tisseur de liens par nature. Je fais circuler le code, le savoir et la valeur.",
     cta: "Lire le manifeste",
   },
   manifeste: {
@@ -33,7 +33,7 @@ const fr = {
     title: "Manifeste",
   },
   projets: {
-    heading: "Projets",
+    heading: "Mes projets",
     intro: "Les arbres que le réseau nourrit.",
     all: "Tous les projets",
   },
@@ -109,10 +109,10 @@ const en: Dict = {
     switchTo: { fr: "Français", en: "English", es: "Español" },
   },
   hero: {
-    h1a: "What leaves the network",
-    h1aEm: "network",
-    h1b: "comes back.",
-    sub: "William. Physicist by training, network weaver by nature. I keep code, knowledge and value in circulation.",
+    h1a: "William Mycelic",
+    h1aEm: "Mycelic",
+    h1b: "",
+    sub: "Physicist by training, independent DevOps and weaver of ties by nature. I keep code, knowledge and value in circulation.",
     cta: "Read the manifesto",
   },
   manifeste: {
@@ -122,7 +122,7 @@ const en: Dict = {
     title: "Manifesto",
   },
   projets: {
-    heading: "Projects",
+    heading: "My projects",
     intro: "The trees the network feeds.",
     all: "All projects",
   },
@@ -189,10 +189,10 @@ const es: Dict = {
     switchTo: { fr: "Français", en: "English", es: "Español" },
   },
   hero: {
-    h1a: "Lo que sale de la red",
-    h1aEm: "red",
-    h1b: "vuelve.",
-    sub: "William. Físico de formación, tejedor de redes por naturaleza. Hago circular el código, el saber y el valor.",
+    h1a: "William Mycelic",
+    h1aEm: "Mycelic",
+    h1b: "",
+    sub: "Físico de formación, DevOps independiente y tejedor de vínculos por naturaleza. Hago circular el código, el saber y el valor.",
     cta: "Leer el manifiesto",
   },
   manifeste: {
@@ -202,7 +202,7 @@ const es: Dict = {
     title: "Manifiesto",
   },
   projets: {
-    heading: "Proyectos",
+    heading: "Mis proyectos",
     intro: "Los árboles que la red alimenta.",
     all: "Todos los proyectos",
   },

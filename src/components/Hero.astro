@@ -41,8 +41,8 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
               ) : (
                 h1a
               )}
-            </span>{" "}
-            <span>{h1b}</span>
+            </span>
+            {h1b && <span>{h1b}</span>}
           </h1>
           <p class="hero-sub">
             {subLead}
@@ -127,23 +127,8 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     padding-inline: var(--pad);
     padding-bottom: clamp(3.5rem, 9vh, 6rem);
   }
-  /* copy scrim: local darkening behind the text so it stays AA-legible over
-     the bloom's rightward spill, without flattening the organism elsewhere.
-     Reaches further LEFT, toward the incoming mass. */
-  .hero-copy::before {
-    content: "";
-    position: absolute;
-    inset: -4rem -4rem -2rem -6rem;
-    z-index: -1;
-    background: radial-gradient(
-      95% 100% at 60% 62%,
-      rgba(18, 16, 13, 0.9) 0%,
-      rgba(18, 16, 13, 0.7) 30%,
-      rgba(18, 16, 13, 0.4) 55%,
-      rgba(18, 16, 13, 0.15) 78%,
-      transparent 100%
-    );
-  }
+  /* No copy scrim: the text sits directly over the organism (asi0 review,
+     2026-09-04: the translucent card must be fully invisible). */
 
   .hero h1 {
     font-family: var(--disp);
