@@ -175,7 +175,8 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
     grid-area: lang;
     justify-self: end;
     align-items: center;
-    font-family: var(--disp);
+    /* mono, not disp: Basteleur's decorative capitals make EN/ES unreadable */
+    font-family: var(--mono);
     font-size: 0.78rem;
     line-height: 1;
     letter-spacing: 0.02em;

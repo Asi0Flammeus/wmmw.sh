@@ -1,13 +1,28 @@
 @import "./reset.css";
 @import "./tokens.css";
 
+/* Basteleur (Keussel, Velvetyne, OFL) — self-hosted: velvetyne.fr sends no
+   CORS headers, hot-linking breaks. Two cuts only, no italic. */
+@font-face {
+  font-family: "Basteleur";
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("/fonts/basteleur-moonlight.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Basteleur";
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/basteleur-bold.woff2") format("woff2");
+}
+
 body {
   position: relative;
   background: var(--bg);
   color: var(--bone);
   font-family: var(--body);
-  font-size: 1.0625rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }

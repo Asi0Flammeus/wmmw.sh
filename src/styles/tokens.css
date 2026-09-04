@@ -34,8 +34,8 @@
   --s-16: 4rem;
 
   /* type */
-  --disp: "Space Grotesk Variable", "Space Grotesk", sans-serif;
-  --body: "Instrument Sans Variable", "Instrument Sans", sans-serif;
+  --disp: "Basteleur", Georgia, serif;
+  --body: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "DejaVu Sans Mono", monospace;
 
   /* type scale (editorial; body 1.0625rem is the base) */
