@@ -30,7 +30,7 @@ const tools = (await getCollection("tools")).sort(
             tools.map((tool) => {
               const mainHref = tool.data.repo ?? tool.data.url;
               return (
-                <article class="row-item tool">
+                <article class="row-item tool" data-myc-node>
                   <div class="tool-head">
                     <h2 class="tool-name">
                       {mainHref ? (

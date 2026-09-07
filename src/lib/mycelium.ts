@@ -114,7 +114,10 @@ const STEP_MS = 30; // ~33fps step cap (breathing is slow)
 const FREEZE_STEPS = 300; // reduced-motion settle
 
 const AG_CAP = 9000;
-const RESPAWN_FRAC = 0.0015; // colony share re-emerging on the guide per step
+const RESPAWN_FRAC = 0.0024; // colony share re-emerging on the guide per step
+/* raised with the roaming lane + anastomoses (2026-09-07): the network below
+   the hero is longer and wider than the old left lane, so it needs more flux
+   to stay visible instead of thinning out over the extra distance. */
 const SCAN_FRAC = 0.06; // agents scanned per step to find frozen ones
 const HERO_RESPAWN_FRAC = 0.002; // hero ambience churn (left-biased)
 const CULL_GUIDE = 0.012; // below-hero: off-network guide threshold
@@ -124,7 +127,7 @@ const TIP_ROWS = 50; // respawn window height above the frontier
 const WALL = 1.5; // repellent border margin, cells (kills wall-hugging)
 const CAP_BELOW = 2.4; // softer deposit cap below the hero: strand, not pipe
 const CROWD_P = 0.02; // overcrowd thinning: saturated-cell squatters move on
-const BELOW_GAIN = 0.55; // render gain below the hero (bright core, no slab)
+const BELOW_GAIN = 0.74; // render gain below the hero (bright core, no slab)
 const GAIN_FADE = 0.045; // per-row ease from hero gain into below-hero gain
 
 /* trunk / branch guide tubes (peak attractant, gaussian sigma in cells) --
@@ -133,6 +136,11 @@ const TRUNK_PEAK = 0.55;
 const TRUNK_SIG = 2.2;
 const BR_PEAK = 0.5;
 const BR_SIG = 1.8;
+/* anastomoses: hyphal fusions bridging neighbouring branch tips. Fainter than
+   a branch so they read as secondary routes, which is what makes the field a
+   mesh instead of a comb (asi0, 2026-09-07). */
+const LINK_PEAK = 0.3;
+const LINK_SIG = 1.5;
 
 /* branch tip -> terminal activation: dispatch "myc:reach" when this much
    trail mass has accumulated in the 3x3 around the branch endpoint */
@@ -195,6 +203,12 @@ function catmull(pts: Pt[]): string {
       p2.y.toFixed(1);
   }
   return d;
+}
+
+/** Quadratic Bezier component at t (anastomosis links). */
+function quadAt(t: number, a: number, b: number, c: number): number {
+  const u = 1 - t;
+  return u * u * a + 2 * u * t * b + t * t * c;
 }
 
 function cubicAt(t: number, a: number, b: number, c: number, d: number): number {
@@ -726,23 +740,33 @@ export function mountMycelium(root: HTMLElement): Mycelium {
     svg!.style.height = newDocH + "px";
     svg!.style.display = anim ? "none" : "block";
 
-    // ---- trunk: seeded organic meander down a left lane ----
+    // ---- trunk: seeded organic meander that traverses the page ----
+    // It used to hug the left margin the whole way down. asi0 (2026-09-07):
+    // the organism should roam the screen and follow the reading, so the lane
+    // now drifts across a wide band, crossing the content column and coming
+    // back. Mobile keeps a narrow sway: there is no room to cross there.
     const rnd = mulberry32(0x5eed21 ^ (W & 0xffff));
     const laneX = mobile ? Math.max(11, W * 0.04) : Math.max(20, Math.min(44, W * 0.03));
+    const roam = mobile ? W * 0.1 : Math.min(W * 0.46, W - laneX - 80);
     const amp = mobile ? 6 : Math.min(22, W * 0.018);
     const span = endY - startY;
     const segs = Math.max(8, Math.round(span / 130));
     const pts: Pt[] = [];
     const phase = rnd() * TAU;
+    // ~1.2 crossings over the page, whatever its length: a long page wanders
+    // the same number of times, it does not oscillate faster.
+    const cross = Math.PI * (2 + rnd() * 0.5);
     for (let i = 0; i <= segs; i++) {
       const t = i / segs;
       const y = startY + span * t;
+      const traverse = (1 - Math.cos(t * cross)) * 0.5 * roam;
       const wob =
         Math.sin(t * Math.PI * 2.6 + phase) * amp +
         Math.sin(t * Math.PI * 6.1 + phase * 1.7) * amp * 0.35;
       const jitter = (rnd() - 0.5) * amp * 0.5;
+      // the mouth stays seamed to the hero bloom, which exits bottom-left
       const ease = i === 0 ? 0 : 1;
-      pts.push({ x: laneX + (wob + jitter) * ease, y });
+      pts.push({ x: laneX + (traverse + wob + jitter) * ease, y });
     }
     trunkEl!.setAttribute("d", catmull(pts));
     const tlen = trunkEl!.getTotalLength();
@@ -761,19 +785,29 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       panel: HTMLElement | null;
     }
     const defs: BDef[] = [];
+    // `data-myc-anchor` pulls a filament under a section heading (left edge).
+    // `data-myc-node` is a free attractant: the network reaches for the
+    // element wherever it sits, which is how the mesh spreads across the
+    // width instead of hanging off one lane.
     const heads = Array.prototype.slice.call(
-      document.querySelectorAll("[data-myc-anchor], .panel-head"),
+      document.querySelectorAll("[data-myc-anchor], [data-myc-node], .panel-head"),
     ) as HTMLElement[];
     for (let idx = 0; idx < heads.length; idx++) {
       const head = heads[idx]!;
       const hr = head.getBoundingClientRect();
+      if (hr.width === 0 && hr.height === 0) continue;
+      const isNode = head.hasAttribute("data-myc-node");
       const attachY = hr.top + scrollY + hr.height * 0.5;
       if (attachY < startY + 44 || attachY > endY) continue;
       const drop = mobile ? 30 : 64;
       let sy = attachY - drop;
       if (sy < startY + 20) sy = startY + 20;
       const sx = trunkXAt(pts, sy);
-      const tx = mobile ? Math.min(hr.left + scrollX + 40, W - 12) : hr.left + scrollX + 34;
+      const tx = isNode
+        ? Math.max(12, Math.min(hr.left + scrollX + hr.width * 0.5, W - 12))
+        : mobile
+          ? Math.min(hr.left + scrollX + 40, W - 12)
+          : hr.left + scrollX + 34;
       const ty = attachY;
       const dx = tx - sx;
       const dy = ty - sy;
@@ -838,8 +872,63 @@ export function mountMycelium(root: HTMLElement): Mycelium {
         c2y,
         tx,
         ty,
-        panel: head.closest<HTMLElement>(".panel") ?? head,
+        // free nodes never wake a terminal: only real headings claim a panel
+        panel: isNode ? null : (head.closest<HTMLElement>(".panel") ?? head),
       });
+    }
+
+    // ---- anastomoses: link neighbouring tips so the guide closes into a
+    // network. Real mycelium fuses hypha to hypha; visually this is what
+    // turns a comb hanging off one lane into a mesh roaming the page. ----
+    interface LDef {
+      x0: number;
+      y0: number;
+      cx: number;
+      cy: number;
+      x1: number;
+      y1: number;
+    }
+    const links: LDef[] = [];
+    const tips = defs.slice().sort((a, b) => a.ty - b.ty);
+    for (let i = 0; i + 1 < tips.length; i++) {
+      const a = tips[i]!;
+      const b = tips[i + 1]!;
+      // never bridge across a long empty stretch: that reads as a stray wire
+      if (b.ty - a.ty > vh * 0.9) continue;
+      const lr = mulberry32((0xfa11 + i * 2246822519) | 0);
+      const mx = (a.tx + b.tx) * 0.5;
+      const my = (a.ty + b.ty) * 0.5;
+      // bow the link away from the trunk so it arcs through the content
+      const away = mx >= trunkXAt(pts, my) ? 1 : -1;
+      const bow = (mobile ? 18 : 46) + lr() * (mobile ? 14 : 54);
+      links.push({
+        x0: a.tx,
+        y0: a.ty,
+        cx: Math.max(10, Math.min(mx + away * bow, W - 10)),
+        cy: my + (lr() - 0.5) * 30,
+        x1: b.tx,
+        y1: b.ty,
+      });
+    }
+    for (let i = 0; i < links.length; i++) {
+      const l = links[i]!;
+      const pathEl = document.createElementNS(SVGNS, "path");
+      pathEl.setAttribute(
+        "d",
+        "M" +
+          l.x0.toFixed(1) +
+          "," +
+          l.y0.toFixed(1) +
+          "Q" +
+          l.cx.toFixed(1) +
+          "," +
+          l.cy.toFixed(1) +
+          " " +
+          l.x1.toFixed(1) +
+          "," +
+          l.y1.toFixed(1),
+      );
+      brg!.appendChild(pathEl);
     }
 
     // ---- grid carry-over ----
@@ -953,6 +1042,18 @@ export function mountMycelium(root: HTMLElement): Mycelium {
       if (def.panel) {
         def.panel.dataset.mycClaim = "1";
         branchEnds.push({ x: def.tx / CELL, y: def.ty / CELL, panel: def.panel, reached: false });
+      }
+    }
+    for (let l = 0; l < links.length; l++) {
+      const lk = links[l]!;
+      const chord = Math.hypot(lk.x1 - lk.x0, lk.y1 - lk.y0);
+      const steps = Math.max(6, Math.ceil((chord * 1.2) / CELL));
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const px = quadAt(t, lk.x0, lk.cx, lk.x1);
+        const py = quadAt(t, lk.y0, lk.cy, lk.y1);
+        depositTube(px, py, LINK_PEAK, LINK_SIG);
+        if ((s & 3) === 0) spinePts.push(px / CELL, py / CELL);
       }
     }
     // y-sorted spine arrays for binary-searched respawn windows

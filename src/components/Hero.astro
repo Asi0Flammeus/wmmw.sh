@@ -176,6 +176,21 @@ const subTail = subCut >= 0 ? sub.slice(subCut + 2) : "";
     padding: 0.6em 1.15em;
     border-radius: var(--r-pill);
   }
+  /* Membrane: the chip lies directly on the organism, so it frosts what is
+     behind it instead of hiding it. Solid --accent-soft stays the fallback. */
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .cta-chip {
+      background: rgba(217, 162, 74, 0.14);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+      backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+    }
+    .cta-chip:hover,
+    .cta-chip:focus-visible {
+      background: var(--accent);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
   .cta-chip:hover,
   .cta-chip:focus-visible {
     background: var(--accent);

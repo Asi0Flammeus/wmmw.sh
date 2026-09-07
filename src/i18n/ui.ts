@@ -31,6 +31,9 @@ const fr = {
     headingGold: "Elle a besoin de mycélium.",
     readMore: "Lire le manifeste en entier",
     title: "Manifeste",
+    signature: "William",
+    signatureLine: "asi0 · construit à ciel ouvert",
+    signatureAlt: "William, de profil, dans la lumière basse d'un intérieur.",
   },
   projets: {
     heading: "Mes projets",
@@ -120,6 +123,9 @@ const en: Dict = {
     headingGold: "It needs mycelium.",
     readMore: "Read the full manifesto",
     title: "Manifesto",
+    signature: "William",
+    signatureLine: "asi0 · building in the open",
+    signatureAlt: "William, in profile, in the low light of an interior.",
   },
   projets: {
     heading: "My projects",
@@ -200,6 +206,9 @@ const es: Dict = {
     headingGold: "Necesita micelio.",
     readMore: "Leer el manifiesto completo",
     title: "Manifiesto",
+    signature: "William",
+    signatureLine: "asi0 · construyo a cielo abierto",
+    signatureAlt: "William, de perfil, en la luz baja de un interior.",
   },
   projets: {
     heading: "Mis proyectos",

@@ -99,6 +99,21 @@ const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
     pointer-events: none;
     z-index: -1;
   }
+  /* Membrane: frost the top strip so nav stays legible over bright sim
+     regions without a hard bar. The gradient above is the fallback. */
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .site-head::before {
+      background: linear-gradient(
+        to bottom,
+        rgba(18, 16, 13, 0.55),
+        rgba(18, 16, 13, 0)
+      );
+      -webkit-backdrop-filter: blur(9px) saturate(var(--glass-sat));
+      backdrop-filter: blur(9px) saturate(var(--glass-sat));
+      -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+    }
+  }
 
   .wordmark {
     grid-area: mark;

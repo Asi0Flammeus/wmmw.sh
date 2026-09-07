@@ -138,7 +138,7 @@ const tz = teaser[locale];
         <div class="rows reveal">
           {
             projects.map((p) => (
-              <div class="row-item proj">
+              <div class="row-item proj" data-myc-node>
                 <p class="proj-name">
                   {p.data.url ? (
                     <a href={p.data.url}>{p.data.title}</a>
@@ -167,7 +167,7 @@ const tz = teaser[locale];
             tools.map((tool) => {
               const href = tool.data.repo ?? tool.data.url;
               return (
-                <div class="row-item tool">
+                <div class="row-item tool" data-myc-node>
                   <p class="tool-name">
                     {href ? <a href={href}>{tool.data.name}</a> : tool.data.name}
                   </p>
@@ -200,6 +200,7 @@ const tz = teaser[locale];
               return (
                 <a
                   class="row-item writing"
+                  data-myc-node
                   href={localePath(locale, `/ecrits/${slug}`)}
                 >
                   <p class="meta-label">
