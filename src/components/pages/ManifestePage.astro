@@ -39,7 +39,7 @@ const ecritsHref = localePath(locale, "/ecrits");
           src={portrait}
           alt={dict.manifeste.signatureAlt}
           widths={[320, 480, 640]}
-          sizes="(max-width: 640px) 62vw, 320px"
+          sizes="(max-width: 640px) 52vw, 320px"
           loading="lazy"
         />
         <figcaption class="sig-caption">
@@ -72,17 +72,20 @@ const ecritsHref = localePath(locale, "/ecrits");
     height: auto;
     display: block;
     border-radius: 2px;
-    /* dissolve into the background on every edge, strongest at the bottom:
-       a radial core intersected with a bottom fade, so he emerges from the
-       humus rather than sitting in a cut-out rectangle */
+    /* Dissolve on every edge so he emerges from the humus instead of sitting
+       in a cut-out rectangle: an elliptical core intersected with a vertical
+       and a horizontal fade. All three must reach transparent INSIDE the
+       frame, or the image edge itself shows as a hard line. */
     -webkit-mask-image:
-      radial-gradient(96% 74% at 50% 40%, #000 22%, rgba(0, 0, 0, 0.55) 55%, transparent 82%),
-      linear-gradient(to bottom, #000 46%, transparent 96%);
+      radial-gradient(78% 62% at 50% 42%, #000 18%, rgba(0, 0, 0, 0.6) 52%, transparent 78%),
+      linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 97%),
+      linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
     mask-image:
-      radial-gradient(96% 74% at 50% 40%, #000 22%, rgba(0, 0, 0, 0.55) 55%, transparent 82%),
-      linear-gradient(to bottom, #000 46%, transparent 96%);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+      radial-gradient(78% 62% at 50% 42%, #000 18%, rgba(0, 0, 0, 0.6) 52%, transparent 78%),
+      linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 97%),
+      linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    -webkit-mask-composite: source-in, source-in;
+    mask-composite: intersect, intersect;
     filter: saturate(0.82) contrast(1.02);
   }
   .sig-caption {
@@ -106,7 +109,7 @@ const ecritsHref = localePath(locale, "/ecrits");
 
   @media (max-width: 640px) {
     .signature {
-      grid-template-columns: minmax(0, 62vw);
+      grid-template-columns: minmax(0, 52vw);
       gap: 1.1rem;
       align-items: start;
     }
