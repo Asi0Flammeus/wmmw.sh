@@ -1,9 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
-import { Image } from "astro:assets";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { type Locale, t, localePath } from "@i18n/index";
-import portrait from "@assets/william.jpg";
 
 interface Props {
   locale: Locale;
@@ -33,20 +31,6 @@ const ecritsHref = localePath(locale, "/ecrits");
       <div class="manifesto reveal">
         <Content />
       </div>
-      <figure class="signature reveal" data-myc-node>
-        <Image
-          class="sig-portrait"
-          src={portrait}
-          alt={dict.manifeste.signatureAlt}
-          widths={[320, 480, 640]}
-          sizes="(max-width: 640px) 52vw, 320px"
-          loading="lazy"
-        />
-        <figcaption class="sig-caption">
-          <span class="sig-name">{dict.manifeste.signature}</span>
-          <span class="sig-line">{dict.manifeste.signatureLine}</span>
-        </figcaption>
-      </figure>
       <p class="man-end reveal">
         <a class="arrow-link" href={ecritsHref}>{dict.ecrits.all}</a>
       </p>
@@ -55,69 +39,6 @@ const ecritsHref = localePath(locale, "/ecrits");
 </BaseLayout>
 
 <style>
-  /* ---------- signature: the face at the foot of the letter ----------
-     No avatar circle, no about-page card. The portrait is masked so it
-     dissolves into the humus instead of sitting in a hard rectangle, the way
-     the organism does. It carries data-myc-node, so the network reaches for
-     it: the last thing the mycelium touches on this page is him. */
-  .signature {
-    margin: 4.5rem 0 0;
-    display: grid;
-    grid-template-columns: minmax(0, 15rem) 1fr;
-    gap: 1.6rem 2rem;
-    align-items: end;
-  }
-  .sig-portrait {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 2px;
-    /* Dissolve on every edge so he emerges from the humus instead of sitting
-       in a cut-out rectangle: an elliptical core intersected with a vertical
-       and a horizontal fade. All three must reach transparent INSIDE the
-       frame, or the image edge itself shows as a hard line. */
-    -webkit-mask-image:
-      radial-gradient(78% 62% at 50% 42%, #000 18%, rgba(0, 0, 0, 0.6) 52%, transparent 78%),
-      linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 97%),
-      linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
-    mask-image:
-      radial-gradient(78% 62% at 50% 42%, #000 18%, rgba(0, 0, 0, 0.6) 52%, transparent 78%),
-      linear-gradient(to bottom, transparent 0%, #000 16%, #000 58%, transparent 97%),
-      linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
-    -webkit-mask-composite: source-in, source-in;
-    mask-composite: intersect, intersect;
-    filter: saturate(0.82) contrast(1.02);
-  }
-  .sig-caption {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding-bottom: 2.6rem;
-  }
-  .sig-name {
-    font-family: var(--disp);
-    font-size: clamp(1.6rem, 3.4vw, 2.2rem);
-    line-height: 1;
-    color: var(--bone);
-  }
-  .sig-line {
-    font-family: var(--mono);
-    font-size: var(--fs-meta);
-    letter-spacing: 0.02em;
-    color: var(--ink-3);
-  }
-
-  @media (max-width: 640px) {
-    .signature {
-      grid-template-columns: minmax(0, 52vw);
-      gap: 1.1rem;
-      align-items: start;
-    }
-    .sig-caption {
-      padding-bottom: 0;
-    }
-  }
-
   .man-wrap {
     max-width: 65ch;
     margin-inline: auto;

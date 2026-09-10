@@ -9,6 +9,7 @@ const fr = {
     projets: "Projets",
     outils: "Outils",
     ecrits: "Écrits",
+    contact: "Contact",
     nourritures: "Nourritures",
     manifeste: "Manifeste",
     ariaLabel: "Sections",
@@ -31,9 +32,6 @@ const fr = {
     headingGold: "Elle a besoin de mycélium.",
     readMore: "Lire le manifeste en entier",
     title: "Manifeste",
-    signature: "William",
-    signatureLine: "asi0 · construit à ciel ouvert",
-    signatureAlt: "William, de profil, dans la lumière basse d'un intérieur.",
   },
   projets: {
     heading: "Mes projets",
@@ -62,11 +60,32 @@ const fr = {
     tabs: { livres: "Livres", films: "Films", videos: "Vidéos" },
     empty: "Rien ici pour le moment. Bientôt.",
   },
+  contact: {
+    heading: "Contact",
+    intro:
+      "Une idée à relier, une question ou simplement l'envie d'échanger ? Écris-moi là où tu te sens chez toi.",
+    direct: "Le chemin le plus direct",
+    directText:
+      "Pour le moment, le plus simple est de m'envoyer un message sur X. Une adresse wmmw.sh viendra compléter ce chemin.",
+    directCta: "M'écrire sur X",
+    directEmailText:
+      "Le courriel est le chemin le plus simple pour me joindre. Je te répondrai dès que possible.",
+    directEmailCta: "M'écrire par courriel",
+    elsewhere: "Ailleurs dans le réseau",
+    portraitAlt:
+      "William, alias asi0, de profil dans la lumière basse d'un intérieur.",
+    portraitCaption: "William · asi0",
+    links: {
+      github: "Code, outils et contributions ouvertes.",
+      x: "Notes courtes et conversations.",
+      planb: "Éducation Bitcoin et travail collectif.",
+    },
+  },
   footer: {
     thesis:
       "wmmw.sh : WilliaM Mycelic Wealth. Un palindrome. Ce qui sort du réseau y revient.",
     rss: "flux RSS",
-    contactSoon: "courriel bientôt",
+    contact: "contact",
   },
   notFound: {
     output: "Cette page n'existe pas, ou pas encore.",
@@ -79,6 +98,8 @@ const fr = {
     outils: "Des outils libres, comme des spores : TUI pour agents, dictée vocale, extensions, CLI cloud.",
     ecrits: "Des signaux envoyés dans le réseau : essais sur la technique, la physique et ce qui circule entre les deux.",
     nourritures: "Ce qui me nourrit : livres, films et vidéos. Le sol d'où tout pousse.",
+    contact:
+      "Contacter William, alias asi0, et retrouver ses présences sur GitHub, X et Plan ₿ Academy.",
     notFound: "Page introuvable.",
   },
   rss: {
@@ -101,6 +122,7 @@ const en: Dict = {
     projets: "Projects",
     outils: "Tools",
     ecrits: "Writings",
+    contact: "Contact",
     nourritures: "Nourishment",
     manifeste: "Manifesto",
     ariaLabel: "Sections",
@@ -123,9 +145,6 @@ const en: Dict = {
     headingGold: "It needs mycelium.",
     readMore: "Read the full manifesto",
     title: "Manifesto",
-    signature: "William",
-    signatureLine: "asi0 · building in the open",
-    signatureAlt: "William, in profile, in the low light of an interior.",
   },
   projets: {
     heading: "My projects",
@@ -154,11 +173,32 @@ const en: Dict = {
     tabs: { livres: "Books", films: "Films", videos: "Videos" },
     empty: "Nothing here yet. Soon.",
   },
+  contact: {
+    heading: "Contact",
+    intro:
+      "An idea to connect, a question, or simply a wish to talk? Write to me wherever feels natural.",
+    direct: "The most direct path",
+    directText:
+      "For now, the simplest way is to message me on X. A wmmw.sh email address will complete this path later.",
+    directCta: "Write to me on X",
+    directEmailText:
+      "Email is the simplest way to reach me. I will reply as soon as I can.",
+    directEmailCta: "Write to me by email",
+    elsewhere: "Elsewhere in the network",
+    portraitAlt:
+      "William, aka asi0, in profile in the low light of an interior.",
+    portraitCaption: "William · asi0",
+    links: {
+      github: "Code, tools and open contributions.",
+      x: "Short notes and conversations.",
+      planb: "Bitcoin education and collective work.",
+    },
+  },
   footer: {
     thesis:
       "wmmw.sh: WilliaM Mycelic Wealth. A palindrome. What leaves the network returns to it.",
     rss: "RSS feed",
-    contactSoon: "email soon",
+    contact: "contact",
   },
   notFound: {
     output: "This page does not exist, or not yet.",
@@ -171,6 +211,8 @@ const en: Dict = {
     outils: "Free tools, like spores: agent TUI, voice dictation, browser extensions, cloud CLI.",
     ecrits: "Signals sent into the network: essays on technology, physics and what flows between the two.",
     nourritures: "What feeds me: books, films and videos. The soil everything grows from.",
+    contact:
+      "Contact William, aka asi0, and find him on GitHub, X and Plan ₿ Academy.",
     notFound: "Page not found.",
   },
   rss: {
@@ -184,6 +226,7 @@ const es: Dict = {
     projets: "Proyectos",
     outils: "Herramientas",
     ecrits: "Escritos",
+    contact: "Contacto",
     nourritures: "Alimentos",
     manifeste: "Manifiesto",
     ariaLabel: "Secciones",
@@ -206,9 +249,6 @@ const es: Dict = {
     headingGold: "Necesita micelio.",
     readMore: "Leer el manifiesto completo",
     title: "Manifiesto",
-    signature: "William",
-    signatureLine: "asi0 · construyo a cielo abierto",
-    signatureAlt: "William, de perfil, en la luz baja de un interior.",
   },
   projets: {
     heading: "Mis proyectos",
@@ -237,11 +277,32 @@ const es: Dict = {
     tabs: { livres: "Libros", films: "Películas", videos: "Vídeos" },
     empty: "Nada por ahora. Pronto.",
   },
+  contact: {
+    heading: "Contacto",
+    intro:
+      "¿Una idea que conectar, una pregunta o simplemente ganas de conversar? Escríbeme donde te resulte más natural.",
+    direct: "El camino más directo",
+    directText:
+      "Por ahora, lo más sencillo es enviarme un mensaje en X. Más adelante, una dirección wmmw.sh completará este camino.",
+    directCta: "Escribirme en X",
+    directEmailText:
+      "El correo es la forma más sencilla de contactarme. Te responderé en cuanto pueda.",
+    directEmailCta: "Escribirme por correo",
+    elsewhere: "En otros rincones de la red",
+    portraitAlt:
+      "William, alias asi0, de perfil en la luz tenue de un interior.",
+    portraitCaption: "William · asi0",
+    links: {
+      github: "Código, herramientas y contribuciones abiertas.",
+      x: "Notas breves y conversaciones.",
+      planb: "Educación sobre Bitcoin y trabajo colectivo.",
+    },
+  },
   footer: {
     thesis:
       "wmmw.sh: WilliaM Mycelic Wealth. Un palíndromo. Lo que sale de la red vuelve a ella.",
     rss: "canal RSS",
-    contactSoon: "correo pronto",
+    contact: "contacto",
   },
   notFound: {
     output: "Esta página no existe, o todavía no.",
@@ -254,6 +315,8 @@ const es: Dict = {
     outils: "Herramientas libres, como esporas: TUI para agentes, dictado por voz, extensiones, CLI cloud.",
     ecrits: "Señales enviadas a la red: ensayos sobre la técnica, la física y lo que circula entre ambas.",
     nourritures: "Lo que me nutre: libros, películas y vídeos. El suelo del que todo crece.",
+    contact:
+      "Contactar con William, alias asi0, y encontrarlo en GitHub, X y Plan ₿ Academy.",
     notFound: "Página no encontrada.",
   },
   rss: {

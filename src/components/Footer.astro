@@ -1,6 +1,6 @@
 ---
 import { type Locale, t, localePath } from "@i18n/index";
-import { GITHUB_URL, CONTACT_EMAIL } from "@lib/site";
+import { GITHUB_URL } from "@lib/site";
 
 interface Props {
   locale: Locale;
@@ -20,13 +20,7 @@ const rssHref = localePath(locale, "/rss.xml");
       <nav class="foot-links">
         <a href={GITHUB_URL} rel="me">GitHub</a>
         <a href={rssHref}>{dict.footer.rss}</a>
-        {
-          CONTACT_EMAIL ? (
-            <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-          ) : (
-            <span class="soon">{dict.footer.contactSoon}</span>
-          )
-        }
+        <a href={localePath(locale, "/contact")}>{dict.footer.contact}</a>
       </nav>
     </div>
   </div>
@@ -74,10 +68,6 @@ const rssHref = localePath(locale, "/rss.xml");
   .foot-links a:focus-visible {
     color: var(--accent);
     border-color: var(--accent);
-  }
-  .foot-links .soon {
-    color: var(--ink-3);
-    font-size: var(--fs-small);
   }
   :global(html.anim) .foot-links a {
     transition:

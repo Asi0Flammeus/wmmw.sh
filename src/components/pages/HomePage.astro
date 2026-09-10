@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import { type Locale, t, localePath, isoDate } from "@i18n/index";
-import { SITE_URL, GITHUB_URL } from "@lib/site";
+import { SITE_URL, GITHUB_URL, X_URL, PLANB_URL } from "@lib/site";
 import { publishedWritings, baseSlug } from "@lib/writings";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
@@ -26,7 +26,7 @@ const jsonLd = {
   name: "William",
   alternateName: "asi0",
   url: SITE_URL,
-  sameAs: [GITHUB_URL],
+  sameAs: [GITHUB_URL, X_URL, PLANB_URL],
 };
 
 /**
