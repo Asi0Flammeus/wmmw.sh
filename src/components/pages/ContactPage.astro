@@ -59,7 +59,6 @@ const links = [
           sizes="(max-width: 760px) 82vw, 38vw"
           loading="lazy"
         />
-        <figcaption>{dict.contact.portraitCaption}</figcaption>
       </figure>
 
       <div class="contact-copy">
@@ -73,25 +72,25 @@ const links = [
             <span aria-hidden="true">↗</span>
           </a>
         </section>
-
-        <section class="network reveal" aria-labelledby="network-heading">
-          <h2 id="network-heading">{dict.contact.elsewhere}</h2>
-          <div class="link-list">
-            {
-              links.map((link) => (
-                <a class="network-link" href={link.href} rel="me noopener">
-                  <span class="link-identity">
-                    <strong>{link.label}</strong>
-                    <span class="handle">{link.handle}</span>
-                  </span>
-                  <span class="link-description">{link.description}</span>
-                  <span class="external" aria-hidden="true">↗</span>
-                </a>
-              ))
-            }
-          </div>
-        </section>
       </div>
+
+      <section class="network reveal" aria-labelledby="network-heading">
+        <h2 id="network-heading">{dict.contact.elsewhere}</h2>
+        <div class="link-list">
+          {
+            links.map((link) => (
+              <a class="network-link" href={link.href} rel="me noopener">
+                <span class="link-identity">
+                  <strong>{link.label}</strong>
+                  <span class="handle">{link.handle}</span>
+                </span>
+                <span class="link-description">{link.description}</span>
+                <span class="external" aria-hidden="true">↗</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
     </div>
   </section>
 </BaseLayout>
@@ -104,34 +103,35 @@ const links = [
   .contact-layout {
     display: grid;
     grid-template-columns: minmax(17rem, 0.76fr) minmax(20rem, 1.24fr);
-    gap: clamp(3rem, 8vw, 8rem);
-    align-items: start;
+    grid-template-areas:
+      "portrait copy"
+      ". network";
+    column-gap: clamp(3rem, 8vw, 8rem);
+    row-gap: clamp(3.5rem, 8vw, 6rem);
+    align-items: stretch;
   }
 
   .portrait {
-    position: sticky;
-    top: 2rem;
+    grid-area: portrait;
+    position: relative;
+    min-height: 0;
     margin: 0;
+    overflow: hidden;
+    border-radius: var(--r-tile);
   }
 
   .portrait-image {
-    display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    aspect-ratio: 4 / 5;
+    height: 100%;
     object-fit: cover;
     object-position: 50% 25%;
-    border-radius: var(--r-tile);
     filter: saturate(0.78) contrast(1.04);
   }
 
-  .portrait figcaption {
-    margin-top: 0.8rem;
-    font-family: var(--mono);
-    font-size: var(--fs-meta);
-    color: var(--ink-3);
-  }
-
   .contact-copy {
+    grid-area: copy;
     padding-top: clamp(0rem, 4vw, 3.5rem);
   }
 
@@ -187,7 +187,7 @@ const links = [
   }
 
   .network {
-    margin-top: clamp(3.5rem, 8vw, 6rem);
+    grid-area: network;
   }
 
   .link-list {
@@ -263,12 +263,16 @@ const links = [
   @media (max-width: 760px) {
     .contact-layout {
       grid-template-columns: 1fr;
+      grid-template-areas:
+        "portrait"
+        "copy"
+        "network";
       gap: 2.8rem;
     }
 
     .portrait {
-      position: static;
       width: min(82vw, 25rem);
+      aspect-ratio: 4 / 5;
     }
 
     .contact-copy {
