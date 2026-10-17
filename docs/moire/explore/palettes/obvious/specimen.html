@@ -1,0 +1,133 @@
+<!doctype html><html><head><meta charset="utf-8"><title>obvious centers (to avoid) palettes</title>
+<style>
+@font-face{font-family:Bast;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/public/fonts/basteleur-moonlight.woff2) format("woff2");font-weight:400}
+@font-face{font-family:Bast;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/public/fonts/basteleur-bold.woff2) format("woff2");font-weight:700}
+@font-face{font-family:JBM;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2) format("woff2");font-weight:100 800}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:system-ui,sans-serif;padding:24px;color:#111}
+.pal{margin:0 0 28px;background:#ddd;padding:16px;border-radius:8px;width:1520px}
+.pal h3{font:600 16px/1.3 system-ui}.pal p.story{font:13px/1.45 system-ui;max-width:1400px;margin:4px 0 12px;color:#333}
+.pair{display:flex;gap:16px}
+.mock{position:relative;overflow:hidden;width:736px;height:560px;background:var(--bg);color:var(--ink);border-radius:6px;padding:22px 30px;font-family:JBM,monospace;font-size:13px}
+.fringe{position:absolute;right:-120px;top:-60px;width:520px;height:420px;pointer-events:none;opacity:1;
+ background:
+  repeating-radial-gradient(circle at 62% 38%, var(--fringe) 0 1.2px, transparent 1.2px 5px),
+  repeating-radial-gradient(circle at 70% 44%, var(--fringe) 0 1.2px, transparent 1.2px 5px);
+ -webkit-mask:radial-gradient(closest-side,#000 40%,transparent);mask:radial-gradient(closest-side,#000 40%,transparent)}
+header{position:relative;display:flex;align-items:center;gap:22px;font-size:12px}
+.wm{font-weight:700;color:var(--ink)}nav{display:flex;gap:16px;margin-left:auto}nav a{color:var(--ink-2)}nav a.cur{color:var(--ink);border-bottom:1px solid var(--accent)}
+.tog{width:26px;height:26px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--ink-2)}
+.hero{position:relative;margin-top:44px}
+h1{font-family:Bast,serif;font-weight:400;font-size:58px;line-height:1.05;letter-spacing:-.01em;color:var(--ink)}
+.sub{font-family:system-ui,sans-serif;font-size:19px;margin-top:12px;color:var(--ink)}
+.aside{margin-top:8px;font-size:12px;color:var(--ink-3)}
+.run{position:relative;margin-top:30px}
+h2{font-family:Bast,serif;font-weight:400;font-size:20px;margin-bottom:6px;color:var(--ink)}
+.row{display:grid;grid-template-columns:150px 1fr 20px;gap:12px;padding:8px 10px;margin:0 -10px;border-top:1px solid var(--line);color:var(--ink-2);font-size:12.5px;border-radius:4px}
+.row b{color:var(--ink);font-weight:600}.row i{font-style:normal;color:var(--accent-text)}
+.row.hov{background:var(--surface)}.row.hov b{color:var(--accent-text)}
+.foot{position:relative;margin-top:20px}
+.body{font-family:system-ui,sans-serif;font-size:14.5px;line-height:1.55;max-width:56ch;color:var(--ink-2)}
+.acts{display:flex;align-items:center;gap:14px;margin-top:14px}
+.cta{background:var(--accent);color:var(--on-accent);padding:8px 16px;border-radius:999px;font-weight:600}
+.ghost{color:var(--accent-text);text-decoration:underline;text-underline-offset:3px}
+.focus{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+.meta{margin-left:auto;color:var(--ink-3);font-size:11.5px}
+.sw{display:flex;gap:4px;margin-top:8px}.sw span{width:40px;height:16px;border-radius:3px;border:1px solid #0002}
+</style></head><body>
+
+<div class="pal" id="p-G1">
+  <h3>G1 · First guess: humus + gold / paper + ochre (current site + mockup A)</h3>
+  <p class="story">The center of the first guess: warm earth dark with bone text and a gold accent, and its paper twin with ink and ochre. This is today's wmmw.sh. The final palette must NOT sit here.</p>
+  <div class="pair">
+<div class="mock" style="--bg:#f1f2ea;--surface:#e7e8dd;--ink:#20281d;--ink-2:#4f5145;--ink-3:#5c5a4e;--line:rgba(32,40,29,.14);--accent:#b5832f;--accent-text:#8a5a12;--on-accent:#1a1408;--fringe:rgba(32,40,29,.09);--focus:#8a5a12;">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:#12100d;--surface:#1a1712;--ink:#e8e2d5;--ink-2:#b6ae9e;--ink-3:#8d8472;--line:rgba(232,226,213,.14);--accent:#d9a24a;--accent-text:#d9a24a;--on-accent:#1a1206;--fringe:rgba(232,226,213,.07);--focus:#d9a24a;">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:#f1f2ea"></span><span title="light surface" style="background:#e7e8dd"></span><span title="light ink" style="background:#20281d"></span><span title="light ink-2" style="background:#4f5145"></span><span title="light ink-3" style="background:#5c5a4e"></span><span title="light accent" style="background:#b5832f"></span><span title="light accent-text" style="background:#8a5a12"></span><span title="light fringe" style="background:rgba(32,40,29,.09)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:#12100d"></span><span title="dark surface" style="background:#1a1712"></span><span title="dark ink" style="background:#e8e2d5"></span><span title="dark ink-2" style="background:#b6ae9e"></span><span title="dark ink-3" style="background:#8d8472"></span><span title="dark accent" style="background:#d9a24a"></span><span title="dark accent-text" style="background:#d9a24a"></span><span title="dark fringe" style="background:rgba(232,226,213,.07)"></span></div>
+</div>
+<div class="pal" id="p-G2">
+  <h3>G2 · Second guess: ink navy + cream + cobalt / op-art black-white + signal</h3>
+  <p class="story">The center of the second guess: deep ink blue with cream text and an electric cobalt accent, the default 'serious creative technologist' look. The final palette must NOT sit here either.</p>
+  <div class="pair">
+<div class="mock" style="--bg:#f6f3ec;--surface:#ece8de;--ink:#141a2e;--ink-2:#3d4459;--ink-3:#5a6075;--line:rgba(20,26,46,.14);--accent:#2747d6;--accent-text:#2342c8;--on-accent:#ffffff;--fringe:rgba(20,26,46,.09);--focus:#2747d6;">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:#0e1220;--surface:#161b2c;--ink:#ece8de;--ink-2:#b3b4be;--ink-3:#8b8fa0;--line:rgba(236,232,222,.14);--accent:#6f8cff;--accent-text:#8aa2ff;--on-accent:#0b1030;--fringe:rgba(236,232,222,.07);--focus:#8aa2ff;">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:#f6f3ec"></span><span title="light surface" style="background:#ece8de"></span><span title="light ink" style="background:#141a2e"></span><span title="light ink-2" style="background:#3d4459"></span><span title="light ink-3" style="background:#5a6075"></span><span title="light accent" style="background:#2747d6"></span><span title="light accent-text" style="background:#2342c8"></span><span title="light fringe" style="background:rgba(20,26,46,.09)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:#0e1220"></span><span title="dark surface" style="background:#161b2c"></span><span title="dark ink" style="background:#ece8de"></span><span title="dark ink-2" style="background:#b3b4be"></span><span title="dark ink-3" style="background:#8b8fa0"></span><span title="dark accent" style="background:#6f8cff"></span><span title="dark accent-text" style="background:#8aa2ff"></span><span title="dark fringe" style="background:rgba(236,232,222,.07)"></span></div>
+</div>
+</body></html>

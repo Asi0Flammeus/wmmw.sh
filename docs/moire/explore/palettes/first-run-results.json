@@ -1,0 +1,170 @@
+[
+ {
+  "lens": "print: instruments, print and editorial",
+  "palettes": [
+   {
+    "id": "PRINT4",
+    "name": "Tableau noir",
+    "story": "The physicist's oldest instrument: the green slate board, chalk dust, and one stick of lemon chalk for what matters. In dark mode the page is the board. In light mode the page is paper, and the only board left is the button, written on in chalk. Equations get worked out in the open, in front of everyone.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/PRINT4.png",
+    "allContrastPass": true,
+    "selfScore": 8.2,
+    "whyNotObvious": "Blackboard green with lemon chalk: a cold, saturated slate and a yellow that leans green. Not humus and gold, not sage and terracotta.",
+    "selfCritique": "The strongest atmosphere of the five, and the most instantly 'physicist' without any terminal cosplay. Dark (bg #12221b, ink 13.7:1, lemon #ece280) is calm for long reading, and the chalk-line fringe is the most refined corner of the set. Light mode is the clever part: the CTA is a slate pill with lemon text (9.5:1), so the chalk shows up in both modes. Risks: (1) in light mode the accent is nearly as dark as the ink, so links depend on the slate-green tint (#1e604a) plus an underline; (2) someone reading quickly could take the lemon for G1 gold. Keep it at hue 103 or higher and never let it drift warm; (3) the light ink is neutral graphite on purpose, because a green-black ink would land on G1's sous-bois #20281d."
+   },
+   {
+    "id": "PRINT1",
+    "name": "Teinte sensible",
+    "story": "Pencil graphite on neutral paper, plus one ink: first-order red, the magenta a physicist sees through a gypsum plate between crossed polarisers. It is white light minus green, a colour with no wavelength of its own, and the slightest shift in path difference flips it to blue or yellow. Small shift, large visible change: the moiré promise, as a colour.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/PRINT1.png",
+    "allContrastPass": true,
+    "selfScore": 8,
+    "whyNotObvious": "Neutral graphite with a cool magenta ink: no earth, no gold, no navy, no cobalt.",
+    "selfCritique": "The best story of the five: a real interference colour, and a colour that belongs to neither layer, which is the brand idea itself. Light mode is the hero: crisp graphite (13.7:1) on barely warm paper, a magenta CTA (#b5297b, 5.6:1 on-accent), and a faint pink tint in the fringe that reads as the sensitive tint. Dark mode works but is the more generic half: graphite plus hot pink can remind people of developer themes such as Dracula. I pulled the dark accent down from candy pink to a deeper fuchsia (#dc52a0), but it still needs restraint in use: CTA and focus only, with link text kept sparing. Magenta also needs care next to Basteleur so it doesn't go playful."
+   },
+   {
+    "id": "PRINT3",
+    "name": "Vert-de-gris",
+    "story": "Copper is what carries the current. Left in the air, it grows verdigris, the blue-green salt of old domes, roofs and lab fittings. The page is pewter, the accent is the patina, and the moiré lines stay copper underneath: what circulates changes colour and stays the same metal.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/PRINT3.png",
+    "allContrastPass": true,
+    "selfScore": 7.5,
+    "whyNotObvious": "A cool blue-green patina on pewter grey, with copper only as a hairline: no humus, no cream, no sage, no navy.",
+    "selfCritique": "The calmest and most professional of the five, and the most comfortable for long reading (cool, low-chroma grounds, ink 13.6 and 14.1:1). The copper fringe is a lovely hidden warm note in light mode and almost invisible in dark mode, which is correct for the moiré budget. Weakness: teal on grey is a familiar health and fintech look, so the brand character depends on the copper detail surviving into production. Warmth is low overall. Its dark CTA (#4ab8b5) also sits in the same family as PRINT5's dark mint, though the grounds tell them apart."
+   },
+   {
+    "id": "PRINT5",
+    "name": "Deux encres",
+    "story": "A risograph prints one drum per ink, and two slightly misregistered screens make the moiré printers fight. Two Riso inks, Plum and Mint, swap roles between modes: plum printed on mint stock by day, mint printed on a plum ground by night, and whichever one is the ink is the accent. Two layers, a third pattern, never separate.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/PRINT5.png",
+    "allContrastPass": true,
+    "selfScore": 7,
+    "whyNotObvious": "A coloured ground in both modes, warm plum against cool mint: no neutral paper, no earth, no navy.",
+    "selfCritique": "Structurally the most original: light and dark are related by construction, as the same two inks with their roles swapped. That fits 'Distinct, jamais séparé' perfectly and gives the most whimsy. It is also the riskiest for 'calm professional'. The mint stock reads slightly sweet, and the aubergine night (#1d131e) is moody for long reading, even after I dropped its chroma to 0.026. The accent changes hue between modes (plum by day, mint by night). That follows from the concept, but some people will see two brands. Best suited to an owner who wants playful riso warmth over sober precision."
+   },
+   {
+    "id": "PRINT2",
+    "name": "Encre violette",
+    "story": "The French school notebook: Seyès paper with its violet lines and blue interlines, written on in the methyl violet ink French classrooms used for a century. The dark side is the carbon sheet underneath. It is where a physicist first wrote equations by hand. The ruling is already a grating: here the moiré is drawn in the blue interline colour, and the ink stays violet.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/PRINT2.png",
+    "allContrastPass": true,
+    "selfScore": 6.5,
+    "whyNotObvious": "Violet ink on cool ruled white and a violet carbon grey: a red-leaning ink, far from indigo grounds and cobalt signals.",
+    "selfCritique": "It has a personal French story (Seyès, encre violette) and a good scholarly light mode (violet-black ink 13.6:1, deep violet CTA #693cab). The blue-interline fringe beside the violet ink is a nice two-hue detail. It is the weakest of the set, though. Its structure matches PRINT1 (near-neutral ground plus one purple-family accent), the dark lavender CTA can read like a Twitch or Notion purple, and a cool ground with a blue-violet accent is the nearest of the five to G2. Keep it as a reference for the Seyès fringe idea rather than as a finalist."
+   }
+  ],
+  "notes": "I made five palettes in PRINT1 to PRINT5 under docs/moire/explore/palettes/print/. All five pass every contrast pair in both modes (0 FAIL in contrast.txt), and every colour is inside sRGB. The list above is ranked best first; the ids keep their original numbering.\n\nMy pick from this lens is PRINT4 Tableau noir, with PRINT1 Teinte sensible as the runner-up. Neither is in the G1 or G2 centre. PRINT4 has the strongest physicist image and the best dark mode. PRINT1 has the best concept: a colour that belongs to neither layer.\n\nFiles (all in /data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/print/):\n- palettes.json (tokens for both modes, in oklch)\n- PRINT1.png to PRINT5.png\n- contrast.txt\n- specimen.html\n\nContrast in every palette:\n- Ink on bg is 13.5 to 14.8:1 in both modes (never 21:1).\n- ink-2 is 7.3:1 or more.\n- ink-3 is 4.8:1 or more on surface.\n- accent-text is 5.3:1 or more on surface.\n- on-accent is 5.2:1 or more.\n- Light bgs are L 0.965 to 0.972; dark bgs are L 0.195 to 0.235 (no pure white, no pure black).\n\nHow I got here:\n- **First round.** PRINT4 started as 'Lissajous' (oscilloscope phosphor emerald on graphite). It looked like a green success button and was close to the rejected terminal direction (R1), so I replaced it with Tableau noir. I first gave Tableau noir a green-black light ink, then made it neutral graphite because the green version landed on G1's light ink (#20281d).\n- **Second round, per palette:**\n  - PRINT1: dark accent moved from candy pink to a deeper fuchsia; dark ground moved to pencil-lead graphite.\n  - PRINT2: the 'ardoise' dark became a violet carbon sheet so it doesn't overlap PRINT4's board; its fringe is now drawn in the Seyès blue interline colour.\n  - PRINT3: fixed out-of-gamut values; deepened the light accent so on-accent goes from 4.85 to 5.5:1; deepened the dark verdigris so it doesn't merge with PRINT5's mint.\n  - PRINT5: calmer chroma on both grounds; paler, brighter dark mint.\n- **Fringe corners.** I checked them on a separate sheet of close crops. All are subtle and refined. The best are PRINT4's chalk lines and PRINT3's copper lines.\n\nRemaining issues:\n- Hue space is tight once G1 and G2 are excluded. Yellow and orange can't be an accent in light mode (it can't reach 3:1 on near-white), blue is G2, and red or orange is the G2 op-art signal. So the five sit in magenta, violet, plum and mint, verdigris, and slate with lemon. PRINT1 and PRINT2 share a structure, and PRINT3 and PRINT5 have similar dark CTAs.\n- The shared mock puts the fringe behind the hero text ('oiré'). That breaks dossier rule P3 in production; it comes from the template, not from these palettes.\n\nReferences I used:\n- First-order red (sensitive tint): about 530 to 550 nm retardation; white light minus green; it shifts to cyan or yellow with tiny path changes (NIST OSAC glossary, DoITPoMS tint plates, Evident first-order plate primer).\n- Riso ink values from the riso-colors package (scraped from stencil.wiki): Plum #845991, Mint #82d8d5, Sea Foam #62c2b1, Teal #00838a, Lagoon #2f6165, Fluorescent Pink #ff48b0, Violet #9d7ad2, Copper #bd6439.\n- Seyès ruling: red margin, violet writing lines, blue interlines (Clairefontaine product spec).\n- Verdigris as the patina of copper, the conductor, ties to « Faisons circuler ».\n- Blackboard green with lemon chalk as the iconic physics desk.\n- Cruz-Diez Physichromie (from the research file) for colour that emerges between layers."
+ },
+ {
+  "lens": "optics and interference (thin films, polarisation colours, labradorescence, AR coatings, photopic peak, dichroic glass)",
+  "notes": "Deliverables are all in /data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/: palettes.json (token contract, light and dark for each palette), OPTICS1.png to OPTICS5.png, contrast.txt (0 FAIL and no out-of-gamut warnings) and specimen.html. Every colour is oklch. Ink sits at 12.8 to 13.2:1 on bg everywhere except OPTICS3, which deliberately runs at 11.5:1 for low glare. ink-2 is 7.0 to 8.0:1 and ink-3 is 4.8 to 5.1:1, and also passes on surface. I deleted my scratch scripts. Nothing outside the folder was touched.\n\nResearch notes (the real physics behind each pick):\n- Michel-Levy / Newton interference scale: first-order red near 530 to 550 nm is the most sensitive point on the chart. A small change in retardation shifts it towards blue or yellow, which is why mineralogists use it as a tint plate. Sources: FSU Microscopy Primer, NIST/OSAC glossary, McCrone.\n- Anodised titanium: it runs bronze, then purple, then blue, then silver, then gold to rose, with a narrow pink band near 62 V that changes with viewing angle, then purple, teal, green and lime. Thin-film physics never produces red (Monster Bolts chart, knifemaker forums).\n- Labradorescence: lamellae under 200 nm inside the feldspar interfere. The flashes are mostly blue, also green, gold and violet, on a dark grey or black body (GIA).\n- Anti-reflection coatings: a quarter-wave MgF2 layer tuned to about 550 nm leaves a purple-magenta residual reflection. Multilayer coatings usually leave green (HyperPhysics, USPTO lens-coating patents).\n- Soap films: colour follows thickness. At the very thinnest the film turns black, Newton's black film (UNSW, LibreTexts).\n- The eye is most sensitive at 555 nm, a yellow-green (CIE V(lambda)).\n- Lycurgus cup: gold and silver nanoparticles make it jade in reflected light and ruby in transmitted light. Strictly this is plasmonic dichroism, not thin-film interference. I put it under the brief's \"dichroic glass\" and say so in its critique.\n\nMethod: I solved lightness per token against target ratios, then rendered and looked. I did three full revision passes:\n- OPTICS1 dark: the pastel candy-pink became a saturated orchid.\n- OPTICS2: the cyan pastel became one petrol fill used identically in both modes, and the cold light ground became warm-neutral.\n- OPTICS3: success-green became sea green on a low-glare structure with magenta reserved for focus.\n- OPTICS5: the salmon-on-wine dark mode became ruby on jade-black, so light and dark read as siblings.\nI also checked the fringe corners zoomed 2x in both modes. All read as faint and refined, and OPTICS1's orchid fringe in dark is the nicest.\n\nRanking and recommendation:\n1. OPTICS5 Lycurgus: warmest, most memorable, strongest sibling logic (jade ground, ruby constant).\n2. OPTICS1 Teinte sensible: the most direct moiré story, since a tiny shift gives a big visible change, and the most unexpected light mode.\n3. OPTICS4 555 nm: the sharpest, with a distinctive inverted CTA.\n4. OPTICS2 Labradorite: calm and safe.\n5. OPTICS3 Antireflet: the best comfort story, the weakest identity.\nFor convergence I would take OPTICS5 or OPTICS1 forward.\n\nImplementer note: the shared mock draws the fringe under the hero text. Dossier rule P3 forbids that. It is a property of the mock, not of these palettes.\n\nSources: https://micro.magnet.fsu.edu/primer/java/polarizedlight/michellevy/index.html ; https://www.nist.gov/glossary-term/37641 ; https://www.mccrone.com/wp-content/uploads/2020/10/Using-the-Michel-Levy-Chart.pdf ; https://monsterbolts.com/pages/anodized-titanium-color-chart ; https://www.gia.edu/articles/gems-gemology-summary-guide-to-phenomenal-gems ; https://hyperphysics.gsu.edu/hbase/phyopt/antiref.html ; https://patents.google.com/patent/US7452076 ; https://animations.physics.unsw.edu.au/jw/light/thin-film-interference-and-reflections.html ; https://en.wikipedia.org/wiki/Thin-film_interference",
+  "palettes": [
+   {
+    "id": "OPTICS5",
+    "name": "Lycurgus",
+    "story": "The Lycurgus cup, Roman glass from the 4th century, holds gold and silver nanoparticles: lit from the front it looks jade, lit from behind it glows ruby. One material, two colours, decided only by the relation between light and viewer. Jade-grey glass by day, jade-black glass by night, and a single ruby fill as the constant.",
+    "whyNotObvious": "Jade glass and rubine are a dichroic pair from neither guess. There is no umber, gold, cream or navy, and the red is a deep rubine (hue about 5) on green-tinted glass, not a signal red on black and white.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/OPTICS5.png",
+    "allContrastPass": true,
+    "selfScore": 8.3,
+    "selfCritique": "The warmest and most memorable of the set. The jade-black ink with a ruby seal feels crafted rather than picked, the jade fringe is refined in both modes, and light and dark are clearly one identity. Risks: the colour comes from plasmonic dichroism, not thin-film interference, so the physics story should say that honestly. The ruby has to stay deep and pink-leaning or it starts to read as an alert red. Red and green are complements, so the ground has to stay low-chroma or it turns festive. The dark ruby pill sits at 3.4:1 on bg, enough but quiet."
+   },
+   {
+    "id": "OPTICS1",
+    "name": "Teinte sensible",
+    "story": "Under a polarising microscope, the first-order red near 550 nm is the most sensitive tint of the whole interference scale: a few nanometres of shift flip it to blue or to yellow. William Moiré works the same way, small precise interventions with an outsized visible effect. A quiet lilac-grey quartz page carries one red-violet signal, plum ink by day and orchid light by night.",
+    "whyNotObvious": "Red-violet on lilac-grey quartz has no umber, no gold, no navy and no cobalt. The warmth comes from a hue neither guess touches.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/OPTICS1.png",
+    "allContrastPass": true,
+    "selfScore": 8,
+    "selfCritique": "The most direct tie to the moiré idea, since a tiny shift gives a large visible change. The light mode is the most unexpected and refined page in the set. Risks: red-violet can read as beauty or wellness, and it drifts towards the generic AI purple if the chroma or hue creeps towards 300. The dark orchid pill is the loudest element, so it must stay the single CTA. The ink and paper are slightly tinted, so check them with a long-form reading sample."
+   },
+   {
+    "id": "OPTICS4",
+    "name": "555 nm",
+    "story": "The human eye is most sensitive at 555 nm, a yellow-green: the colour that needs the least light to be seen. William Moiré uses it the way an instrument would, a graphite ground with one luminous signal: a lacquered dark button with a chartreuse label by day, a lit chartreuse button by night. Sharp and exact, and a little whimsical once you know why.",
+    "whyNotObvious": "Chartreuse on neutral graphite, with the CTA inverted between modes. There is no warm earth and no blue at all: the opposite temperature and structure of both guesses.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/OPTICS4.png",
+    "allContrastPass": true,
+    "selfScore": 7.5,
+    "selfCritique": "The sharpest and most professional-instrument feel, with a distinctive structure: dark lacquer plus a chartreuse label in light mode, a lit chartreuse fill in dark. Risks: acid lime is a current tech-brand trend, and the dark pill is close to loud. The light-mode link colour has to be olive (oklch 0.48 0.12 125) to pass contrast, which is less elegant than the chartreuse itself. Chartreuse with mono type must never slide towards terminal green (rejection R1)."
+   },
+   {
+    "id": "OPTICS2",
+    "name": "Labradorite",
+    "story": "Labradorite is a plain grey stone that flashes peacock blue-green when light meets its lamellae, layers thinner than 200 nm interfering inside the crystal. The site is the stone: warm-neutral grey by day, graphite by night, and one petrol flash that keeps exactly the same fill in both modes. Two layers, and a colour that only exists between them.",
+    "whyNotObvious": "A green-leaning petrol on warm-neutral grey and graphite. There is no cream, no umber and no navy ground, and the accent sits about 55 degrees of hue away from cobalt.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/OPTICS2.png",
+    "allContrastPass": true,
+    "selfScore": 7,
+    "selfCritique": "The calmest and most serious-consultant option, and the tightest sibling link because the same oklch(0.52 0.09 212) fill is used in both modes. Weaknesses: petrol teal is a familiar calm-tech choice, so it surprises least. The dark pill at 3.4:1 reads a little heavy, and without the story the palette lacks warmth."
+   },
+   {
+    "id": "OPTICS3",
+    "name": "Antireflet",
+    "story": "An anti-reflection coating is interference used for comfort: a quarter-wave layer cancels the glare, and all that is left is a faint sea-green sheen with a magenta edge. This palette is built for long reading, with a dimmed grey-card page, a lifted night instead of black, ink near 11.5:1, sea-green actions and the magenta residue kept for focus rings and the moiré. Expertise you feel as the absence of strain.",
+    "whyNotObvious": "Sea green plus a magenta residue on a dimmed neutral grey: not sage, cream or terracotta. Its low-glare structure (dimmed page, lifted night, raised rows lighter than the page) differs from both guesses.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/optics/OPTICS3.png",
+    "allContrastPass": true,
+    "selfScore": 6.5,
+    "selfCritique": "The best for eye comfort, and it has the most useful story for the owner's 'not eye-tiring' brief. Using magenta for focus rings is a smart two-hue touch. Weaknesses: a green CTA still hints at a success button, so the identity is the quietest of the five. The magenta fringe almost disappears in dark mode. The ink-3 margin is the thinnest in the set (4.8:1 on the light bg)."
+   }
+  ]
+ },
+ {
+  "lens": "spore prints, lichen and mineral",
+  "palettes": [
+   {
+    "id": "SPORE1",
+    "name": "Strophaire vert-de-gris",
+    "story": "One mushroom holds the whole palette: the verdigris agaric (Stropharia aeruginosa) has a blue-green cap, purple-grey gills and a purple-brown spore print. The page is the gill, the text is the spore print, and the verdigris accent is the cap, the one part that catches the eye. Distinct parts, one organism: the brand idea in a single species.",
+    "whyNotObvious": "Violet-taupe neutrals with a cool blue-green accent: no umber, no gold, no navy, and verdigris sits between cobalt and sage without being either.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/SPORE1.png",
+    "allContrastPass": true,
+    "selfScore": 8.5,
+    "selfCritique": "Strongest of the five and my recommendation to converge on. The purple-brown ink (13.3:1 light, 13.9:1 dark) is warm without being earthy, and the mauve paper is calm for long reading. The verdigris pill on the purple-black dark mode really sings. Light and dark clearly read as one organism. Weak spot: the light-mode verdigris fill has to sit at L 0.50 to carry white text, so it reads as a deep patina rather than bright verdigris, and close to a generic teal button. Keep it rare (one CTA plus focus). The verdigris fringe at 0.09 in light gives a faint blue-grey moiré that looks refined."
+   },
+   {
+    "id": "SPORE4",
+    "name": "Érythrite",
+    "story": "Erythrite (cobalt bloom, crimson) and annabergite (nickel bloom, pale green) are the two ends of one continuous mineral series: swap cobalt for nickel atom by atom and the colour slides from one to the other. The paper is the nickel end, the action is the cobalt end, and every page lives in between. Distinct, never separate, written in chemistry.",
+    "whyNotObvious": "Pale green-grey paper and teal-graphite night with a cool crimson accent: not earthy, not navy, and the sage-cream-terracotta trio loses both its cream and its warm clay red.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/SPORE4.png",
+    "allContrastPass": true,
+    "selfScore": 8,
+    "selfCritique": "Fresh, mineral and sharp. Revised once: the first dark mode used a bubblegum pink pill on teal-black, which looked synthwave. It now uses a deep crimson fill with near-white text (4.85:1) and pale pink for links, so the CTA matches across modes. Risks: on a quick glance the pale celadon paper could be filed under 'sage'. On-accent in dark is the tightest pair in the set (4.85). The magenta-crimson needs discipline: one fill per screen."
+   },
+   {
+    "id": "SPORE3",
+    "name": "Lichen géographique",
+    "story": "The map lichen (Rhizocarpon geographicum) tiles Alpine schist in yellow-green, each colony fenced by a black line of fungal threads, and geologists date moraines by measuring it. A fungus and an alga living as a third organism, read with a ruler: interdependence and precision on the same stone, in the mountains above Chambéry. The chartreuse only ever sits on slate, so in light mode the button is a stone carrying lichen, and in dark mode the whole page is the stone.",
+    "whyNotObvious": "Slate and acid chartreuse are mineral and cold-bright, nowhere near humus and gold or ink and cobalt, and the button that inverts between modes (W into M) is a structure neither guess has.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/SPORE3.png",
+    "allContrastPass": true,
+    "selfScore": 7.5,
+    "selfCritique": "The dark mode is excellent: chartreuse on teal-slate, the sharpest and most 'expert' feel in the set. The first light mode used an olive-lime fill, which was muddy and military. I restructured it so the CTA is a slate stone with a chartreuse label (10.7:1), which is crisp and inverts the dark CTA. Remaining weaknesses: the light page is cool and slightly clinical, and links have to be olive (5.8:1) because chartreuse cannot be text on light, which is the dullest note here. I moved the slate hue from 248 to 235 to keep it away from G2's navy night."
+   },
+   {
+    "id": "SPORE2",
+    "name": "Rhodochrosite",
+    "story": "Sliced rhodochrosite stalactites show concentric rose bands laid down by rhythmic precipitation: a natural ring grating, close kin to the hero field radiating from the accent of the é. The palette is one warm hue at every depth, blush paper, raspberry action, wine-dark night, so the warmth of the person carries the page while the physics hides in the rings.",
+    "whyNotObvious": "One rose hue family from paper to night: warm without earth, with no ochre, umber, terracotta or blue anywhere in it.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/SPORE2.png",
+    "allContrastPass": true,
+    "selfScore": 7,
+    "selfCritique": "The warmest and most human option. The light mode (raspberry on blush paper) is lovely and calm, and the wine-dark night is clearly plum, not humus. Revised once: hue pulled from 12 toward 8 and chroma lowered, because the first pass leaned toward signal red. Weaknesses: the dark blush pill is slightly sweet. Being all one hue, it carries less of the 'two layers' tension than the others, and some visitors may read rose as soft rather than precise. Best if the owner wants warmth to lead."
+   },
+   {
+    "id": "SPORE5",
+    "name": "Améthyste dans la mousse",
+    "story": "The amethyst deceiver (Laccaria amethystina) trades with beech and oak through its roots, and its violet only shows while water moves through it: dry, it fades to buff. It grows in bright moss, so violet and moss green meet on every autumn forest floor. Here the night is amethyst and the action is moss: colour that exists only in circulation, like wealth in the manifesto.",
+    "whyNotObvious": "A coloured violet night with a moss accent: not near-black humus, not ink navy, and the violet is a ground, never the AI-default purple button.",
+    "png": "/data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/SPORE5.png",
+    "allContrastPass": true,
+    "selfScore": 7,
+    "selfCritique": "The most expressive and whimsical of the five, with the best story fit for Mycelic Wealth (colour that only shows in circulation). It replaced a 'graphite plus amethyst accent' version that looked like a default purple SaaS brand. Risks: the violet night (hue moved from 298 to 312 so it reads as amethyst, not navy) still sits near purple-tech territory. It shares the paired slate-and-chartreuse button structure with SPORE3, so the two compete. The light page is close to SPORE1's mauve paper, and only the ink and button tell them apart."
+   }
+  ],
+  "notes": "Recommendation: converge on SPORE1 (Strophaire vert-de-gris), with SPORE4 (Érythrite) as runner-up. SPORE1 is the only one that is warm, precise and calm in both modes at the same time. Its whole palette comes from one real organism, which says \"distinct, never separate\" without any copy.\n\nFiles (all under /data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/spore/):\n- palettes.json: tokens in oklch, plus a top-level \"references\" block holding the research notes and the rejected directions.\n- SPORE1.png to SPORE5.png\n- contrast.txt: 110 of 110 pairs pass, no FAIL.\n- specimen.html\n- _check.mjs: a fast contrast tuner using the same maths as contrast.mjs, without spawning node per pair. Keep it or delete it.\n\nContrast levels:\n- Ink sits at 13.2 to 13.9:1 in every mode, inside the 11 to 15 target and never 21.\n- ink-2 is at least 7.05:1 everywhere.\n- ink-3 is at least 4.79:1 on surface.\n- Every colour is in sRGB gamut.\n\nProcess:\n- Draft 1 had 5 palettes.\n- Revision 1 replaced \"Olive et lilas\". Its olive paper and olive-black (#f3f2eb, #15140c) landed almost on G1's #f1f2ea and #12100d.\n- Revision 2 replaced a graphite plus amethyst version, which read as a default purple brand. It also fixed SPORE4's bubblegum dark pill and SPORE3's muddy olive light fill, and shifted the SPORE3 and SPORE5 neutral hues away from G2's navy (271 degrees).\n- Five other candidates were rendered in scratch and dropped: patina monochrome (calm but generic teal), malachite (forest green), slate plus verdigris (generic dev-theme teal), plus the two above.\n\nStructural ideas worth carrying into the final, whichever palette wins:\n- The light button can be the inverse of the dark one: ink stone with the accent as its label in light, accent fill with ink text in dark. It is a W into M mirror, and it lets acid accents like chartreuse survive light mode.\n- The fringe can use the accent hue at 0.055 to 0.09 instead of ink, which tints the moiré without adding contrast.\n\nCaveats: these are not claims about the site.\n- SPORE1 and SPORE5 light papers are close. At chroma 0.01, every light bg mostly reads as a tinted white, so the ink and the accent carry the identity.\n- The inkcap (spores as a forgery-proof signature in mushroom ink) is a great story for the manifesto or the 404, but its colours are G2's black and white.\n\nSources:\n- https://en.wikipedia.org/wiki/Stropharia_aeruginosa\n- https://www.mushroomexpert.com/stropharia_aeruginosa.html\n- https://en.wikipedia.org/wiki/Verdigris\n- https://repositoriosdigitales.mincyt.gob.ar/vufind/Record/CONICETDig_92fb81d346c9d7c6f22c99b7153aad5a\n- https://en.wikipedia.org/wiki/Rhizocarpon_geographicum\n- https://nora.nerc.ac.uk/id/eprint/10285/\n- https://en.wikipedia.org/wiki/Erythrite\n- https://zh.mindat.org/min-8601.html\n- https://www.Britannica.Com/science/erythrite\n- https://en.wikipedia.org/wiki/Xanthoria_parietina\n- https://www.newforestnpa.gov.uk/discover/plants-fungi/fungi/shaggy-inkcap/\n- https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/common-inkcap/\n- https://www.mushroomexpert.com/gilled_dark.html\n- https://www.mushroom-appreciation.com/spore-prints.html"
+ }
+]

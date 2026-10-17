@@ -1,0 +1,9 @@
+# Exploration scratch and renders: regenerable from the committed sources
+# (palettes.json -> render-palettes.mjs, specimen.html, prototype html).
+_scratch/
+_qa/
+_cand/
+_zoom/
+_rerun-draft/
+shots/
+*.png

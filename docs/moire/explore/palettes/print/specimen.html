@@ -1,0 +1,274 @@
+<!doctype html><html><head><meta charset="utf-8"><title>print: instruments, print and editorial palettes</title>
+<style>
+@font-face{font-family:Bast;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/public/fonts/basteleur-moonlight.woff2) format("woff2");font-weight:400}
+@font-face{font-family:Bast;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/public/fonts/basteleur-bold.woff2) format("woff2");font-weight:700}
+@font-face{font-family:JBM;src:url(file:///data/crqpt/repos/Asi0Flammeus/wmmw.sh/node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2) format("woff2");font-weight:100 800}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:system-ui,sans-serif;padding:24px;color:#111}
+.pal{margin:0 0 28px;background:#ddd;padding:16px;border-radius:8px;width:1520px}
+.pal h3{font:600 16px/1.3 system-ui}.pal p.story{font:13px/1.45 system-ui;max-width:1400px;margin:4px 0 12px;color:#333}
+.pair{display:flex;gap:16px}
+.mock{position:relative;overflow:hidden;width:736px;height:560px;background:var(--bg);color:var(--ink);border-radius:6px;padding:22px 30px;font-family:JBM,monospace;font-size:13px}
+.fringe{position:absolute;right:-120px;top:-60px;width:520px;height:420px;pointer-events:none;opacity:1;
+ background:
+  repeating-radial-gradient(circle at 62% 38%, var(--fringe) 0 1.2px, transparent 1.2px 5px),
+  repeating-radial-gradient(circle at 70% 44%, var(--fringe) 0 1.2px, transparent 1.2px 5px);
+ -webkit-mask:radial-gradient(closest-side,#000 40%,transparent);mask:radial-gradient(closest-side,#000 40%,transparent)}
+header{position:relative;display:flex;align-items:center;gap:22px;font-size:12px}
+.wm{font-weight:700;color:var(--ink)}nav{display:flex;gap:16px;margin-left:auto}nav a{color:var(--ink-2)}nav a.cur{color:var(--ink);border-bottom:1px solid var(--accent)}
+.tog{width:26px;height:26px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--ink-2)}
+.hero{position:relative;margin-top:44px}
+h1{font-family:Bast,serif;font-weight:400;font-size:58px;line-height:1.05;letter-spacing:-.01em;color:var(--ink)}
+.sub{font-family:system-ui,sans-serif;font-size:19px;margin-top:12px;color:var(--ink)}
+.aside{margin-top:8px;font-size:12px;color:var(--ink-3)}
+.run{position:relative;margin-top:30px}
+h2{font-family:Bast,serif;font-weight:400;font-size:20px;margin-bottom:6px;color:var(--ink)}
+.row{display:grid;grid-template-columns:150px 1fr 20px;gap:12px;padding:8px 10px;margin:0 -10px;border-top:1px solid var(--line);color:var(--ink-2);font-size:12.5px;border-radius:4px}
+.row b{color:var(--ink);font-weight:600}.row i{font-style:normal;color:var(--accent-text)}
+.row.hov{background:var(--surface)}.row.hov b{color:var(--accent-text)}
+.foot{position:relative;margin-top:20px}
+.body{font-family:system-ui,sans-serif;font-size:14.5px;line-height:1.55;max-width:56ch;color:var(--ink-2)}
+.acts{display:flex;align-items:center;gap:14px;margin-top:14px}
+.cta{background:var(--accent);color:var(--on-accent);padding:8px 16px;border-radius:999px;font-weight:600}
+.ghost{color:var(--accent-text);text-decoration:underline;text-underline-offset:3px}
+.focus{outline:2px solid var(--focus);outline-offset:3px;border-radius:3px}
+.meta{margin-left:auto;color:var(--ink-3);font-size:11.5px}
+.sw{display:flex;gap:4px;margin-top:8px}.sw span{width:40px;height:16px;border-radius:3px;border:1px solid #0002}
+</style></head><body>
+
+<div class="pal" id="p-PRINT1">
+  <h3>PRINT1 · Teinte sensible</h3>
+  <p class="story">Pencil graphite on neutral paper, plus one ink: first-order red, the magenta a physicist sees through a gypsum plate under crossed polarisers. It is white light minus green, a colour with no wavelength of its own, and the slightest shift in path difference flips it to blue or yellow. Small shift, large visible change: the moiré promise, as a colour.</p>
+  <div class="pair">
+<div class="mock" style="--bg:oklch(0.968 0.003 90);--surface:oklch(0.942 0.004 260);--ink:oklch(0.27 0.01 260);--ink-2:oklch(0.42 0.01 260);--ink-3:oklch(0.5 0.01 260);--line:oklch(0.27 0.01 260 / 0.14);--accent:oklch(0.53 0.19 350);--accent-text:oklch(0.5 0.18 350);--on-accent:oklch(0.985 0.004 350);--fringe:oklch(0.5 0.18 350 / 0.08);--focus:oklch(0.5 0.18 350);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:oklch(0.195 0.004 260);--surface:oklch(0.228 0.005 260);--ink:oklch(0.915 0.004 260);--ink-2:oklch(0.75 0.007 260);--ink-3:oklch(0.64 0.008 260);--line:oklch(0.915 0.004 260 / 0.13);--accent:oklch(0.645 0.19 349);--accent-text:oklch(0.71 0.165 351);--on-accent:oklch(0.18 0.025 349);--fringe:oklch(0.75 0.14 351 / 0.06);--focus:oklch(0.71 0.165 351);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:oklch(0.968 0.003 90)"></span><span title="light surface" style="background:oklch(0.942 0.004 260)"></span><span title="light ink" style="background:oklch(0.27 0.01 260)"></span><span title="light ink-2" style="background:oklch(0.42 0.01 260)"></span><span title="light ink-3" style="background:oklch(0.5 0.01 260)"></span><span title="light accent" style="background:oklch(0.53 0.19 350)"></span><span title="light accent-text" style="background:oklch(0.5 0.18 350)"></span><span title="light fringe" style="background:oklch(0.5 0.18 350 / 0.08)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:oklch(0.195 0.004 260)"></span><span title="dark surface" style="background:oklch(0.228 0.005 260)"></span><span title="dark ink" style="background:oklch(0.915 0.004 260)"></span><span title="dark ink-2" style="background:oklch(0.75 0.007 260)"></span><span title="dark ink-3" style="background:oklch(0.64 0.008 260)"></span><span title="dark accent" style="background:oklch(0.645 0.19 349)"></span><span title="dark accent-text" style="background:oklch(0.71 0.165 351)"></span><span title="dark fringe" style="background:oklch(0.75 0.14 351 / 0.06)"></span></div>
+</div>
+<div class="pal" id="p-PRINT2">
+  <h3>PRINT2 · Encre violette</h3>
+  <p class="story">The French school notebook: Seyès paper with its violet lines and blue interlines, written on in the methyl violet ink French classrooms used for a century; the dark side is the carbon sheet underneath. It is where a physicist first wrote equations by hand. The ruling is already a grating: here the moiré is drawn in the blue interline colour, the ink stays violet.</p>
+  <div class="pair">
+<div class="mock" style="--bg:oklch(0.972 0.006 285);--surface:oklch(0.945 0.01 290);--ink:oklch(0.28 0.03 295);--ink-2:oklch(0.43 0.03 295);--ink-3:oklch(0.51 0.025 295);--line:oklch(0.28 0.03 295 / 0.14);--accent:oklch(0.47 0.17 298);--accent-text:oklch(0.45 0.16 298);--on-accent:oklch(0.985 0.008 300);--fringe:oklch(0.55 0.12 255 / 0.09);--focus:oklch(0.45 0.16 298);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:oklch(0.2 0.018 302);--surface:oklch(0.236 0.022 302);--ink:oklch(0.92 0.008 290);--ink-2:oklch(0.76 0.014 290);--ink-3:oklch(0.645 0.016 290);--line:oklch(0.92 0.008 290 / 0.13);--accent:oklch(0.72 0.13 298);--accent-text:oklch(0.77 0.11 298);--on-accent:oklch(0.19 0.03 298);--fringe:oklch(0.75 0.08 255 / 0.06);--focus:oklch(0.77 0.11 298);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:oklch(0.972 0.006 285)"></span><span title="light surface" style="background:oklch(0.945 0.01 290)"></span><span title="light ink" style="background:oklch(0.28 0.03 295)"></span><span title="light ink-2" style="background:oklch(0.43 0.03 295)"></span><span title="light ink-3" style="background:oklch(0.51 0.025 295)"></span><span title="light accent" style="background:oklch(0.47 0.17 298)"></span><span title="light accent-text" style="background:oklch(0.45 0.16 298)"></span><span title="light fringe" style="background:oklch(0.55 0.12 255 / 0.09)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:oklch(0.2 0.018 302)"></span><span title="dark surface" style="background:oklch(0.236 0.022 302)"></span><span title="dark ink" style="background:oklch(0.92 0.008 290)"></span><span title="dark ink-2" style="background:oklch(0.76 0.014 290)"></span><span title="dark ink-3" style="background:oklch(0.645 0.016 290)"></span><span title="dark accent" style="background:oklch(0.72 0.13 298)"></span><span title="dark accent-text" style="background:oklch(0.77 0.11 298)"></span><span title="dark fringe" style="background:oklch(0.75 0.08 255 / 0.06)"></span></div>
+</div>
+<div class="pal" id="p-PRINT3">
+  <h3>PRINT3 · Vert-de-gris</h3>
+  <p class="story">Copper is what carries the current; left in the air it grows verdigris, the blue-green salt of old domes, roofs and lab fittings. The page is pewter, the accent is the patina, and the moiré lines stay copper underneath. What circulates changes colour and stays the same metal.</p>
+  <div class="pair">
+<div class="mock" style="--bg:oklch(0.966 0.004 180);--surface:oklch(0.94 0.007 185);--ink:oklch(0.27 0.018 210);--ink-2:oklch(0.43 0.02 210);--ink-3:oklch(0.51 0.02 210);--line:oklch(0.27 0.018 210 / 0.14);--accent:oklch(0.5 0.085 190);--accent-text:oklch(0.48 0.08 192);--on-accent:oklch(0.985 0.006 185);--fringe:oklch(0.6 0.13 50 / 0.09);--focus:oklch(0.48 0.08 192);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:oklch(0.2 0.012 200);--surface:oklch(0.235 0.014 200);--ink:oklch(0.915 0.01 190);--ink-2:oklch(0.76 0.016 195);--ink-3:oklch(0.64 0.018 195);--line:oklch(0.915 0.01 190 / 0.13);--accent:oklch(0.72 0.1 192);--accent-text:oklch(0.76 0.09 190);--on-accent:oklch(0.19 0.03 200);--fringe:oklch(0.72 0.12 55 / 0.07);--focus:oklch(0.76 0.09 190);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:oklch(0.966 0.004 180)"></span><span title="light surface" style="background:oklch(0.94 0.007 185)"></span><span title="light ink" style="background:oklch(0.27 0.018 210)"></span><span title="light ink-2" style="background:oklch(0.43 0.02 210)"></span><span title="light ink-3" style="background:oklch(0.51 0.02 210)"></span><span title="light accent" style="background:oklch(0.5 0.085 190)"></span><span title="light accent-text" style="background:oklch(0.48 0.08 192)"></span><span title="light fringe" style="background:oklch(0.6 0.13 50 / 0.09)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:oklch(0.2 0.012 200)"></span><span title="dark surface" style="background:oklch(0.235 0.014 200)"></span><span title="dark ink" style="background:oklch(0.915 0.01 190)"></span><span title="dark ink-2" style="background:oklch(0.76 0.016 195)"></span><span title="dark ink-3" style="background:oklch(0.64 0.018 195)"></span><span title="dark accent" style="background:oklch(0.72 0.1 192)"></span><span title="dark accent-text" style="background:oklch(0.76 0.09 190)"></span><span title="dark fringe" style="background:oklch(0.72 0.12 55 / 0.07)"></span></div>
+</div>
+<div class="pal" id="p-PRINT4">
+  <h3>PRINT4 · Tableau noir</h3>
+  <p class="story">The physicist's oldest instrument: the green slate board, chalk dust, one stick of lemon chalk for what matters. By night the page is the board; by day the page is paper and the only board left is the button, written on in chalk. Equations are worked out in the open, in front of everyone.</p>
+  <div class="pair">
+<div class="mock" style="--bg:oklch(0.967 0.003 120);--surface:oklch(0.94 0.005 140);--ink:oklch(0.27 0.01 220);--ink-2:oklch(0.42 0.012 220);--ink-3:oklch(0.5 0.012 220);--line:oklch(0.27 0.01 220 / 0.14);--accent:oklch(0.34 0.04 168);--accent-text:oklch(0.44 0.075 168);--on-accent:oklch(0.93 0.12 103);--fringe:oklch(0.34 0.04 168 / 0.08);--focus:oklch(0.44 0.075 168);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:oklch(0.235 0.026 166);--surface:oklch(0.27 0.028 166);--ink:oklch(0.935 0.006 110);--ink-2:oklch(0.785 0.012 150);--ink-3:oklch(0.675 0.016 155);--line:oklch(0.935 0.006 110 / 0.13);--accent:oklch(0.9 0.12 103);--accent-text:oklch(0.9 0.11 103);--on-accent:oklch(0.25 0.03 166);--fringe:oklch(0.935 0.01 110 / 0.06);--focus:oklch(0.9 0.11 103);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:oklch(0.967 0.003 120)"></span><span title="light surface" style="background:oklch(0.94 0.005 140)"></span><span title="light ink" style="background:oklch(0.27 0.01 220)"></span><span title="light ink-2" style="background:oklch(0.42 0.012 220)"></span><span title="light ink-3" style="background:oklch(0.5 0.012 220)"></span><span title="light accent" style="background:oklch(0.34 0.04 168)"></span><span title="light accent-text" style="background:oklch(0.44 0.075 168)"></span><span title="light fringe" style="background:oklch(0.34 0.04 168 / 0.08)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:oklch(0.235 0.026 166)"></span><span title="dark surface" style="background:oklch(0.27 0.028 166)"></span><span title="dark ink" style="background:oklch(0.935 0.006 110)"></span><span title="dark ink-2" style="background:oklch(0.785 0.012 150)"></span><span title="dark ink-3" style="background:oklch(0.675 0.016 155)"></span><span title="dark accent" style="background:oklch(0.9 0.12 103)"></span><span title="dark accent-text" style="background:oklch(0.9 0.11 103)"></span><span title="dark fringe" style="background:oklch(0.935 0.01 110 / 0.06)"></span></div>
+</div>
+<div class="pal" id="p-PRINT5">
+  <h3>PRINT5 · Deux encres</h3>
+  <p class="story">A risograph prints one drum per ink, and two slightly misregistered screens make the moiré printers fight. Two Riso inks, Plum and Mint, swap roles between modes: plum printed on mint stock by day, mint printed on a plum ground by night, and whichever is the ink is the accent. Two layers, a third pattern, never separate.</p>
+  <div class="pair">
+<div class="mock" style="--bg:oklch(0.966 0.011 180);--surface:oklch(0.938 0.016 180);--ink:oklch(0.28 0.045 325);--ink-2:oklch(0.42 0.045 325);--ink-3:oklch(0.5 0.04 325);--line:oklch(0.28 0.045 325 / 0.14);--accent:oklch(0.49 0.12 332);--accent-text:oklch(0.47 0.11 332);--on-accent:oklch(0.975 0.015 180);--fringe:oklch(0.45 0.1 325 / 0.08);--focus:oklch(0.47 0.11 332);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◐</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div>
+<div class="mock" style="--bg:oklch(0.205 0.026 325);--surface:oklch(0.24 0.03 325);--ink:oklch(0.93 0.025 180);--ink-2:oklch(0.78 0.03 180);--ink-3:oklch(0.67 0.03 180);--line:oklch(0.93 0.025 180 / 0.13);--accent:oklch(0.86 0.085 172);--accent-text:oklch(0.86 0.08 172);--on-accent:oklch(0.22 0.04 325);--fringe:oklch(0.86 0.07 172 / 0.06);--focus:oklch(0.86 0.08 172);">
+  <div class="fringe" aria-hidden="true"></div>
+  <header><span class="wm">[w]</span><nav><a>Projets</a><a>Outils</a><a class="cur">Écrits</a><a>Contact</a></nav><span class="tog">◑</span></header>
+  <section class="hero">
+    <h1>William Moiré</h1>
+    <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+    <p class="aside">Physicien de formation. Aussi connu comme asi0.</p>
+  </section>
+  <section class="run">
+    <h2>En ce moment</h2>
+    <a class="row"><b>Plan ₿ Academy</b><span>Le savoir Bitcoin, libre, dans ta langue.</span><i>↗</i></a>
+    <a class="row hov"><b>alysis</b><span>Des sites faits main pour des métiers faits main.</span><i>↗</i></a>
+    <a class="row"><b>Outils sur mesure</b><span>Un logiciel pour une seule personne.</span><i>→</i></a>
+    <a class="row"><b>Ghosts</b><span>Des agents au très long cours. Bientôt.</span><i>·</i></a>
+  </section>
+  <section class="foot">
+    <p class="body">La richesse a cinq dimensions. L'argent n'en est qu'une. Ce que je publie est libre, ce que je construis pour toi est cadré.</p>
+    <div class="acts"><a class="cta">Travailler ensemble</a><a class="ghost focus">flux RSS</a><span class="meta">2026-10-17 · écrits</span></div>
+  </section>
+</div></div>
+  <div class="sw"><span title="light bg" style="background:oklch(0.966 0.011 180)"></span><span title="light surface" style="background:oklch(0.938 0.016 180)"></span><span title="light ink" style="background:oklch(0.28 0.045 325)"></span><span title="light ink-2" style="background:oklch(0.42 0.045 325)"></span><span title="light ink-3" style="background:oklch(0.5 0.04 325)"></span><span title="light accent" style="background:oklch(0.49 0.12 332)"></span><span title="light accent-text" style="background:oklch(0.47 0.11 332)"></span><span title="light fringe" style="background:oklch(0.45 0.1 325 / 0.08)"></span>
+  &nbsp;&nbsp;<span title="dark bg" style="background:oklch(0.205 0.026 325)"></span><span title="dark surface" style="background:oklch(0.24 0.03 325)"></span><span title="dark ink" style="background:oklch(0.93 0.025 180)"></span><span title="dark ink-2" style="background:oklch(0.78 0.03 180)"></span><span title="dark ink-3" style="background:oklch(0.67 0.03 180)"></span><span title="dark accent" style="background:oklch(0.86 0.085 172)"></span><span title="dark accent-text" style="background:oklch(0.86 0.08 172)"></span><span title="dark fringe" style="background:oklch(0.86 0.07 172 / 0.06)"></span></div>
+</div>
+</body></html>

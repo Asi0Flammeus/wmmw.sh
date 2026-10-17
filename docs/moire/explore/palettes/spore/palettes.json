@@ -1,0 +1,177 @@
+{
+ "lens": "spore prints, lichen and mineral",
+ "references": {
+  "Stropharia aeruginosa (verdigris agaric)": "cap vivid blue-green fading to ochre, gills purple-grey to purple-black, spore print brownish-purple to purplish black (Wikipedia; mushroomexpert.com)",
+  "Verdigris pigment": "copper acetates, green to blue-green, reference #43B3AE (Wikipedia)",
+  "Rhodochrosite": "MnCO3, stalactite slices with concentric white to raspberry-pink bands from rhythmic precipitation, Capillitas, Argentina (CONICET study; Sotheby's listing)",
+  "Rhizocarpon geographicum (map lichen)": "yellow-green areoles from rhizocarpic acid on a black hypothallus; each colony bordered by a black line; used in lichenometry to date moraines; common on Alpine siliceous rock (Wikipedia; Bradwell 2010)",
+  "Erythrite / annabergite": "complete solid-solution series Co3(AsO4)2.8H2O to Ni3(AsO4)2.8H2O; crimson to pink (cobalt bloom) through grey to apple green (nickel bloom) (mindat; Britannica)",
+  "Laccaria amethystina (amethyst deceiver)": "ectomycorrhizal, hygrophanous: intense violet when moist, fades to buff when dry; fruits in moss and leaf litter in autumn",
+  "Spore print colours": "white, cream, pink (Entoloma, Pluteus), purple-brown (Agaricus, Hypholoma, Stropharia), rusty (Cortinarius, Gymnopilus), olive, black (inkcaps); fresh deposit read on white paper",
+  "Coprinopsis atramentaria (inkcap)": "gills autodigest to a spore-filled black ink used in the 17th and 18th centuries; suggested as forgery-proof ink (spores as hidden signature). Kept as a note, not a palette: its structure is black on white (G2 cousin)",
+  "Xanthoria parietina": "parietin, an orange anthraquinone sunscreen for its algal partner, orange in sun, greenish-yellow in shade. Rejected as accent: it lands on G1 ochre or the G2 signal orange",
+  "Rejected in exploration": "olive neutrals plus lilac (olive paper and olive-black collapse onto G1's #f1f2ea and #12100d); graphite plus amethyst accent (reads as default purple brand); malachite monochrome (forest green); slate plus verdigris (generic dev-theme teal); patina monochrome (calm but generic)"
+ },
+ "palettes": [
+  {
+   "id": "SPORE1",
+   "name": "Strophaire vert-de-gris",
+   "story": "One mushroom holds the whole palette: the verdigris agaric (Stropharia aeruginosa) has a blue-green cap, purple-grey gills and a purple-brown spore print. The page is the gill, the text is the spore print, and the verdigris accent is the cap, the one part that catches the eye. Distinct parts, one organism: the brand idea in a single species.",
+   "whyNotObvious": "Violet-taupe neutrals with a cool blue-green accent: no umber, no gold, no navy, and verdigris sits between cobalt and sage without being either.",
+   "light": {
+    "bg": "oklch(0.958 0.010 335)",
+    "surface": "oklch(0.930 0.013 335)",
+    "ink": "oklch(0.275 0.035 348)",
+    "ink-2": "oklch(0.43 0.030 345)",
+    "ink-3": "oklch(0.50 0.025 340)",
+    "line": "oklch(0.275 0.035 348 / 0.14)",
+    "accent": "oklch(0.50 0.075 195)",
+    "accent-text": "oklch(0.46 0.072 198)",
+    "on-accent": "oklch(0.98 0.006 335)",
+    "fringe": "oklch(0.50 0.075 195 / 0.09)",
+    "focus": "oklch(0.46 0.072 198)"
+   },
+   "dark": {
+    "bg": "oklch(0.19 0.016 345)",
+    "surface": "oklch(0.23 0.019 345)",
+    "ink": "oklch(0.905 0.013 335)",
+    "ink-2": "oklch(0.78 0.018 335)",
+    "ink-3": "oklch(0.675 0.020 335)",
+    "line": "oklch(0.905 0.013 335 / 0.13)",
+    "accent": "oklch(0.76 0.085 192)",
+    "accent-text": "oklch(0.79 0.080 192)",
+    "on-accent": "oklch(0.21 0.030 348)",
+    "fringe": "oklch(0.76 0.085 192 / 0.06)",
+    "focus": "oklch(0.79 0.080 192)"
+   }
+  },
+  {
+   "id": "SPORE2",
+   "name": "Rhodochrosite",
+   "story": "Sliced rhodochrosite stalactites show concentric rose bands laid down by rhythmic precipitation: a natural ring grating, close kin to the hero field radiating from the accent of the é. The palette is one warm hue at every depth, blush paper, raspberry action, wine-dark night, so the warmth of the person carries the page while the physics hides in the rings.",
+   "whyNotObvious": "One rose hue family from paper to night: warm without earth, with no ochre, umber, terracotta or blue anywhere in it.",
+   "light": {
+    "bg": "oklch(0.962 0.010 12)",
+    "surface": "oklch(0.935 0.014 12)",
+    "ink": "oklch(0.28 0.032 0)",
+    "ink-2": "oklch(0.44 0.035 5)",
+    "ink-3": "oklch(0.505 0.030 8)",
+    "line": "oklch(0.28 0.032 0 / 0.14)",
+    "accent": "oklch(0.53 0.13 8)",
+    "accent-text": "oklch(0.50 0.13 6)",
+    "on-accent": "oklch(0.985 0.005 12)",
+    "fringe": "oklch(0.53 0.13 8 / 0.08)",
+    "focus": "oklch(0.50 0.13 6)"
+   },
+   "dark": {
+    "bg": "oklch(0.195 0.022 355)",
+    "surface": "oklch(0.235 0.026 355)",
+    "ink": "oklch(0.91 0.014 12)",
+    "ink-2": "oklch(0.79 0.022 10)",
+    "ink-3": "oklch(0.685 0.026 8)",
+    "line": "oklch(0.91 0.014 12 / 0.13)",
+    "accent": "oklch(0.75 0.11 8)",
+    "accent-text": "oklch(0.79 0.09 10)",
+    "on-accent": "oklch(0.21 0.030 355)",
+    "fringe": "oklch(0.75 0.11 8 / 0.06)",
+    "focus": "oklch(0.79 0.09 10)"
+   }
+  },
+  {
+   "id": "SPORE3",
+   "name": "Lichen géographique",
+   "story": "The map lichen (Rhizocarpon geographicum) tiles Alpine schist in yellow-green, each colony fenced by a black line of fungal threads, and geologists date moraines by measuring it. A fungus and an alga living as a third organism, read with a ruler: interdependence and precision on the same stone, in the mountains above Chambéry. The chartreuse only ever sits on slate, so in light mode the button is a stone carrying lichen, and in dark mode the whole page is the stone.",
+   "whyNotObvious": "Slate and acid chartreuse are mineral and cold-bright, nowhere near humus and gold or ink and cobalt, and the button that inverts between modes (W into M) is a structure neither guess has.",
+   "light": {
+    "bg": "oklch(0.952 0.004 235)",
+    "surface": "oklch(0.925 0.006 235)",
+    "ink": "oklch(0.26 0.020 235)",
+    "ink-2": "oklch(0.42 0.020 235)",
+    "ink-3": "oklch(0.50 0.017 235)",
+    "line": "oklch(0.26 0.020 235 / 0.14)",
+    "accent": "oklch(0.29 0.025 235)",
+    "accent-text": "oklch(0.47 0.105 125)",
+    "on-accent": "oklch(0.90 0.155 115)",
+    "fringe": "oklch(0.26 0.020 235 / 0.08)",
+    "focus": "oklch(0.47 0.105 125)"
+   },
+   "dark": {
+    "bg": "oklch(0.205 0.013 235)",
+    "surface": "oklch(0.245 0.015 235)",
+    "ink": "oklch(0.91 0.012 115)",
+    "ink-2": "oklch(0.785 0.014 115)",
+    "ink-3": "oklch(0.675 0.012 200)",
+    "line": "oklch(0.91 0.012 115 / 0.13)",
+    "accent": "oklch(0.86 0.145 115)",
+    "accent-text": "oklch(0.86 0.145 115)",
+    "on-accent": "oklch(0.23 0.022 235)",
+    "fringe": "oklch(0.86 0.145 115 / 0.055)",
+    "focus": "oklch(0.86 0.145 115)"
+   }
+  },
+  {
+   "id": "SPORE4",
+   "name": "Érythrite",
+   "story": "Erythrite (cobalt bloom, crimson) and annabergite (nickel bloom, pale green) are the two ends of one continuous mineral series: swap cobalt for nickel atom by atom and the colour slides from one to the other. The paper is the nickel end, the action is the cobalt end, and every page lives in between. Distinct, never separate, written in chemistry.",
+   "whyNotObvious": "Pale green-grey paper and teal-graphite night with a cool crimson accent: not earthy, not navy, and the sage-cream-terracotta trio loses both its cream and its warm clay red.",
+   "light": {
+    "bg": "oklch(0.955 0.011 172)",
+    "surface": "oklch(0.928 0.014 172)",
+    "ink": "oklch(0.27 0.026 200)",
+    "ink-2": "oklch(0.43 0.025 195)",
+    "ink-3": "oklch(0.50 0.020 195)",
+    "line": "oklch(0.27 0.026 200 / 0.14)",
+    "accent": "oklch(0.50 0.135 352)",
+    "accent-text": "oklch(0.48 0.135 352)",
+    "on-accent": "oklch(0.985 0.005 172)",
+    "fringe": "oklch(0.27 0.026 200 / 0.08)",
+    "focus": "oklch(0.48 0.135 352)"
+   },
+   "dark": {
+    "bg": "oklch(0.195 0.018 195)",
+    "surface": "oklch(0.235 0.021 195)",
+    "ink": "oklch(0.905 0.012 172)",
+    "ink-2": "oklch(0.785 0.015 175)",
+    "ink-3": "oklch(0.675 0.018 180)",
+    "line": "oklch(0.905 0.012 172 / 0.13)",
+    "accent": "oklch(0.56 0.15 355)",
+    "accent-text": "oklch(0.78 0.10 355)",
+    "on-accent": "oklch(0.985 0.005 172)",
+    "fringe": "oklch(0.905 0.012 172 / 0.06)",
+    "focus": "oklch(0.78 0.10 355)"
+   }
+  },
+  {
+   "id": "SPORE5",
+   "name": "Améthyste dans la mousse",
+   "story": "The amethyst deceiver (Laccaria amethystina) trades with beech and oak through its roots, and its violet only shows while water moves through it: dry, it fades to buff. It grows in bright moss, so violet and moss green meet on every autumn forest floor. Here the night is amethyst and the action is moss: colour that exists only in circulation, like wealth in the manifesto.",
+   "whyNotObvious": "A coloured violet night with a moss accent: not near-black humus, not ink navy, and the violet is a ground, never the AI-default purple button.",
+   "light": {
+    "bg": "oklch(0.955 0.007 312)",
+    "surface": "oklch(0.928 0.011 312)",
+    "ink": "oklch(0.27 0.040 312)",
+    "ink-2": "oklch(0.43 0.035 312)",
+    "ink-3": "oklch(0.505 0.030 312)",
+    "line": "oklch(0.27 0.040 312 / 0.14)",
+    "accent": "oklch(0.30 0.050 312)",
+    "accent-text": "oklch(0.47 0.10 128)",
+    "on-accent": "oklch(0.90 0.15 125)",
+    "fringe": "oklch(0.27 0.040 312 / 0.08)",
+    "focus": "oklch(0.47 0.10 128)"
+   },
+   "dark": {
+    "bg": "oklch(0.21 0.035 312)",
+    "surface": "oklch(0.25 0.040 312)",
+    "ink": "oklch(0.91 0.015 312)",
+    "ink-2": "oklch(0.79 0.022 312)",
+    "ink-3": "oklch(0.69 0.028 312)",
+    "line": "oklch(0.91 0.015 312 / 0.13)",
+    "accent": "oklch(0.86 0.14 125)",
+    "accent-text": "oklch(0.86 0.14 125)",
+    "on-accent": "oklch(0.24 0.045 312)",
+    "fringe": "oklch(0.86 0.14 125 / 0.055)",
+    "focus": "oklch(0.86 0.14 125)"
+   }
+  }
+ ]
+}

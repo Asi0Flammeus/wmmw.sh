@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Q1 · Bascule de thème · labo moiré</title>
+<script>
+/* Theme boot. Inline in <head>, before any stylesheet paints: no flash.
+   A stored choice wins; otherwise the system preference applies through CSS. */
+(() => {
+  const d = document.documentElement;
+  try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") d.dataset.theme = t; } catch (e) {}
+  const q = new URLSearchParams(location.search);
+  const f = q.get("theme"); if (f === "light" || f === "dark") d.dataset.theme = f;   /* lab override */
+  if (q.has("bare")) d.classList.add("bare");
+  d.classList.add("js");
+})();
+</script>
+<style>
+@font-face { font-family: "Basteleur"; font-weight: 400; font-display: swap; src: url("fonts/basteleur-moonlight.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0152-0153, U+2000-206F, U+20AC, U+2122; }
+@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+1E00-1E9F; }
+@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
+
+:root {
+  color-scheme: light;
+  --bg: #f3f2ee; --surface: #ebe9e3; --ink: #1d1c19; --ink-2: #5a5850; --accent: #1f6b5c;
+  --line: rgb(29 28 25 / .12);
+  --disp: "Basteleur", Georgia, serif; --text: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --pad: clamp(1.25rem, 5vw, 3rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .14); }
+}
+:root[data-theme="dark"] { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .14); }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); }
+body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
+
+/* Page crossfade, 200 ms, through View Transitions. No striped wipe (dossier §9). */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; animation-timing-function: ease; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+
+.head .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.mark { font: 400 1.375rem/1 var(--disp); }
+.nav { display: flex; align-items: center; gap: clamp(.9rem, 2vw, 1.75rem); font: 400 .8125rem/1 var(--mono); color: var(--ink-2); }
+.nav .links { display: flex; gap: inherit; }
+.nav .langs { display: flex; gap: .6rem; }
+.nav .langs [aria-current] { color: var(--ink); }
+
+/* ===== Q1 · theme toggle =====
+   Two line gratings in a 20 px disc: pitch 2 px, line 1 px, pixel aligned.
+   Light: set B lies on set A, one even hatch (a lit grey disc, never a menu icon).
+   Dark: set B turns 3 deg about the disc's left edge. Fringe period
+   p / (2 sin 1.5 deg) = 38 px, about twice the disc: the hatch stays open on the
+   left and closes to solid on the right. A half moon made by interference.
+   8 deg at this pitch packs 1.4 fringes into the disc (stripes, not a moon):
+   see ?a=8. 3 deg is also the top of the dossier's angle range. */
+.q1 {
+  --q1-a: 3deg;
+  position: relative; display: grid; place-items: center;
+  width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%;
+  color: var(--ink); background: transparent; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.q1::before {                                   /* 44 px hit area, 32 px visual */
+  content: ""; position: absolute; inset: -6px; border-radius: 50%;
+}
+.q1::after {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow .16s ease;
+}
+.q1:hover::after { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 35%, transparent); }
+.q1 svg { width: 32px; height: 32px; display: block; overflow: visible; }
+.q1 .b { transform-box: view-box; transform-origin: 6px 16px; transform: rotate(0deg); transition: transform .42s cubic-bezier(.2, .8, .2, 1); }
+:root[data-theme="dark"] .q1 .b { transform: rotate(var(--q1-a)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .q1 .b { transform: rotate(var(--q1-a)); } }
+@media (prefers-reduced-motion: reduce) { .q1 .b { transition: none; } }
+html:not(.js) .q1 { display: none; }            /* no JS: the system preference applies, no dead button */
+@media (forced-colors: active) {
+  .q1 svg .b { display: none; }                 /* plain disc of lines, no moiré */
+  .q1::after { box-shadow: inset 0 0 0 1px ButtonText; }
+}
+
+/* Specimens (lab only) */
+.spec { padding-block: clamp(3rem, 10vh, 6rem); }
+.spec h1 { margin: 0 0 .5rem; font: 400 clamp(2rem, 4vw, 3rem)/1.1 var(--disp); }
+.spec p { margin: 0 0 2.5rem; max-width: 52ch; color: var(--ink-2); }
+.grid { display: grid; grid-template-columns: repeat(2, max-content); gap: 1.5rem 4rem; align-items: end; }
+.cell { display: grid; gap: .75rem; justify-items: start; }
+.cell small { font: 400 .75rem/1 var(--mono); color: var(--ink-2); }
+.row-sizes { display: flex; align-items: end; gap: 1.75rem; }
+.ico { color: var(--ink); }
+.ico .b { transform-box: view-box; transform-origin: 6px 16px; }
+.ico.on .b { transform: rotate(var(--q1-a, 3deg)); }
+
+.lab { position: fixed; right: 12px; bottom: 12px; z-index: 50; display: flex; gap: .5rem; align-items: center; padding: .45rem .6rem; font: 400 11px/1 var(--mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.lab b { color: var(--ink); font-weight: 500; }
+.lab button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: .3rem .45rem; cursor: pointer; }
+.bare .lab { display: none; }
+</style>
+</head>
+<body>
+<template id="q1-icon">
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <defs><clipPath id="CLIP"><circle cx="16" cy="16" r="10"/></clipPath></defs>
+    <g clip-path="url(#CLIP)" fill="none" stroke="currentColor" stroke-width="1" shape-rendering="geometricPrecision">
+      <path class="a" d="M0 0.5H32M0 2.5H32M0 4.5H32M0 6.5H32M0 8.5H32M0 10.5H32M0 12.5H32M0 14.5H32M0 16.5H32M0 18.5H32M0 20.5H32M0 22.5H32M0 24.5H32M0 26.5H32M0 28.5H32M0 30.5H32"/>
+      <path class="b" d="M-8 -3.5H40M-8 -1.5H40M-8 0.5H40M-8 2.5H40M-8 4.5H40M-8 6.5H40M-8 8.5H40M-8 10.5H40M-8 12.5H40M-8 14.5H40M-8 16.5H40M-8 18.5H40M-8 20.5H40M-8 22.5H40M-8 24.5H40M-8 26.5H40M-8 28.5H40M-8 30.5H40M-8 32.5H40M-8 34.5H40"/>
+    </g>
+  </svg>
+</template>
+
+<header class="head">
+  <div class="wrap">
+    <a class="mark" href="#">[w]</a>
+    <nav class="nav" aria-label="Principale">
+      <span class="links"><a href="#">Projets</a><a href="#">Outils</a><a href="#">Écrits</a><a href="#">Contact</a></span>
+      <button class="q1" type="button" data-q1></button>
+      <span class="langs"><a href="#" aria-current="true">FR</a><a href="#">EN</a><a href="#">ES</a></span>
+    </nav>
+  </div>
+</header>
+
+<main class="spec">
+  <div class="wrap">
+    <h1>Deux trames, une lune.</h1>
+    <p>La bascule tient dans 32 px. Clair : les deux trames se superposent. Sombre : l'une tourne de quelques degrés, et la frange dessine la lune.</p>
+    <div class="grid">
+      <div class="cell"><div class="row-sizes" data-spec="off"></div><small>clair · trames alignées</small></div>
+      <div class="cell"><div class="row-sizes" data-spec="on"></div><small>sombre · une trame à 3°</small></div>
+    </div>
+  </div>
+</main>
+
+<div class="lab" role="group" aria-label="Labo"><b>Q1 bascule</b><button type="button" data-act="clear">oublier le choix</button></div>
+
+<script>
+/* ===========================================================================
+   Q1 · theme toggle. Persists to localStorage("theme"); the system preference
+   is the default and is followed live while no choice is stored.
+   =========================================================================== */
+(() => {
+  const root = document.documentElement;
+  const q = new URLSearchParams(location.search);
+  if (q.get("a")) root.style.setProperty("--q1-a", parseFloat(q.get("a")) + "deg");
+  const tpl = document.getElementById("q1-icon");
+  let n = 0;
+  const icon = () => {                                  // unique clipPath id per instance
+    const f = tpl.content.cloneNode(true), id = "q1clip" + n++;
+    f.querySelector("clipPath").id = id; f.querySelector("g").setAttribute("clip-path", `url(#${id})`);
+    return f;
+  };
+
+  const btn = document.querySelector("[data-q1]");
+  btn.append(icon());
+  const sys = matchMedia("(prefers-color-scheme: dark)");
+  const current = () => root.dataset.theme || (sys.matches ? "dark" : "light");
+  const label = () => {
+    const dark = current() === "dark";
+    const t = dark ? "Plus de lumière" : "Moins de lumière";
+    btn.setAttribute("aria-label", t); btn.title = t;
+  };
+  const apply = (t) => {
+    root.dataset.theme = t;
+    try { localStorage.setItem("theme", t); } catch (e) {}
+    label();
+  };
+  btn.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (document.startViewTransition && !still) document.startViewTransition(() => apply(next));
+    else apply(next);
+  });
+  sys.addEventListener("change", label);
+  label();
+
+  // Astro view transitions keep the choice across swaps:
+  document.addEventListener("astro:before-swap", (e) => { if (root.dataset.theme) e.newDocument.documentElement.dataset.theme = root.dataset.theme; });
+
+  // specimens
+  for (const box of document.querySelectorAll("[data-spec]")) {
+    for (const s of [32, 64, 128]) {
+      const w = document.createElement("span"); w.className = "ico" + (box.dataset.spec === "on" ? " on" : "");
+      w.append(icon()); const svg = w.querySelector("svg"); svg.setAttribute("width", s); svg.setAttribute("height", s);
+      box.append(w);
+    }
+  }
+  document.querySelector(".lab").addEventListener("click", (e) => {
+    if (e.target.closest('[data-act="clear"]')) { try { localStorage.removeItem("theme"); } catch (err) {} delete root.dataset.theme; label(); }
+  });
+})();
+</script>
+</body>
+</html>

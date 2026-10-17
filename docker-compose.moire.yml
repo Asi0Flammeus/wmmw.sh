@@ -1,0 +1,42 @@
+# William Moiré redesign preview (branch feat/william-moire).
+# Served at https://moire.wmmw.sh by a hand-managed nginx vhost -> 127.0.0.1:4356.
+# Own compose project name so it never touches the production `wmmw` service
+# that lives in this same checkout.
+#
+#   docker compose -f docker-compose.moire.yml up -d --build
+name: wmmw-moire
+
+services:
+  wmmw-moire:
+    image: wmmw-moire:preview
+    container_name: wmmw-moire
+    build:
+      context: .
+      args:
+        # QA annotation overlay (Alt+Y) is the point of this preview.
+        - ANNOTATION_SYSTEM=true
+    ports:
+      - "127.0.0.1:4356:4321"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4321
+      - REPORTS_DIR=/data/reports
+      - INTAKE_DIR=/data/intake
+      - INTAKE_TOKEN=${INTAKE_TOKEN:-}
+    volumes:
+      - moire-reports:/data/reports
+      - moire-intake:/data/intake
+      - moire-feedback:/app/.prototype-feedback
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4321/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  moire-reports:
+  moire-intake:
+  moire-feedback:

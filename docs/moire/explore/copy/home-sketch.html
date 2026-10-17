@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>William Moiré · copy-fit sketch (not a palette or type proposal)</title>
+<style>
+  /* Copy-fit wireframe for the copy deck. Tokens are the dossier's starting
+     pairs (§8), used only so the sketch is readable in both schemes. */
+  @font-face { font-family: "Basteleur"; src: url("../moire/fonts/basteleur-bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "JetBrains Mono"; src: url("../moire/fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); font-weight: 100 800; font-display: swap; }
+  @font-face { font-family: "JBM ext"; src: url("../moire/fonts/jetbrains-mono-latin-ext-wght-normal.woff2") format("woff2"); font-weight: 100 800; unicode-range: U+20BF; }
+  @font-face { font-family: "Instrument Sans"; src: url("../moire/fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); font-weight: 400 700; font-display: swap; }
+  :root {
+    color-scheme: light dark;
+    --bg: #f1f2ea; --ink: #20281d; --ink-2: #5c5a4e; --ink-3: #6f6c60; --line: #b9b8aa; --accent: #8a5a12; --hair: rgba(32,40,29,.14);
+    --disp: "Basteleur", Georgia, serif; --mono: "JetBrains Mono", ui-monospace, monospace; --text: "Instrument Sans", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12100d; --ink: #e8e2d5; --ink-2: #b6ae9e; --ink-3: #8d8472; --line: #5a5346; --accent: #d9a24a; --hair: rgba(232,226,213,.12); }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font: 400 1rem/1.55 var(--text); }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 clamp(1.25rem, 5vw, 4rem); }
+  header { display: flex; align-items: center; gap: 2rem; padding: 1.4rem 0; font: 500 .82rem/1 var(--mono); color: var(--ink-2); }
+  header .logo { font-family: var(--mono); color: var(--ink); font-weight: 600; }
+  header nav { display: flex; gap: 1.6rem; }
+  header .end { margin-left: auto; display: flex; gap: 1rem; align-items: center; }
+  .toggle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--ink-3); background: linear-gradient(90deg, var(--ink-3) 50%, transparent 50%); }
+  main { max-width: 760px; }
+  .hero { padding: clamp(2.2rem, 7vh, 4.5rem) 0 2.2rem; }
+  h1 { font: 700 clamp(2.6rem, 6.4vw, 4.6rem)/1.08 var(--disp); letter-spacing: -.01em; }
+  .sub { margin-top: .9rem; font-size: clamp(1.15rem, 2vw, 1.35rem); color: var(--ink); max-width: 34ch; }
+  .aside { margin-top: .6rem; font: 400 .82rem/1.5 var(--mono); color: var(--ink-3); }
+  section { padding: 1.6rem 0; }
+  h2 { font: 700 1.35rem/1.2 var(--disp); margin-bottom: .9rem; }
+  .row { display: grid; grid-template-columns: 11.5rem 1fr 1.2rem; gap: .2rem 1.6rem; align-items: baseline; padding: .8rem 0; border-top: 1px solid var(--hair); }
+  .rows .row:last-child { border-bottom: 1px solid var(--hair); }
+  .row .name { font: 700 1.05rem/1.25 var(--disp); }
+  .row .line { color: var(--ink-2); }
+  .btc { font-family: "JBM ext", var(--mono); font-weight: 600; }
+  .row .go { color: var(--accent); font-family: var(--mono); text-align: right; }
+  .row:hover .name { color: var(--accent); }
+  /* Ghosts row: line + quiet notify disclosure; W2 lens keeps its own zone on the right */
+  .row.ghosts { grid-template-columns: 11.5rem 1fr 8.5rem; }
+  .lens-zone { align-self: center; height: 44px; border: 1px dashed var(--line); border-radius: 10px; opacity: .55; }
+  .notify-btn { display: inline-block; margin-left: .55rem; padding: 14px 0; margin-block: -14px; background: none; border: 0; font: 500 .78rem/1 var(--mono); color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); cursor: pointer; white-space: nowrap; }
+  .notify-btn:hover { color: var(--ink); }
+  .notify { grid-column: 2; display: none; margin-top: .4rem; }
+  .ghosts.open .notify { display: block; }
+  .ghosts.open .notify-btn { visibility: hidden; }
+  .notify label { display: block; font: 500 .78rem/1.3 var(--mono); color: var(--ink-2); margin-bottom: .35rem; }
+  .notify .field { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .notify input { flex: 1 1 14rem; min-height: 44px; padding: 0 .8rem; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--ink); font: 400 .95rem/1 var(--text); }
+  .notify button { min-height: 44px; padding: 0 1rem; border: 1px solid var(--ink-3); border-radius: 999px; background: transparent; color: var(--ink); font: 500 .8rem/1 var(--mono); }
+  .notify .hint, .notify .fine { font-size: .8rem; color: var(--ink-3); margin-top: .35rem; }
+  .notify .fine a { text-decoration: underline; text-underline-offset: 2px; }
+  .work-line { color: var(--ink-2); max-width: 46ch; }
+  /* V1: four beats on one line */
+  ol.steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); max-width: 420px; margin: 1.3rem 0 1.2rem; position: relative; }
+  ol.steps li { position: relative; padding-top: 1.05rem; font: 400 .75rem/1.3 var(--mono); color: var(--ink-2); }
+  ol.steps li::before { content: ""; position: absolute; top: 4px; left: 0; width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--ink-2); background: var(--bg); z-index: 1; }
+  ol.steps li::after { content: ""; position: absolute; top: 8px; left: 9px; right: -1px; border-top: 1px solid var(--line); }
+  ol.steps li:nth-of-type(2)::after { top: 6.5px; height: 3px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  ol.steps li:nth-of-type(3)::after { border-top: 1px dashed var(--line); }
+  ol.steps li:nth-of-type(4) { color: var(--ink-3); }
+  ol.steps li:nth-of-type(4)::before { border-style: dashed; border-color: var(--ink-3); }
+  ol.steps li:nth-of-type(4)::after { display: none; }
+  ol.steps .dot { position: absolute; top: 6px; left: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); z-index: 2; opacity: 0; }
+  .work:hover ol.steps .dot { opacity: 1; left: calc(50% + 2px); transition: left 600ms cubic-bezier(.2,.8,.2,1); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: .55rem; }
+  .chip { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border: 1px solid var(--line); border-radius: 999px; font: 500 .8rem/1 var(--mono); color: var(--ink); }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .writing { display: grid; grid-template-columns: 6.6rem 1fr; gap: 1rem; padding: .55rem 0; align-items: baseline; }
+  .writing time { font: 400 .78rem/1 var(--mono); color: var(--ink-3); }
+  .writing span { font: 700 1rem/1.3 var(--disp); }
+  .more { display: inline-block; margin-top: .7rem; font: 500 .8rem/1 var(--mono); color: var(--accent); }
+  /* V2: five strands */
+  .wealth { display: grid; grid-template-columns: 120px 1fr auto; gap: 1.4rem; align-items: center; padding: 1.1rem 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+  .wealth p { color: var(--ink); }
+  .wealth .hint { font: 500 .78rem/1 var(--mono); color: var(--accent); }
+  .strands path { fill: none; stroke: var(--ink-3); stroke-width: 1.25; stroke-linecap: round; transition: transform 400ms cubic-bezier(.2,.8,.2,1); }
+  .strands path.money { stroke: var(--ink); stroke-width: 1.75; }
+  .wealth:hover .strands path:nth-child(1) { transform: translateY(-6px); }
+  .wealth:hover .strands path:nth-child(2) { transform: translateY(-3px); }
+  .wealth:hover .strands path:nth-child(4) { transform: translateY(3px); }
+  .wealth:hover .strands path:nth-child(5) { transform: translateY(6px); }
+  footer { margin-top: 2.4rem; padding: 1.6rem 0 2.4rem; border-top: 1px solid var(--hair); font: 400 .8rem/1.6 var(--mono); color: var(--ink-2); }
+  footer .legal { color: var(--ink-3); }
+  @media (max-width: 767px) {
+    header nav { display: none; }
+    .row { grid-template-columns: 1fr 1.2rem; }
+    .row .name { grid-column: 1; }
+    .row .line { grid-column: 1; grid-row: 2; }
+    .row .go { grid-column: 2; grid-row: 1; }
+    .row.ghosts { grid-template-columns: 1fr 5.5rem; }
+    .row.ghosts .lens-zone { grid-column: 2; grid-row: 1 / span 2; }
+    .notify { grid-column: 1; }
+    .wealth { grid-template-columns: 1fr auto; }
+    .wealth svg { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="#" title="Deux trames, un léger décalage. C'est tout mon nom.">[w]</a>
+    <nav><a href="#">Projets</a><a href="#">Outils</a><a href="#">Écrits</a><a href="#">Contact</a></nav>
+    <div class="end"><span class="toggle" aria-label="Plus de lumière"></span><span>FR EN ES</span></div>
+  </header>
+  <main>
+    <div class="hero">
+      <h1>William Moiré</h1>
+      <p class="sub">Faisons circuler le savoir, la pratique et la valeur.</p>
+      <p class="aside">Physicien devenu développeur indépendant. Aussi connu comme asi0.</p>
+    </div>
+
+    <section>
+      <h2>En ce moment</h2>
+      <div class="rows">
+        <a class="row" href="#"><span class="name">Plan <span class="btc">₿</span> Academy</span><span class="line">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="go">↗</span></a>
+        <a class="row" href="#"><span class="name">alysis</span><span class="line">Des sites faits main pour des métiers faits main.</span><span class="go">↗</span></a>
+        <a class="row" href="#"><span class="name">Outils sur mesure</span><span class="line">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="go">→</span></a>
+        <div class="row ghosts" id="ghosts"><span class="name">Ghosts</span><span class="line">Des agents au très long cours. J'en dis plus bientôt.<button class="notify-btn" type="button" aria-expanded="false" onclick="this.closest('.ghosts').classList.add('open')">Préviens-moi</button></span><span class="lens-zone" aria-hidden="true" title="W2 lens zone"></span>
+          <form class="notify" onsubmit="return false">
+            <label for="gn">Ton email ou ton pseudo</label>
+            <div class="field"><input id="gn" placeholder="toi@exemple.fr"><button type="submit">Me prévenir</button></div>
+            <p class="hint">Un pseudo ? Précise le réseau : @camille sur X.</p>
+            <p class="fine">Un seul message, à la sortie de Ghosts. Ensuite, ton contact est effacé. <a href="#">Détails</a></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="work">
+      <h2>Travailler ensemble</h2>
+      <p class="work-line">Raconte-moi ce qui coince. Je te dis franchement si je peux aider.</p>
+      <ol class="steps" aria-label="Comment on travaille">
+        <span class="dot" aria-hidden="true"></span>
+        <li>Raconter</li><li>Cadrer</li><li>Construire</li><li>Entretenir<span class="sr"> (si tu veux)</span></li>
+      </ol>
+      <div class="chips">
+        <a class="chip" href="#">Un outil pour moi ou mon équipe</a>
+        <a class="chip" href="#">Un site pour mon activité&nbsp;↗</a>
+        <a class="chip" href="#">Un projet ouvert</a>
+        <a class="chip" href="#">Autre chose</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Écrits</h2>
+      <a class="writing" href="#"><time>2026-07-04</time><span>Un workflow à en perdre la tête</span></a>
+      <a class="writing" href="#"><time>2026-02-12</time><span>Discuter avec Silicium</span></a>
+      <a class="writing" href="#"><time>2026-02-09</time><span>L'estimateur de Pareto</span></a>
+      <a class="more" href="#">Tous les écrits</a>
+    </section>
+
+    <a class="wealth" href="#" aria-label="Lire le manifeste : la richesse a cinq dimensions">
+      <svg class="strands" width="120" height="40" viewBox="0 0 120 40" role="img" aria-label="Cinq fils tissés ensemble. Un seul est plus marqué : l'argent.">
+        <path id="s0"/><path id="s1"/><path id="s2"/><path id="s3" class="money"/><path id="s4"/>
+      </svg>
+      <p>La richesse a cinq dimensions. L'argent n'en est qu'une.</p>
+      <span class="hint">manifeste →</span>
+    </a>
+  </main>
+  <footer>
+    <p>William Moiré · Mycelic Wealth. WM | MW, un palindrome. Ce qui sort du réseau y revient.</p>
+    <p>Le manifeste · GitHub · X · Flux RSS · Mentions légales</p>
+    <p class="legal">Éditeur : William Lecompte, EI</p>
+  </footer>
+</div>
+<script>
+  // Five strands: alternating phase so neighbours cross, a small per-strand drift keeps it hand-drawn.
+  const W = 120, mid = 20, gap = 5, amp = 3.6, period = 56;
+  for (let i = 0; i < 5; i++) {
+    const y0 = mid + (i - 2) * gap, ph = (i % 2 ? Math.PI : 0) + i * 0.35;
+    let d = "";
+    for (let x = 2; x <= W - 2; x += 2) {
+      const y = y0 + amp * Math.sin((2 * Math.PI * x) / period + ph);
+      d += (x === 2 ? "M" : "L") + x + " " + y.toFixed(2) + " ";
+    }
+    document.getElementById("s" + i).setAttribute("d", d);
+  }
+</script>
+</body>
+</html>

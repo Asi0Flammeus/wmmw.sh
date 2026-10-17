@@ -1,0 +1,165 @@
+{
+ "lens": "optics and interference",
+ "palettes": [
+  {
+   "id": "OPTICS1",
+   "name": "Teinte sensible",
+   "story": "Under a polarising microscope, the first-order red near 550 nm is the most sensitive tint of the whole interference scale: a few nanometres of shift flip it to blue or to yellow. William Moiré works the same way, small precise interventions with an outsized visible effect. A quiet lilac-grey quartz page carries one red-violet signal, plum ink by day and orchid light by night.",
+   "whyNotObvious": "Red-violet on lilac-grey quartz: no umber, no gold, no navy, no cobalt, and the warmth comes from a hue neither guess touches.",
+   "light": {
+    "bg": "oklch(0.962 0.006 335)",
+    "surface": "oklch(0.935 0.010 335)",
+    "ink": "oklch(0.288 0.035 325)",
+    "ink-2": "oklch(0.420 0.028 325)",
+    "ink-3": "oklch(0.517 0.022 325)",
+    "accent": "oklch(0.535 0.15 332)",
+    "accent-text": "oklch(0.513 0.15 332)",
+    "on-accent": "oklch(0.985 0.004 320)",
+    "line": "oklch(0.288 0.035 325 / 0.14)",
+    "fringe": "oklch(0.50 0.14 332 / 0.08)",
+    "focus": "oklch(0.513 0.15 332)"
+   },
+   "dark": {
+    "bg": "oklch(0.195 0.020 328)",
+    "surface": "oklch(0.232 0.024 328)",
+    "ink": "oklch(0.892 0.014 325)",
+    "ink-2": "oklch(0.745 0.02 325)",
+    "ink-3": "oklch(0.622 0.024 325)",
+    "accent": "oklch(0.64 0.16 330)",
+    "accent-text": "oklch(0.722 0.13 330)",
+    "on-accent": "oklch(0.17 0.03 330)",
+    "line": "oklch(0.892 0.014 325 / 0.14)",
+    "fringe": "oklch(0.74 0.14 330 / 0.06)",
+    "focus": "oklch(0.722 0.13 330)"
+   }
+  },
+  {
+   "id": "OPTICS2",
+   "name": "Labradorite",
+   "story": "Labradorite is a plain grey stone that flashes peacock blue-green when light meets its lamellae, layers thinner than 200 nm interfering inside the crystal. The site is the stone: warm-neutral grey by day, graphite by night, and one petrol flash that keeps exactly the same fill in both modes. Two layers, and a colour that only exists between them.",
+   "whyNotObvious": "Green-leaning petrol on warm-neutral grey and graphite: no cream, no umber, no navy ground, and the accent sits about 55 degrees of hue away from cobalt.",
+   "light": {
+    "bg": "oklch(0.952 0.003 70)",
+    "surface": "oklch(0.926 0.004 70)",
+    "ink": "oklch(0.275 0.012 230)",
+    "ink-2": "oklch(0.410 0.01 230)",
+    "ink-3": "oklch(0.508 0.01 230)",
+    "accent": "oklch(0.52 0.09 212)",
+    "accent-text": "oklch(0.483 0.08 212)",
+    "on-accent": "oklch(0.985 0.004 200)",
+    "line": "oklch(0.275 0.012 230 / 0.14)",
+    "fringe": "oklch(0.52 0.09 212 / 0.08)",
+    "focus": "oklch(0.483 0.08 212)"
+   },
+   "dark": {
+    "bg": "oklch(0.200 0.006 230)",
+    "surface": "oklch(0.236 0.007 230)",
+    "ink": "oklch(0.890 0.006 230)",
+    "ink-2": "oklch(0.745 0.008 230)",
+    "ink-3": "oklch(0.622 0.01 230)",
+    "accent": "oklch(0.52 0.09 212)",
+    "accent-text": "oklch(0.720 0.1 205)",
+    "on-accent": "oklch(0.985 0.004 200)",
+    "line": "oklch(0.890 0.006 230 / 0.14)",
+    "fringe": "oklch(0.78 0.10 205 / 0.06)",
+    "focus": "oklch(0.720 0.1 205)"
+   }
+  },
+  {
+   "id": "OPTICS3",
+   "name": "Antireflet",
+   "story": "An anti-reflection coating is interference used for comfort: a quarter-wave layer cancels the glare, and all that is left is a faint sea-green sheen with a magenta edge. This palette is built for long reading, with a dimmed grey-card page, a lifted night instead of black, ink near 11.5:1, sea-green actions and the magenta residue kept for focus rings and the moiré. Expertise you feel as the absence of strain.",
+   "whyNotObvious": "Sea green plus a magenta residue on a dimmed neutral grey: not sage, cream or terracotta, and its low-glare structure (dimmed page, lifted night, lighter raised rows) differs from both guesses.",
+   "light": {
+    "bg": "oklch(0.940 0.003 200)",
+    "surface": "oklch(0.962 0.003 200)",
+    "ink": "oklch(0.295 0.015 180)",
+    "ink-2": "oklch(0.415 0.012 170)",
+    "ink-3": "oklch(0.508 0.01 170)",
+    "accent": "oklch(0.498 0.09 174)",
+    "accent-text": "oklch(0.475 0.09 174)",
+    "on-accent": "oklch(0.985 0.004 170)",
+    "line": "oklch(0.295 0.015 180 / 0.14)",
+    "fringe": "oklch(0.52 0.17 342 / 0.08)",
+    "focus": "oklch(0.52 0.17 342)"
+   },
+   "dark": {
+    "bg": "oklch(0.235 0.008 175)",
+    "surface": "oklch(0.270 0.010 175)",
+    "ink": "oklch(0.877 0.008 170)",
+    "ink-2": "oklch(0.732 0.01 170)",
+    "ink-3": "oklch(0.647 0.012 170)",
+    "accent": "oklch(0.70 0.10 174)",
+    "accent-text": "oklch(0.702 0.09 174)",
+    "on-accent": "oklch(0.20 0.03 170)",
+    "line": "oklch(0.877 0.008 170 / 0.14)",
+    "fringe": "oklch(0.74 0.14 342 / 0.06)",
+    "focus": "oklch(0.74 0.14 342)"
+   }
+  },
+  {
+   "id": "OPTICS4",
+   "name": "555 nm",
+   "story": "The human eye is most sensitive at 555 nm, a yellow-green: the colour that needs the least light to be seen. William Moiré uses it the way an instrument would, a graphite ground with one luminous signal: a lacquered dark button with a chartreuse label by day, a lit chartreuse button by night. Sharp and exact, and a little whimsical once you know why.",
+   "whyNotObvious": "Chartreuse on neutral graphite with an inverted CTA between modes: no warm earth, no blue at all, the opposite temperature and structure of both guesses.",
+   "light": {
+    "bg": "oklch(0.958 0.003 250)",
+    "surface": "oklch(0.932 0.004 250)",
+    "ink": "oklch(0.275 0.008 250)",
+    "ink-2": "oklch(0.415 0.008 250)",
+    "ink-3": "oklch(0.513 0.008 250)",
+    "accent": "oklch(0.27 0.03 125)",
+    "accent-text": "oklch(0.478 0.12 125)",
+    "on-accent": "oklch(0.91 0.19 122)",
+    "line": "oklch(0.275 0.008 250 / 0.14)",
+    "fringe": "oklch(0.50 0.12 125 / 0.08)",
+    "focus": "oklch(0.478 0.12 125)"
+   },
+   "dark": {
+    "bg": "oklch(0.195 0.006 140)",
+    "surface": "oklch(0.232 0.008 140)",
+    "ink": "oklch(0.887 0.006 140)",
+    "ink-2": "oklch(0.742 0.008 140)",
+    "ink-3": "oklch(0.620 0.01 140)",
+    "accent": "oklch(0.88 0.165 122)",
+    "accent-text": "oklch(0.797 0.17 122)",
+    "on-accent": "oklch(0.24 0.04 125)",
+    "line": "oklch(0.887 0.006 140 / 0.14)",
+    "fringe": "oklch(0.88 0.165 122 / 0.05)",
+    "focus": "oklch(0.797 0.17 122)"
+   }
+  },
+  {
+   "id": "OPTICS5",
+   "name": "Lycurgus",
+   "story": "The Lycurgus cup, Roman glass from the 4th century, holds gold and silver nanoparticles: lit from the front it looks jade, lit from behind it glows ruby. One material, two colours, decided only by the relation between light and viewer. Jade-grey glass by day, jade-black glass by night, and a single ruby fill as the constant.",
+   "whyNotObvious": "Jade glass and rubine are a dichroic pair from neither guess: no umber, gold, cream or navy, and the red is a deep rubine on green-tinted glass, not a signal red on black and white.",
+   "light": {
+    "bg": "oklch(0.957 0.007 172)",
+    "surface": "oklch(0.930 0.010 172)",
+    "ink": "oklch(0.278 0.022 180)",
+    "ink-2": "oklch(0.413 0.018 180)",
+    "ink-3": "oklch(0.510 0.015 180)",
+    "accent": "oklch(0.515 0.16 5)",
+    "accent-text": "oklch(0.508 0.16 5)",
+    "on-accent": "oklch(0.985 0.004 15)",
+    "line": "oklch(0.278 0.022 180 / 0.14)",
+    "fringe": "oklch(0.50 0.07 172 / 0.09)",
+    "focus": "oklch(0.508 0.16 5)"
+   },
+   "dark": {
+    "bg": "oklch(0.195 0.012 175)",
+    "surface": "oklch(0.232 0.014 175)",
+    "ink": "oklch(0.887 0.008 170)",
+    "ink-2": "oklch(0.742 0.012 175)",
+    "ink-3": "oklch(0.620 0.015 175)",
+    "accent": "oklch(0.55 0.165 5)",
+    "accent-text": "oklch(0.705 0.12 5)",
+    "on-accent": "oklch(0.985 0.004 15)",
+    "line": "oklch(0.887 0.008 170 / 0.14)",
+    "fringe": "oklch(0.78 0.08 172 / 0.06)",
+    "focus": "oklch(0.705 0.12 5)"
+   }
+  }
+ ]
+}

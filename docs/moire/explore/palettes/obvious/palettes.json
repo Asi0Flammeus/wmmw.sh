@@ -1,0 +1,8 @@
+{"lens":"obvious centers (to avoid)","palettes":[
+{"id":"G1","name":"First guess: humus + gold / paper + ochre (current site + mockup A)","story":"The center of the first guess: warm earth dark with bone text and a gold accent, and its paper twin with ink and ochre. This is today's wmmw.sh. The final palette must NOT sit here.",
+ "light":{"bg":"#f1f2ea","surface":"#e7e8dd","ink":"#20281d","ink-2":"#4f5145","ink-3":"#5c5a4e","line":"rgba(32,40,29,.14)","accent":"#b5832f","accent-text":"#8a5a12","on-accent":"#1a1408","fringe":"rgba(32,40,29,.09)","focus":"#8a5a12"},
+ "dark":{"bg":"#12100d","surface":"#1a1712","ink":"#e8e2d5","ink-2":"#b6ae9e","ink-3":"#8d8472","line":"rgba(232,226,213,.14)","accent":"#d9a24a","accent-text":"#d9a24a","on-accent":"#1a1206","fringe":"rgba(232,226,213,.07)","focus":"#d9a24a"}},
+{"id":"G2","name":"Second guess: ink navy + cream + cobalt / op-art black-white + signal","story":"The center of the second guess: deep ink blue with cream text and an electric cobalt accent, the default 'serious creative technologist' look. The final palette must NOT sit here either.",
+ "light":{"bg":"#f6f3ec","surface":"#ece8de","ink":"#141a2e","ink-2":"#3d4459","ink-3":"#5a6075","line":"rgba(20,26,46,.14)","accent":"#2747d6","accent-text":"#2342c8","on-accent":"#ffffff","fringe":"rgba(20,26,46,.09)","focus":"#2747d6"},
+ "dark":{"bg":"#0e1220","surface":"#161b2c","ink":"#ece8de","ink-2":"#b3b4be","ink-3":"#8b8fa0","line":"rgba(236,232,222,.14)","accent":"#6f8cff","accent-text":"#8aa2ff","on-accent":"#0b1030","fringe":"rgba(236,232,222,.07)","focus":"#8aa2ff"}}
+]}

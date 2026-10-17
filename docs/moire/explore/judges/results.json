@@ -1,0 +1,277 @@
+[
+ {
+  "judge": "distinct (distinctiveness and the owner's rule). I opened all 17 renders (G1, G2 and the 15 candidates) and read every token file and contrast report. I also measured a weighted OKLab deltaE (bg, ink, accent and accent-text, both modes) from each candidate to G1 and G2, to the alysis.cat tokens (cream #f3ecdd, rust #a14a28, forest #3d5a3d, which is the sibling site wmmw.sh routes to), and to six generic 2025-26 centres: volt lime on black, AI purple, dev teal on slate, sage/cream/terracotta, neutral plus hot pink, and black/white plus signal red. I also measured each candidate's distance to its nearest twin in the set.\n\nMain finding: every candidate uses the same lightness skeleton (light bg L 0.94 to 0.97, dark bg L 0.19 to 0.235). Only the hue and chroma of the ground and the accent can make a palette distinct. Three candidates also differ in structure:\n- PRINT5 has coloured grounds in both modes, and the two inks swap roles between modes.\n- The chartreuse family (OPTICS4, SPORE3, PRINT4, SPORE5) inverts the CTA between modes.\n- OPTICS3 makes its raised rows lighter than the page.\n\nThe set is full of near-twins: OPTICS5 and SPORE4 at 2.6, OPTICS4 and SPORE3 at 2.7, SPORE1 and PRINT3 at 2.7, OPTICS3 and PRINT3 at 3.3. So the 15 candidates reduce to about 7 real directions.\n\nTwo risks the candidates' own \"why not obvious\" notes do not mention:\n- **Solana echo.** Purple or plum grounds with a mint or lime partner (PRINT5, SPORE5) can recall Solana's purple and green. On a Bitcoin educator's site, the crypto-literate audiences C and D would notice.\n- **shadcn zinc.** The light grounds of OPTICS4 are almost exactly shadcn zinc, which is on the owner's anti-reference list.\n\nLycurgus wins. Its cool jade glass (C 0.007 to 0.012, H 172 to 175) and deep rubine (H 5) form a complementary pair that no trend owns and neither guess touches. Its story makes the brand thesis concrete: the colour is decided by the relation between light and viewer, just as the moiré lives between two layers. The ruby fill stays almost the same in both modes, which works as a constant brand mark.\n\nI wrote no files (the optional judges/distinct.md was skipped). Sources read are in /data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/palettes/{obvious,optics,spore,print}/.",
+  "scores": [
+   {
+    "id": "OPTICS5",
+    "score": 8.5,
+    "rationale": "The farthest move that still means something. Its cool jade-tinted glass ground and deep rubine accent (oklch 0.515 0.16 5) form a complementary pair that is cool where G1 is warm and has no navy or cobalt like G2; no 2025-26 portfolio trend owns it. Its story encodes the brand thesis directly (the colour depends on how light meets the viewer, as the moiré lives between layers), and the near-identical white-on-ruby fill in both modes works as a constant mark. In the render it looks sharp, calm and professional. Weak points: the dark CTA fill is only 3.43:1 on the night, so it reads slightly dim. In raw distance it is the closest candidate to the sage/terracotta centre (6.8) and to alysis.cat (8.0), but temperature separates it clearly (cool glass and crimson against warm cream and rust). Ground chroma must stay at or below about 0.012 or the pair slides toward Christmas."
+   },
+   {
+    "id": "PRINT5",
+    "score": 7.5,
+    "rationale": "The most distinct structure in the set: its nearest twin is 7.4 deltaE away, while most candidates have a twin under 3. Both grounds are coloured and plum and mint swap roles between modes, which acts out WM|MW and 'Deux trames. Un troisième motif.' Riso misregistration is literally moiré in print, so the meaning is native rather than borrowed. Penalties: plum with mint can recall Solana's purple and green for crypto-literate visitors (audiences C and D) on a Bitcoin educator's site. The pastel mint dark CTA (#96e4cb) reads a bit like candy or fintech. Chromatic plum body ink (C 0.045) on mint paper is softer than the 'sharp, professional' brief, and riso is a designer-scene trend."
+   },
+   {
+    "id": "SPORE4",
+    "score": 7,
+    "rationale": "Effectively a twin of OPTICS5 (2.6 deltaE): green-grey paper with a crimson accent, equally far from G1 and G2. It is weaker on every axis that separates them. The accent at H 352 to 355 leans berry and fuchsia toward the hot-pink centre. The more chromatic mint paper (C 0.011) risks a pharma, mint-fresh feel. The 'cobalt bloom' story literally names G2's colour and is harder to grasp than Lycurgus. Fold it into OPTICS5 rather than shipping it separately."
+   },
+   {
+    "id": "SPORE5",
+    "score": 6,
+    "rationale": "A bold amethyst night (oklch 0.21 0.035 312) with a moss-lime CTA, far from both guesses. 'Colour that only exists in circulation' is a real tie to Mycelic Wealth. But a violet ground with lime or green sits in the web3 (Solana) and gaming (Twitch) register, a risk for the Plan ₿ maintainer. The light mode (lavender paper, aubergine pill, lime label) reads quirky rather than sharp. It shares the inverted lime CTA with OPTICS4 and SPORE3 (2.8 from SPORE3)."
+   },
+   {
+    "id": "PRINT4",
+    "score": 6,
+    "rationale": "The most meaningful of the chartreuse family: the blackboard is a physicist's instrument and stands for Plan ₿ education and 'worked out in the open', and its night (L 0.235, C 0.026) is a real coloured ground. But the dark gestalt, a dark page with a pale yellow pill (#ece280), echoes G1's dark page with its gold CTA. The deep green lacquer button (#223f34) sits beside alysis's forest green #3d5a3d and mockup A's moss, and 'chalkboard' is an education-template cliché."
+   },
+   {
+    "id": "OPTICS1",
+    "score": 6,
+    "rationale": "A coherent single plum and orchid hue (H 325 to 335) on lilac-grey quartz: distinct from G1 and G2 and very calm. First-order red is a superb concept: an interference colour with no wavelength of its own, a third colour born between layers. But most visitors will file orchid as 'purple', close to the AI-purple and wellness or beauty registers, and the dark CTA #c063ba is its weakest swatch. The story is better than the palette."
+   },
+   {
+    "id": "SPORE3",
+    "score": 5.5,
+    "rationale": "The best story in the lime family: Chambéry Alps, lichenometry as ruler plus symbiosis, interdependence read with precision. As a palette it drifts toward known centres. The light CTA is a dark slate-blue pill (#1f2d36) that reads navy-ish next to G2, and the dark mode is a lime pill on blue-black charcoal, the 2024-26 volt-on-dark look. It is a near-twin of OPTICS4 (2.7)."
+   },
+   {
+    "id": "SPORE1",
+    "score": 5.5,
+    "rationale": "The violet-taupe 'gill' ground (H 335 to 348) is unusual and gives the page an identity of its own. But the verdigris accent is the generic dev teal (4.3 from that centre), the pastel teal dark pill (#6bc3bf) is everywhere, and it is a near-twin of PRINT3 (2.7). The ground is distinct, the accent is not."
+   },
+   {
+    "id": "OPTICS4",
+    "score": 5,
+    "rationale": "The 555 nm photopic-peak story is clever and physics-true, and the inverted CTA is a real structural idea. But the light grounds are near-neutral cool grey (C 0.003 to 0.008, H 250), essentially the shadcn zinc on the owner's anti-reference list, and the dark mode is a chartreuse pill on near-black, the archetypal 2024-26 dev or AI startup look. Distinct from G1 and G2, not from the market."
+   },
+   {
+    "id": "PRINT1",
+    "score": 5,
+    "rationale": "Neutral graphite plus one hot magenta signal is the G2 cousin structure (neutral ground plus a signal colour) with the red swapped for pink: it measures 4.7 from the hot-pink centre and reads like Figma or T-Mobile. It has the same strong first-order-red concept as OPTICS1, with a less ownable execution."
+   },
+   {
+    "id": "OPTICS3",
+    "score": 4.5,
+    "rationale": "The smartest UX structure in the set: a dimmed page at L 0.94, a lifted night at L 0.235, ink at about 11.5:1, raised rows lighter than the page, and a secret magenta residue on focus and fringe. But what visitors see is grey with a sea-green button, 5.7 from the dev-teal and fintech-green centre. Graft its structure, not its hue."
+   },
+   {
+    "id": "SPORE2",
+    "score": 4.5,
+    "rationale": "Rose from blush to wine is G1's 'warm everything' structure moved into pink, and it reads as lifestyle or cosmetics rather than a physicist's precision. A warm blush page would also feel like a cousin of alysis's warm paper. The ring-grating story deserved a cooler palette."
+   },
+   {
+    "id": "OPTICS2",
+    "score": 4,
+    "rationale": "Petrol at H 212 sits about 50 degrees from cobalt and still reads as corporate teal-blue (consultancy, healthcare), close to G2 on the blue side and 7.9 from dev teal. The constant fill across modes is a good idea, but it leaves the dark CTA dim at 3.40:1."
+   },
+   {
+    "id": "PRINT3",
+    "score": 3.5,
+    "rationale": "The candidate closest to the generic dev-teal centre (3.7): pewter with verdigris teal is the calm default. The copper fringe is its only distinctive element, and it is effectively invisible at alpha 0.07 to 0.09 on 4 to 6 px lines."
+   },
+   {
+    "id": "PRINT2",
+    "score": 2.5,
+    "rationale": "The methyl violet button (#693cab, H 298) on cool white is the AI-default purple. It is the candidate closest to G2 (6.0) and to the AI-purple centre (7.2). The Seyès notebook story is charming and very French, but no one can read it from the swatches: visitors will see an LLM startup."
+   }
+  ],
+  "top3": [
+   "OPTICS5",
+   "PRINT5",
+   "SPORE4"
+  ],
+  "vetoes": [
+   {
+    "id": "PRINT2",
+    "reason": "It lands on the 2023-26 AI-purple centre (violet #693cab and #af92eb CTAs) and is the candidate closest to G2. This breaks the owner's binding dislike « pas du default de llm » / « un site qui pue pas le IA slop ». Its story cannot be seen in the colours."
+   }
+  ],
+  "graftIdeas": "1. Base on OPTICS5 (Lycurgus) and make the dichroism happen between modes. The moiré fringe is jade in light mode (front-lit cup) and turns ruby in dark mode (back-lit cup), at about oklch(0.70 0.12 5 / 0.05), which I measured at 1.06:1 on the night, well under the 0.10 luminance-delta rule. The Q1 theme toggle then acts out the cup itself: jade hatch by day, ruby fringe moon by night.\n2. Keep OPTICS5's ruby at H 5 (crimson), not SPORE4's H 352 (berry, drifting to fuchsia). Keep the constant white-on-ruby fill in both modes, since that is the brand mark. Do not lighten the dark fill to fix its 3.43:1 edge: oklch 0.66 0.15 5 = #db6686 reads pink. Instead lift the dark CTA's edge with a 1 px accent-text ring (#de7f96) or the glass loupe rim the owner already wants on the primary action.\n3. Bring in OPTICS3's comfort structure: lift the Lycurgus night from L 0.195 to about 0.21 to 0.215 (ink still 12.5:1, and less halation for long reading), dim the light page to about 0.95, and make dark raised rows lighter than the page.\n4. If the owner wants the glass to be visible rather than merely implied, borrow SPORE4's slightly more chromatic paper. Push the light bg to C 0.010 to 0.011 at H 172 and stop there: beyond that, jade with ruby starts to read as Christmas.\n5. Take one quiet idea from PRINT5's role swap without coloured grounds: text selection uses ruby at about 20% in light mode and jade at about 20% in dark mode, so the two colours trade places in a detail only careful readers find.\n6. If PRINT5 is chosen instead, de-Solana it. Shift the plum toward the wine-rubine side (H about 350 to 355, lower chroma), deepen the dark mint CTA to about L 0.78 C 0.08 so it reads less candy, and lower the plum body ink chroma from 0.045 to about 0.03 for long-reading comfort.\n7. Put the accent in the hero once, never as a gradient: the W1 interference source anchored on the accent of the é can be the one ruby point on a jade-black page. The palette and the hero then tell the same story at the first glance."
+ },
+ {
+  "judge": "brand",
+  "scores": [
+   {
+    "id": "OPTICS5",
+    "score": 9,
+    "rationale": "Its physics story is the brand sentence itself. The Lycurgus cup is one material showing two colours, and which one you see depends only on the relationship between light and viewer: 'the pattern lives in the relation', as a famous object a physicist knows (the textbook plasmonics example), with Roman whimsy. The theme toggle becomes the cup, lit from the front or from behind. Jade and ruby suit Basteleur's archaic, alchemical letterforms, and the ruby glass pill reads as a cut gem, which fits the loupe request. The ruby (hue 5) brings back gold's warmth without earth. The fringe stays in the ground jade, so the accent is kept for the one action. One constant ruby in both modes gives clean assets (OG image, favicon, CTA). Brand-architecture bonus: it is alysis.cat transposed (terracotta oklch 0.514 0.125 41 becomes ruby 0.515 0.16 5, moss becomes jade, cream becomes jade glass), so hub and atelier look related, not cloned. Risks: Christmas if ground chroma rises; ruby collides with error red in the intake form; red-green colour blindness (it relies on lightness, so links need underlines); the thin dark fill margin (3.43:1, label 5.08:1) rules out a translucent glass body."
+   },
+   {
+    "id": "SPORE4",
+    "score": 8,
+    "rationale": "Almost the same structure as OPTICS5 (green-grey nickel paper, teal-black night, crimson action), and two lenses converging here is a signal. It loses because the accent drifts to hue 352: in the render it reads raspberry-magenta and a little purple, cooler and closer to the AI-magenta zone. The paper is mintier (C 0.011, leaning pharmacy). The neutral ink fringe is correct but less charming. The erythrite-annabergite series is true and on message, but needs a chemistry lesson, whereas Lycurgus explains itself in one sentence. Keep it as the tuning reference."
+   },
+   {
+    "id": "PRINT5",
+    "score": 6.5,
+    "rationale": "The strongest structural echo of the wordmark: plum and mint swap roles between modes, the way W rotates into M, and Riso misregistration literally explains printed moiré. Its coloured grounds are non-generic. Weak points: there is no single brand colour (plum or mint?), which complicates the OG image, favicon and avatars. The plum CTA by day borders on purple. Mint-tinted body text on plum in dark mode is less comfortable for long reading. The pastel mint pill turns milky under glass. Riso is design-scene, not the owner's world."
+   },
+   {
+    "id": "OPTICS3",
+    "score": 6.5,
+    "rationale": "It answers 'not eye-tiring' most directly, through physics: an AR coating is interference used for comfort, and everyone knows the green-magenta glint on their glasses. Its structure is the best in the set: dimmed page, lifted night, raised rows lighter than the page, ink near 11.5:1. The magenta-residue fringe gives the moiré its own colour. As a brand it splits identity: a green action plus magenta focus rings read as two accents. The deep sea-green fill leans bank or fintech, with little warmth. Graft its structure onto the winner."
+   },
+   {
+    "id": "SPORE1",
+    "score": 6.5,
+    "rationale": "Aubergine ink on mauve-grey paper is the most beautiful Basteleur rendering in the set, like real ink on tinted stock. 'One organism, distinct parts' maps onto 'identity is the network, projects are its organs'. But the verdigris action is generic dev teal (the spore lens itself rejected slate plus verdigris). The mauve paper can read cosmetic. The accent-coloured fringe dilutes the single action."
+   },
+   {
+    "id": "PRINT4",
+    "score": 6,
+    "rationale": "Very on-meaning: physicist, teacher (Plan ₿ Academy), equations worked out in the open. The inverted button, a small chalkboard in light mode, is charming, and the chalk-dust fringe keeps the accent reserved. But in dark mode the yellow pill on a dark ground sits near G1 dark's gold pill (lemon hue 103 against gold 77, 26 degrees apart). The green slate is in mockup A's moss family, and blackboard nostalgia risks a schoolroom feel."
+   },
+   {
+    "id": "OPTICS4",
+    "score": 5.5,
+    "rationale": "The 555 nm story is the wittiest physicist fact in the set, and the light mode (lacquered dark button with a chartreuse label) is elegant. But lit lime on graphite in dark mode is phosphor-terminal adjacent (R1 terminal cosplay) and is the current AI-startup lime trope. It is cold, with no Mycelic warmth, and the lime fringe tints the field green."
+   },
+   {
+    "id": "SPORE3",
+    "score": 5.5,
+    "rationale": "The best biological analogue of the brand: a lichen is a fungus and an alga making a third organism, anchored above Chambéry and measured with a ruler (lichenometry). Steal it for copy. The palette itself is blue-black slate plus one electric signal, which is G2's structure with lime swapped for cobalt, and it carries the same lime and terminal risk as OPTICS4."
+   },
+   {
+    "id": "OPTICS2",
+    "score": 5,
+    "rationale": "A good interference story, and one petrol fill kept constant in both modes is good brand discipline. But petrol on warm grey reads consultancy, health SaaS or bank: correct, but exactly the 'truc bateau' the owner rejects. It sits in the cool blue family, about 55 degrees from cobalt."
+   },
+   {
+    "id": "PRINT3",
+    "score": 5,
+    "rationale": "The copper-conductor story (circulation) fits, and a copper hairline fringe under a patina accent is a nice two-hue moiré idea. But visibly it is teal on pewter: generic dev-theme teal, nearly interchangeable with OPTICS2. The copper fringe at 0.09 alpha is almost invisible, so the surprise does not reach the visitor."
+   },
+   {
+    "id": "PRINT1",
+    "score": 5,
+    "rationale": "The best single idea in the print lens: magenta has no wavelength of its own and exists only in the relation between red and blue, just as the moiré belongs to neither layer. But neutral graphite plus one hot signal is the op-art-plus-signal structure named as a G2 cousin. The C 0.19 magenta pill reads fashion, design tool or synthwave in dark mode. Quote the story; do not ship the palette."
+   },
+   {
+    "id": "SPORE2",
+    "score": 4.5,
+    "rationale": "The warmest candidate, and its concentric bands rhyme with the é-source ring field. The wine-dark night is beautiful. But monochrome rose drops the two-layer duality. Blush paper with a raspberry pill reads beauty, wellness or wedding stationery, which clashes with 'sharp professional physicist' and sits near the wellness register the dossier steers away from. The pastel pink pill in dark mode is candy."
+   },
+   {
+    "id": "OPTICS1",
+    "score": 4,
+    "rationale": "The tinted lilac ground avoids PRINT1's op-art structure, but the orchid-fuchsia pill in both modes lands in AI-purple territory, and the lilac paper reads cosmetic. It is the weaker expression of an idea PRINT1 frames better."
+   },
+   {
+    "id": "SPORE5",
+    "score": 3.5,
+    "rationale": "The circulation story is on message, but a saturated violet night (C 0.035) with a lime pill reads as a code-editor theme (Dracula or Synthwave): loud complementary colours in the violet AI-default family. A coloured violet ground also tires long reading."
+   },
+   {
+    "id": "PRINT2",
+    "score": 2.5,
+    "rationale": "The Seyès notebook story is charming, and its ruling really is a grating. But a violet-600 pill on cool white is the single most recognisable AI-slop signature, and the indigo-violet ink on cool white sits next to G2 (hue 298 against 267). Keep only the idea of drawing the fringe in a second 'ruling' hue."
+   }
+  ],
+  "top3": [
+   "OPTICS5",
+   "SPORE4",
+   "PRINT5"
+  ],
+  "vetoes": [
+   {
+    "id": "PRINT2",
+    "reason": "A violet-600 action on cool white is the AI-slop signature the owner explicitly hates, and the indigo-violet ink on cool white is G2-adjacent."
+   },
+   {
+    "id": "SPORE5",
+    "reason": "A violet ground plus a lime action reads as a code-editor theme (Dracula or Synthwave): loud, in the violet AI-default family, and a saturated violet night tires long reading."
+   }
+  ],
+  "graftIdeas": "Base OPTICS5, then: (1) Make the moiré enact the Lycurgus cup: a jade fringe by day (as now) and a ruby fringe by night, e.g. oklch(0.70 0.12 5 / 0.05), which is a 1.07:1 delta on the night bg. The theme toggle is then literally front-lit or back-lit, and the ruby CTA stays constant in both modes. (2) Graft OPTICS3's comfort structure: lift the night from L 0.195 to about 0.205-0.208 (ink about 12.7:1, ruby fill about 3.5:1; do not go to 0.218, where the fill drops to 3.26:1), dim the light page to about 0.950, and make raised rows lighter than the page in light mode. (3) Hold the ruby at hue 5-8; never drift to SPORE4's 352 (magenta, cooler, AI-like). If the dark label needs headroom, use the fill oklch(0.53 0.165 6), which gives 5.53:1. (4) Glass loupe recipe: keep the fill at least 92% opaque, with the glass only in a 1 px inner highlight, a rim refraction of the moiré and a soft ruby shadow (on-accent margins are only 5.1-5.9:1, so a translucent body fails). (5) Never use ruby for form errors; use ink plus a glyph plus a sentence. Ruby only means 'act here'. (6) Use SPORE4's ink-coloured fringe as a fallback if the jade fringe muddies on some light screens. (7) Copy, not colour: the Lycurgus line for the theme-toggle tooltip or the 404, and PRINT1's 'a colour with no wavelength of its own' or SPORE3's lichen 'third organism' for the manifesto or footnotes, never on home. (8) Brand architecture: OPTICS5 is alysis.cat's terracotta, moss and cream transposed into ruby, jade and jade glass at the same lightness, so present hub and atelier as relatives. (9) If PRINT5 is preferred instead: lock plum as the single asset colour, neutralise the dark body ink to C ≤ 0.01, and keep mint only for the dark-mode action. Full reasoning: /data/crqpt/repos/Asi0Flammeus/wmmw.sh/docs/moire/explore/judges/brand.md. Scratch renders (outside the repo): /tmp/brandjudge/a.png, b.png, c.png."
+ },
+ {
+  "judge": "comfort (eye comfort and accessibility). Method: read every specimen PNG and contrast.txt. Re-rendered each palette as a long-reading card (16px proportional body with an inline link, mono meta on surface, CTA, focus ring) in light, light under a 30% white glare veil, and dark. Rendered the fringe and CTA close up at DPR 2. Computed glare-veiled contrast, dark-mode luminance of text and fill, fringe dE against bg, and how far links sit from body text under protan, deutan and tritan simulation (Machado). Scratch files are only in /tmp/comfort-judge; nothing was written to the repo. Field facts: every candidate passes AA. Ink sits between 11.5 and 14.8:1 everywhere. Every candidate's fringe is quieter than G1 and G2 (light line Weber 10 to 15% vs 16 to 17%). In every palette accent-text is within 1.0 to 1.5:1 of ink-2, so body links need a persistent underline whichever palette wins.",
+  "scores": [
+   {
+    "id": "OPTICS3",
+    "score": 8.5,
+    "rationale": "The only candidate built around comfort, and it shows. Ink is 11.6 light and 11.5 dark, never harsh. The night is lifted (bg L 0.235, ink Y 0.68), which gives the least halation in the field. The dark CTA is a mid sea green (Y 0.36, label 7.05:1) that does not glow in a dim room, and accent chroma stays calm at 0.09. The focus ring is a separate magenta (dE 26 from the fill), so focus on the CTA never looks like the button itself. Costs: the dimmed light page (Y 0.83) has the least outdoor headroom (ink 3.47 and ink-3 2.62 under a 25% glare veil, both lowest in the field). Dark ink-3 on surface is only 4.61. The hover surface step is the smallest in the field (dE 2.2), so hover disappears in sun. Teal links collapse for protan and deutan in dark (dE 1.8 and 3.2). The magenta fringe (C 0.17) leaves a faint pink haze on the grey page. Two small fixes would close most of this: light bg L 0.940 to about 0.952, and dark ink-3 L 0.647 to about 0.665."
+   },
+   {
+    "id": "PRINT3",
+    "score": 8,
+    "rationale": "Crisp pewter neutrals with the brightest light page among the mid-fill CTAs (Y 0.90), so it has the best sun headroom of that group. Ink is 13.6 and 14.1, meta 4.79 and 4.98. Verdigris (C 0.08 to 0.09) is calm for links. The dark CTA is mid-bright (Y 0.39, label 7.7:1): no vibration and no lamp, and both modes feel equally finished. Costs: the copper fringe reads as a beige-brown haze on cool pewter, and its alpha (0.09 light, 0.07 dark) is over the dossier's 0.08 and 0.06. Dark ink is a little bright (Y 0.77). Teal links collapse for protan and deutan in dark (2.7 and 1.7). Focus is the same colour as the accent."
+   },
+   {
+    "id": "SPORE1",
+    "score": 7.5,
+    "rationale": "The strongest meta in the teal group (ink-3 4.92 light and 5.73 dark; ink-2 9.19 dark), with ink at 13.3 and 13.9. The verdigris is low-chroma (0.075 to 0.085) on a low-chroma mauve: a complementary pair, but too quiet to vibrate. The dark aqua CTA (Y 0.46, dark label 8.6:1) is clear without glare. Costs: the pink-mauve tint of the light page (H 335, C 0.010) is noticeable over long reads. Light fringe alpha 0.09 is over spec. Links collapse for deutan in dark (1.8). Focus is the same colour as the accent."
+   },
+   {
+    "id": "OPTICS2",
+    "score": 7,
+    "rationale": "Neutral warm grey and graphite read cleanly, the petrol links are calm (C 0.08 to 0.10), and the fringe is subtle. But the dark mode keeps the same petrol fill, so the CTA is only 3.40:1 on graphite and sinks into the page. ink-3 on surface (4.64 and 4.61) is marginal for 11.5 px mono dates. Links collapse for protan in dark (2.5). With a lighter dark fill and a dark label it would reach about 8."
+   },
+   {
+    "id": "SPORE2",
+    "score": 7,
+    "rationale": "Monochrome rose is the calmest palette by hue: there is no complementary pair anywhere. Meta is strong (4.90 and 5.88) and the dark pink CTA is soft (Y 0.40). Costs: links share the text's hue family, so they stand out only by saturation (dE 6.8 against ink-2 in dark, 1.7 for protan in light). The light page is blush for long reads, and pink is the first tint to wash out under glare."
+   },
+   {
+    "id": "OPTICS5",
+    "score": 7,
+    "rationale": "Good ink (12.9 and 13.0). Rubine links are clearly distinct for typical vision (dE 20 in light), and dark links are a soft pink. Costs: the dark CTA is 3.43:1, because deep rubine on jade-black barely lifts. ink-3 on surface (4.66 and 4.63) is marginal. Light fringe alpha 0.09 is over spec. Links collapse for protan in light (2.3). Red on a green-tinted ground is low risk only because the ground chroma is 0.007."
+   },
+   {
+    "id": "SPORE4",
+    "score": 7,
+    "rationale": "A near twin of OPTICS5 with better meta (4.83 and 5.69) and a calmer crimson (C 0.135). Costs: the dark CTA is 3.60:1 and its on-accent is 4.85, so white on crimson is just over the line. For deutan in dark, links become effectively identical to ink-2 (dE 0.1). Its dark fringe is the most visible in the field (dE 5.2)."
+   },
+   {
+    "id": "OPTICS1",
+    "score": 6.5,
+    "rationale": "Ink is good (12.9 and 13.2), and the orchid dark CTA has a clean figure (5.04:1, label 5.28, Y 0.24, so no lamp). Costs: red-violet at C 0.15 is a lively link colour next to grey text. ink-3 on surface (4.64 and 4.63) is marginal. The lilac page tint plus a violet fringe (C 0.14) make the whole page read as a colour rather than a paper."
+   },
+   {
+    "id": "PRINT4",
+    "score": 6.5,
+    "rationale": "Its light mode copes best with sun in the whole field: the paper is bright (Y 0.905), and the dark pill with a lemon label holds 3.26 and 3.53 under glare. The green slate night (bg L 0.235) is a restful ground for a dim room. Costs: dark text is the brightest in the set (Y 0.82), and the lemon pill acts as a lamp (Y 0.74). Light links are a low-chroma forest green only 1.13:1 off ink-2, with deutan collapse at 2.8, so they look like body text. The identity lives in dark only, and light mode is generic paper."
+   },
+   {
+    "id": "SPORE3",
+    "score": 6.5,
+    "rationale": "It holds up well under colour vision deficiency and glare: chartreuse keeps dE 12 to 15 from text for protan and deutan, and the light mode uses a dark pill. Meta is good (4.79 and 5.54). Costs: the dark CTA is a lamp (Y 0.65, C 0.145). In dark, accent, accent-text and focus are the same colour, so a focused CTA gets a ring that matches the button. The ink-hued light fringe (dE 4.9) is among the busiest. In light mode the brand colour only appears as a button label."
+   },
+   {
+    "id": "OPTICS4",
+    "score": 6,
+    "rationale": "Its light mode has the same strengths as SPORE3. Its dark mode has the most aggressive accent in the set: chartreuse at C 0.165 to 0.17 and Y 0.71 for the pill, plus neon links. By its own story, this is the hue the eye sees with the least light, which is exactly what a dim room does not need. ink-3 on surface (4.64 and 4.62) is marginal. Neon on graphite also drifts toward terminal styling (rejected direction R1)."
+   },
+   {
+    "id": "SPORE5",
+    "score": 6,
+    "rationale": "The amethyst night is the most chromatic dark ground in the field (C 0.035), and it carries a lime pill (Y 0.66) and lime links. That pair is complementary and both colours are saturated: it is the one pairing here that visibly vibrates at link size in dark. Meta is good (4.79 and 5.78). The lilac light mode with an aubergine pill is fine, but much less expressive than dark, so the two modes are not equally first-class."
+   },
+   {
+    "id": "PRINT1",
+    "score": 6,
+    "rationale": "The neutral graphite greys are excellent (ink 13.7 and 14.2, meta 5.06 and 5.05). But magenta at C 0.18 to 0.19 is the most saturated accent offered. Hot pink links (#ec71ae) and pill (#dc52a0) on near-black are loud in a dim room, and the magenta fringe (C 0.18) leaves a pink haze on the light paper."
+   },
+   {
+    "id": "PRINT5",
+    "score": 5.5,
+    "rationale": "The light mode is good (mint paper, plum accent at C 0.11, meta 5.13). The dark mode misses the comfort brief. Mint links are almost the same hue and luminance as the mint-white ink (dE 8.9, ratio 1.22). Dark ink contrast is the highest in the field (14.8:1, and tinted). The mint pill is bright (Y 0.66). The accent also swaps hue between modes, so the two themes do not read as one brand."
+   },
+   {
+    "id": "PRINT2",
+    "score": 5.5,
+    "rationale": "Ink and meta are fine, and the light violet pill holds well under glare (3.2). Costs: links sit at the same luminance as ink-2 in both modes (1.02 and 1.01) and inside the text's own violet family. They collapse for tritan (3.6 and 2.1). Small blue-violet text focuses slightly soft because of chromatic aberration. The blue fringe alpha (0.09) is over spec."
+   }
+  ],
+  "top3": [
+   "OPTICS3",
+   "PRINT3",
+   "SPORE1"
+  ],
+  "vetoes": [],
+  "graftIdeas": "1. Use OPTICS3's comfort structure under whichever hue family wins identity: ink at 11.5 to 12.5:1, a lifted night (bg L about 0.23), a dark CTA filled mid-bright (Y 0.3 to 0.45) with a dark label, and a focus ring in a second hue that is distinct from the fill. Raise the light page to L about 0.952, because 0.940 costs sun headroom. Concrete example: SPORE1's mauve plus verdigris, or OPTICS5's rubine on jade, rebuilt on that skeleton.\n2. Fix the dark CTAs of OPTICS2, OPTICS5 and SPORE4 by giving dark mode a lighter fill with a dark label instead of reusing the light fill with white text. For example OPTICS5 dark accent oklch(0.68 0.13 5) with on-accent oklch(0.20 0.02 175). That keeps the \"same colour in both modes\" story and lifts the fill from about 3.4 to over 5:1, without making it a lamp.\n3. For the chartreuse and lemon family (OPTICS4, SPORE3, PRINT4), keep the light-mode inverted dark pill: it is the most glare-proof CTA in the field. In dark, tame the pill (L 0.80 or less, C 0.12 or less), or make it a tinted surface pill with a chartreuse label, and give the focus ring a different hue from the fill.\n4. Give PRINT3 an ink-hued or verdigris fringe instead of copper, at alpha 0.07 light and 0.05 dark. Copper reads as a beige haze and drifts toward G1.\n5. OPTICS family meta: move ink-3 to about L 0.49 light and 0.66 dark so dates clear 5:1 on surface, up from 4.6.\n6. Bring every fringe into the dossier band: 0.05 to 0.08 light, 0.04 to 0.06 dark. Over spec today: OPTICS5 L, SPORE1 L, PRINT2 L, PRINT3 L and D. Prefer low-chroma fringe hues (C 0.07 or less); the C 0.14 to 0.18 magenta fringes (PRINT1, OPTICS3, OPTICS1) tint the paper pink.\n7. Sitewide rule whichever palette wins: body links always carry a 1px underline offset 3px. No candidate's link colour separates from ink-2 by luminance (1.0 to 1.5:1), and the teal, rubine and violet links each collapse for at least one colour vision deficiency. Keep the hover surface step at dE 2.5 or more so row hover survives sunlight."
+ }
+]

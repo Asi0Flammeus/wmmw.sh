@@ -1,0 +1,125 @@
+# PRINT1
+== light
+  ok   ink         on bg       13.73:1 (min 7)  #24272b / #f5f4f2
+  ok   ink         on surface  12.71:1 (min 7)  #24272b / #eaecee
+  ok   ink-2       on bg        7.71:1 (min 4.5)  #4a4d53 / #f5f4f2
+  ok   ink-3       on bg        5.47:1 (min 4.5)  #606369 / #f5f4f2
+  ok   ink-3       on surface   5.06:1 (min 4.5)  #606369 / #eaecee
+  ok   accent-text on bg        6.06:1 (min 4.5)  #a82571 / #f5f4f2
+  ok   accent-text on surface   5.61:1 (min 4.5)  #a82571 / #eaecee
+  ok   on-accent   on accent    5.62:1 (min 4.5)  #fcf9fa / #b5297b
+  ok   accent      on bg        5.36:1 (min 3)  #b5297b / #f5f4f2
+  ok   focus       on bg        6.06:1 (min 3)  #a82571 / #f5f4f2
+  ok   line        on bg        1.31:1 (min 1.15)  #24272b / #f5f4f2
+== dark
+  ok   ink         on bg       14.21:1 (min 7)  #e1e3e6 / #141517
+  ok   ink         on surface  13.19:1 (min 7)  #e1e3e6 / #1b1c1f
+  ok   ink-2       on bg        8.22:1 (min 4.5)  #abaeb2 / #141517
+  ok   ink-3       on bg        5.44:1 (min 4.5)  #898c91 / #141517
+  ok   ink-3       on surface   5.05:1 (min 4.5)  #898c91 / #1b1c1f
+  ok   accent-text on bg        6.55:1 (min 4.5)  #ec71ae / #141517
+  ok   accent-text on surface   6.08:1 (min 4.5)  #ec71ae / #1b1c1f
+  ok   on-accent   on accent    5.19:1 (min 4.5)  #1a0d13 / #dc52a0
+  ok   accent      on bg        5.02:1 (min 3)  #dc52a0 / #141517
+  ok   focus       on bg        6.55:1 (min 3)  #ec71ae / #141517
+  ok   line        on bg        1.38:1 (min 1.15)  #e1e3e6 / #141517
+# PRINT2
+== light
+  ok   ink         on bg       13.55:1 (min 7)  #2a2636 / #f5f5fa
+  ok   ink         on surface  12.50:1 (min 7)  #2a2636 / #ececf3
+  ok   ink-2       on bg        7.54:1 (min 4.5)  #514d5f / #f5f5fa
+  ok   ink-3       on bg        5.34:1 (min 4.5)  #676373 / #f5f5fa
+  ok   ink-3       on surface   4.92:1 (min 4.5)  #676373 / #ececf3
+  ok   accent-text on bg        7.39:1 (min 4.5)  #6239a0 / #f5f5fa
+  ok   accent-text on surface   6.82:1 (min 4.5)  #6239a0 / #ececf3
+  ok   on-accent   on accent    7.08:1 (min 4.5)  #fbf9ff / #693cab
+  ok   accent      on bg        6.82:1 (min 3)  #693cab / #f5f5fa
+  ok   focus       on bg        7.39:1 (min 3)  #6239a0 / #f5f5fa
+  ok   line        on bg        1.30:1 (min 1.15)  #2a2636 / #f5f5fa
+== dark
+  ok   ink         on bg       14.31:1 (min 7)  #e4e4ea / #17141d
+  ok   ink         on surface  13.17:1 (min 7)  #e4e4ea / #201c27
+  ok   ink-2       on bg        8.43:1 (min 4.5)  #b1b0ba / #17141d
+  ok   ink-3       on bg        5.49:1 (min 4.5)  #8d8c97 / #17141d
+  ok   ink-3       on surface   5.05:1 (min 4.5)  #8d8c97 / #201c27
+  ok   accent-text on bg        8.48:1 (min 4.5)  #bda5f1 / #17141d
+  ok   accent-text on surface   7.80:1 (min 4.5)  #bda5f1 / #201c27
+  ok   on-accent   on accent    7.17:1 (min 4.5)  #15111f / #af92eb
+  ok   accent      on bg        7.01:1 (min 3)  #af92eb / #17141d
+  ok   focus       on bg        8.48:1 (min 3)  #bda5f1 / #17141d
+  ok   line        on bg        1.38:1 (min 1.15)  #e4e4ea / #17141d
+# PRINT3
+== light
+  ok   ink         on bg       13.60:1 (min 7)  #1c292b / #f1f5f4
+  ok   ink         on surface  12.60:1 (min 7)  #1c292b / #e6edec
+  ok   ink-2       on bg        7.29:1 (min 4.5)  #435356 / #f1f5f4
+  ok   ink-3       on bg        5.17:1 (min 4.5)  #59696c / #f1f5f4
+  ok   ink-3       on surface   4.79:1 (min 4.5)  #59696c / #e6edec
+  ok   accent-text on bg        5.70:1 (min 4.5)  #0a6c69 / #f1f5f4
+  ok   accent-text on surface   5.28:1 (min 4.5)  #0a6c69 / #e6edec
+  ok   on-accent   on accent    5.51:1 (min 4.5)  #f6fbfb / #06726e
+  ok   accent      on bg        5.21:1 (min 3)  #06726e / #f1f5f4
+  ok   focus       on bg        5.70:1 (min 3)  #0a6c69 / #f1f5f4
+  ok   line        on bg        1.31:1 (min 1.15)  #1c292b / #f1f5f4
+== dark
+  ok   ink         on bg       14.08:1 (min 7)  #dce5e4 / #101818
+  ok   ink         on surface  12.95:1 (min 7)  #dce5e4 / #162021
+  ok   ink-2       on bg        8.46:1 (min 4.5)  #a6b4b4 / #101818
+  ok   ink-3       on bg        5.41:1 (min 4.5)  #80908f / #101818
+  ok   ink-3       on surface   4.98:1 (min 4.5)  #80908f / #162021
+  ok   accent-text on bg        8.74:1 (min 4.5)  #66c4be / #101818
+  ok   accent-text on surface   8.04:1 (min 4.5)  #66c4be / #162021
+  ok   on-accent   on accent    7.73:1 (min 4.5)  #021819 / #4ab8b5
+  ok   accent      on bg        7.60:1 (min 3)  #4ab8b5 / #101818
+  ok   focus       on bg        8.74:1 (min 3)  #66c4be / #101818
+  ok   line        on bg        1.38:1 (min 1.15)  #dce5e4 / #101818
+# PRINT4
+== light
+  ok   ink         on bg       13.67:1 (min 7)  #21282a / #f4f4f2
+  ok   ink         on surface  12.62:1 (min 7)  #21282a / #e9ece9
+  ok   ink-2       on bg        7.66:1 (min 4.5)  #464f52 / #f4f4f2
+  ok   ink-3       on bg        5.43:1 (min 4.5)  #5c6568 / #f4f4f2
+  ok   ink-3       on surface   5.02:1 (min 4.5)  #5c6568 / #e9ece9
+  ok   accent-text on bg        6.78:1 (min 4.5)  #1e604a / #f4f4f2
+  ok   accent-text on surface   6.27:1 (min 4.5)  #1e604a / #e9ece9
+  ok   on-accent   on accent    9.48:1 (min 4.5)  #f6ec8a / #223f34
+  ok   accent      on bg       10.48:1 (min 3)  #223f34 / #f4f4f2
+  ok   focus       on bg        6.78:1 (min 3)  #1e604a / #f4f4f2
+  ok   line        on bg        1.31:1 (min 1.15)  #21282a / #f4f4f2
+== dark
+  ok   ink         on bg       13.67:1 (min 7)  #e9eae5 / #12221b
+  ok   ink         on surface  12.32:1 (min 7)  #e9eae5 / #192b23
+  ok   ink-2       on bg        8.44:1 (min 4.5)  #b4bbb5 / #12221b
+  ok   ink-3       on bg        5.67:1 (min 4.5)  #8f9a92 / #12221b
+  ok   ink-3       on surface   5.11:1 (min 4.5)  #8f9a92 / #192b23
+  ok   accent-text on bg       12.38:1 (min 4.5)  #ebe289 / #12221b
+  ok   accent-text on surface  11.16:1 (min 4.5)  #ebe289 / #192b23
+  ok   on-accent   on accent   11.86:1 (min 4.5)  #13261e / #ece280
+  ok   accent      on bg       12.39:1 (min 3)  #ece280 / #12221b
+  ok   focus       on bg       12.38:1 (min 3)  #ebe289 / #12221b
+  ok   line        on bg        1.43:1 (min 1.15)  #e9eae5 / #12221b
+# PRINT5
+== light
+  ok   ink         on bg       13.51:1 (min 7)  #342135 / #ecf6f4
+  ok   ink         on surface  12.45:1 (min 7)  #342135 / #e0eeeb
+  ok   ink-2       on bg        7.87:1 (min 4.5)  #5a455b / #ecf6f4
+  ok   ink-3       on bg        5.57:1 (min 4.5)  #6f5c70 / #ecf6f4
+  ok   ink-3       on surface   5.13:1 (min 4.5)  #6f5c70 / #e0eeeb
+  ok   accent-text on bg        6.59:1 (min 4.5)  #7e4176 / #ecf6f4
+  ok   accent-text on surface   6.08:1 (min 4.5)  #7e4176 / #e0eeeb
+  ok   on-accent   on accent    6.26:1 (min 4.5)  #edfaf7 / #87447e
+  ok   accent      on bg        6.08:1 (min 3)  #87447e / #ecf6f4
+  ok   focus       on bg        6.59:1 (min 3)  #7e4176 / #ecf6f4
+  ok   line        on bg        1.31:1 (min 1.15)  #342135 / #ecf6f4
+== dark
+  ok   ink         on bg       14.81:1 (min 7)  #d7eee8 / #1d131e
+  ok   ink         on surface  13.64:1 (min 7)  #d7eee8 / #271a27
+  ok   ink-2       on bg        9.13:1 (min 4.5)  #a4beb8 / #1d131e
+  ok   ink-3       on bg        6.11:1 (min 4.5)  #829c96 / #1d131e
+  ok   ink-3       on surface   5.63:1 (min 4.5)  #829c96 / #271a27
+  ok   accent-text on bg       12.17:1 (min 4.5)  #9ae3cb / #1d131e
+  ok   accent-text on surface  11.21:1 (min 4.5)  #9ae3cb / #271a27
+  ok   on-accent   on accent   11.84:1 (min 4.5)  #241425 / #96e4cb
+  ok   accent      on bg       12.20:1 (min 3)  #96e4cb / #1d131e
+  ok   focus       on bg       12.17:1 (min 3)  #9ae3cb / #1d131e
+  ok   line        on bg        1.39:1 (min 1.15)  #d7eee8 / #1d131e
