@@ -1,47 +1,215 @@
 @import "./reset.css";
+@import "./fonts.css";
 @import "./tokens.css";
+@import "./prose.css";
 
-/* Basteleur (Keussel, Velvetyne, OFL) — self-hosted: velvetyne.fr sends no
-   CORS headers, hot-linking breaks. Two cuts only, no italic. */
-@font-face {
-  font-family: "Basteleur";
-  font-weight: 400 500;
-  font-display: swap;
-  src: url("/fonts/basteleur-moonlight.woff2") format("woff2");
+/* =============================================================================
+   Base elements. Element rules sit in :where() (zero specificity) so any
+   component class wins without a fight.
+   ========================================================================== */
+
+html {
+  background: var(--bg);
+  color: var(--ink);
 }
-@font-face {
-  font-family: "Basteleur";
-  font-weight: 700;
-  font-display: swap;
-  src: url("/fonts/basteleur-bold.woff2") format("woff2");
+@media (min-width: 768px) {
+  /* #ghosts, #intake and every anchor land below the sticky dock */
+  html {
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
 }
 
 body {
-  position: relative;
-  background: var(--bg);
-  color: var(--bone);
-  font-family: var(--body);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-family: var(--text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-kerning: normal;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Themed islands (/lab, /lego swatches): data-theme on any element */
+[data-theme]:not(html) {
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+/* Display face. Basteleur's accents rise above its ascent: never clip it,
+   never set its line-height under 1.04, never bold, italic or uppercase. */
+:where(h1, h2, h3, .disp) {
+  font-family: var(--disp);
+  font-weight: 400;
+  font-style: normal;
+  font-feature-settings: "ss01";
+  font-synthesis: none;
+  letter-spacing: var(--ls-disp);
+  text-wrap: balance;
+}
+:where(h1) {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+}
+:where(h2) {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+}
+:where(h3) {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+}
+:where(h1, h2, h3) {
+  margin: 0 0 0.45em;
+}
+/* ss01 must not leak into reading or mono text nested in a display element */
+:where(h1, h2, h3, .disp) :where(.mono, .meta-label, code, kbd, samp) {
+  font-feature-settings: normal;
+}
+
+:where(p) {
+  text-wrap: pretty;
+}
+:where(strong, b) {
+  font-weight: 600;
+}
+
+/* Links in running text: ruby text, always underlined (spec §1.2 rule 1).
+   Rows, nav, chips and buttons override this in their own components. */
+:where(a) {
+  color: var(--accent-text);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+:where(a:hover) {
+  text-decoration-thickness: 2px;
+}
+html.anim :where(a) {
+  transition: text-decoration-thickness var(--t-1) ease;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--bg);
+  background: var(--selection-bg);
+  color: var(--selection-ink);
 }
 
-a {
-  color: inherit;
+:where(code, kbd, samp, pre) {
+  font-family: var(--mono);
+  font-size: var(--fs-code);
+  font-variant-ligatures: none;
+}
+:where(kbd) {
+  padding: 0.1em 0.4em;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
 }
 
-a:focus-visible,
-button:focus-visible,
-[tabindex]:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 2px;
+:where(hr) {
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+:where(input, textarea, select)::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+/* checking a box is input, not action: ink, never ruby */
+:where(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--ink);
+}
+
+/* Shiki dual themes (astro.config): light colours are inline, dark ones
+   ride on --shiki-dark. The well colour comes from prose.css. */
+[data-theme="dark"] .astro-code,
+[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark) !important;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .astro-code,
+  :root:not([data-theme]) .astro-code span {
+    color: var(--shiki-dark) !important;
+  }
+}
+
+/* =============================================================================
+   Theme switch (src/lib/theme.ts). The 200 ms crossfade is scoped to
+   html.theme-xfade so ClientRouter navigations keep Astro's own timing.
+   ========================================================================== */
+
+html.theme-xfade::view-transition-old(root),
+html.theme-xfade::view-transition-new(root) {
+  animation-duration: var(--t-2);
+  animation-timing-function: ease;
+}
+/* transition:animate="none" on the header emits ungated animation:none rules
+   for its view-transition name; drop the name during the theme crossfade so
+   the dock fades with the page instead of snapping. */
+html.theme-xfade [data-qa="header"] {
+  view-transition-name: none !important;
+}
+/* one frame without transitions, so colours swap together, not in a stagger */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+/* JS-only and no-JS-only controls */
+html:not(.js) [data-js-only] {
+  display: none !important;
+}
+html.js [data-nojs-only] {
+  display: none !important;
+}
+
+/* =============================================================================
+   Layout utilities
+   ========================================================================== */
+
+.wrap {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+/* reading column inside .wrap: posts, manifesto, legal */
+.measure {
+  max-width: var(--measure);
+}
+
+/* two-column split from 1100 px: home (work | writings), /contact (mirrored) */
+@media (min-width: 1100px) {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .split.mirror {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+}
+
+/* type roles as classes, for elements whose tag does not match their role.
+   (.text and .meta are taken by the annotation overlay: never define them.) */
+.mono {
+  font-family: var(--mono);
+  font-size: var(--fs-mono);
+  line-height: var(--lh-mono);
+  letter-spacing: var(--ls-mono);
+}
+.lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
+  color: var(--ink-2);
+  max-width: var(--measure-lead);
+  text-wrap: balance;
 }
 
 /* screen-reader only */
@@ -52,184 +220,287 @@ button:focus-visible,
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
 
-/* skip link */
+/* skip link: one of the few ruby fills (it is an action) */
 .skip {
   position: fixed;
   top: -4rem;
-  left: 0.9rem;
-  z-index: 90;
-  background: var(--accent);
-  color: var(--bg);
-  padding: 0.4rem 0.9rem;
+  left: var(--pad);
+  z-index: var(--z-skip);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 1.1rem;
   border-radius: var(--r-pill);
-  font-family: var(--mono);
-  font-size: 0.82rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 600 1rem/1 var(--text);
   text-decoration: none;
-  transition: top 0.15s;
 }
-
 .skip:focus {
-  top: 0.9rem;
+  top: 0.75rem;
+}
+html.anim .skip {
+  transition: top var(--t-1) var(--ease-out);
 }
 
-/* layout wrap */
-.wrap {
-  max-width: var(--maxw);
-  margin-inline: auto;
-  padding-inline: var(--pad);
+/* =============================================================================
+   Primitives (spec §6.3)
+   ========================================================================== */
+
+/* Radio chip: <label class="chip-radio"><input class="sr" type="radio"><span>Label</span></label>.
+   Checked is inverted ink (selected input, not action) plus a 12 px check. */
+.chip-radio {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+.chip-radio > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-height: var(--tap);
+  padding: 0 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  font: 500 0.9375rem/1.2 var(--text);
+  color: var(--ink);
+}
+.chip-radio > input:checked + span {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.chip-radio > input:checked + span::before {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  mask: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 6.4l2.6 2.6L10 3.4' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.chip-radio > input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .chip-radio:hover > input:not(:checked) + span {
+    border-color: var(--ink);
+    background: var(--surface);
+  }
+}
+html.anim .chip-radio > span {
+  transition:
+    border-color var(--t-2) ease,
+    background-color var(--t-2) ease;
 }
 
-/* display heading */
+/* Tooltip: data-tip="text" (and data-tip-align="start|end" near an edge).
+   The bubble only exists while shown, so it never widens the page at rest.
+   Hover waits 350 ms; focus-visible shows it at once; never on touch. */
+:where([data-tip]) {
+  position: relative;
+}
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: var(--z-tooltip);
+  display: none;
+  width: max-content;
+  max-width: 28ch;
+  padding: 0.45rem 0.65rem;
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  box-shadow: var(--shadow-1);
+  font: 400 var(--fs-meta) / 1.4 var(--text);
+  font-feature-settings: normal;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  text-decoration: none;
+  white-space: normal;
+  pointer-events: none;
+  translate: -50% 0;
+}
+[data-tip][data-tip-align="start"]::after {
+  left: 0;
+  translate: none;
+}
+[data-tip][data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+  translate: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-tip]:hover::after {
+    display: block;
+    animation: tip-in var(--t-1) ease 350ms both;
+  }
+}
+[data-tip]:focus-visible::after {
+  display: block;
+}
+@keyframes tip-in {
+  from {
+    opacity: 0;
+  }
+}
+html.anim [data-tip]:hover::after {
+  animation-name: tip-in-moving;
+}
+@keyframes tip-in-moving {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+/* Moiré safety net (owners hide their own layers too). Q1 and Q3 degrade to
+   plain marks in forced colors, so only the fields are listed here. */
+@media (forced-colors: active), print {
+  [data-moire-layer="w1"],
+  [data-moire-layer="w2"],
+  [data-moire-layer="q2"] {
+    display: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .chip-radio > input:checked + span {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  [aria-invalid="true"] {
+    border-left: 3px solid CanvasText;
+  }
+}
+
+/* =============================================================================
+   Legacy editorial primitives (registry "editorial-css", parked pages).
+   Kept permanently, restyled with the William Moiré tokens. New pages use
+   PageHead, .wrap, .split and their own components instead.
+   ========================================================================== */
+
 .disp-h {
   font-family: var(--disp);
-  font-weight: 500;
-  font-size: clamp(1.9rem, 3.8vw, 2.9rem);
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  font-weight: 400;
+  font-feature-settings: "ss01";
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-disp);
   text-wrap: balance;
   max-width: 34ch;
-  margin-bottom: 2.2rem;
+  margin-bottom: var(--block-gap);
 }
-
 .disp-h .gold {
-  color: var(--accent);
+  color: var(--ink-2);
 }
 
-/* section rhythm: layout family varies per section via offset-l / offset-r */
 .sec {
   position: relative;
-  z-index: 2;
-  padding-block: clamp(4rem, 9vw, 7.5rem);
+  padding-block: var(--block-gap) var(--section-gap);
 }
-
 .sec-inner {
   max-width: var(--panelw);
 }
-
 .offset-l .sec-inner {
   margin-right: auto;
 }
-
 .offset-r .sec-inner {
   margin-left: auto;
 }
 
-/* section head: display heading + filament underline drawn when the mycelium
-   branch reaches it (myc:reach adds .myc-touched; .in + delay is the safety
-   net; no-JS and reduced-motion show it fully drawn) */
 .sec-head {
-  position: relative;
-  margin-bottom: 2.2rem;
+  margin-bottom: var(--block-gap);
 }
 .sec-head .disp-h {
-  margin-bottom: 0.9rem;
-}
-.sec-head::after {
-  content: "";
-  display: block;
-  width: 3.5rem;
-  height: 2px;
-  margin-top: 1.1rem;
-  background: var(--accent);
-  border-radius: 1px;
-  transform-origin: left center;
-}
-html.anim .sec-head::after {
-  transform: scaleX(0);
-  transition: transform 0.9s var(--ease-swift);
-}
-html.anim .sec-head.in::after {
-  transform: scaleX(1);
-  transition-delay: 2.8s;
-}
-html.anim .sec-head.myc-touched::after {
-  transform: scaleX(1);
-  transition-delay: 0s;
+  margin-bottom: 0.6rem;
 }
 
-/* section intro line */
 .sec-intro {
   font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  letter-spacing: var(--ls-lead);
   color: var(--ink-2);
   max-width: 46ch;
   text-wrap: pretty;
 }
 
-/* editorial arrow link ("Tous les projets", back links) */
+/* text link with a trailing arrow ("Tous les écrits", back links) */
 .arrow-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
-  font-family: var(--disp);
+  gap: 0.45em;
+  font-family: var(--text);
   font-weight: 500;
-  font-size: 0.98rem;
-  color: var(--accent);
-  text-decoration: none;
+  font-size: var(--fs-small);
+  color: var(--accent-text);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 .arrow-link::after {
   content: "";
-  width: 0.9em;
-  height: 0.9em;
+  flex: none;
+  width: 0.8em;
+  height: 0.8em;
   background: currentColor;
   mask: no-repeat center / contain
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8h10m0 0L9 4m4 4l-4 4' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 .arrow-link:hover,
 .arrow-link:focus-visible {
-  color: var(--accent-2);
+  text-decoration-thickness: 2px;
 }
 html.anim .arrow-link::after {
-  transition: transform var(--t-base) var(--ease-swift);
+  transition: transform 240ms var(--ease-out);
 }
-.arrow-link:hover::after,
+@media (hover: hover) and (pointer: fine) {
+  .arrow-link:hover::after {
+    transform: translateX(2px);
+  }
+}
 .arrow-link:focus-visible::after {
-  transform: translateX(3px);
+  transform: translateX(2px);
 }
 
-/* ruled editorial list rows (projects, tools, writings) */
+/* ruled list rows (projects, tools, writings, reading lists) */
 .rows {
   display: flex;
   flex-direction: column;
 }
 .row-item {
-  padding-block: 1.5rem;
-  border-top: 1px solid var(--hair-2);
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--line);
 }
 .row-item:last-child {
-  border-bottom: 1px solid var(--hair-2);
+  border-bottom: 1px solid var(--line);
 }
 
-/* mono micro-label (dates, statuses; the only mono left in chrome) */
+/* mono micro-label (dates, tags, statuses): also the meta utility for new code */
 .meta-label {
   font-family: var(--mono);
   font-size: var(--fs-meta);
-  letter-spacing: 0.02em;
+  line-height: var(--lh-mono);
+  letter-spacing: var(--ls-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--ink-3);
 }
 
-/* scroll reveal: CSS scroll-driven, so content never gates on JS. Browsers
-   without animation-timeline (and reduced motion) simply show everything. */
-@supports (animation-timeline: view()) {
-  html.anim .reveal {
-    animation: reveal-in both;
-    animation-timeline: view();
-    animation-range: entry 5% entry 45%;
-  }
-}
-@keyframes reveal-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-}
+/* .reveal is kept as a no-op hook: reveal-on-scroll is retired (spec §4) */
 
-/* single-column collapse */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .sec-inner {
     max-width: 100%;
   }
