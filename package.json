@@ -18,6 +18,7 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/jetbrains-mono": "^5.2.0",
+    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
     "astro": "^6.3.1",
     "katex": "^0.17.0",
     "zod": "^4.4.3"
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@types/katex": "^0.16.8",
+    "sharp": "^0.34.5",
     "typescript": "^6.0.3"
   }
 }
