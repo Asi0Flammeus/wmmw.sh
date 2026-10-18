@@ -14,44 +14,15 @@
   const q = new URLSearchParams(location.search);
   const f = q.get("theme"); if (f === "light" || f === "dark") d.dataset.theme = f;   /* lab override */
   if (q.has("bare")) d.classList.add("bare");
-  d.classList.add("js");
+  d.classList.add("js", "anim");   /* production: html.anim gates every transition (kept across astro:before-swap) */
 })();
 </script>
+<link rel="stylesheet" href="tokens.css">
 <style>
-@font-face { font-family: "Basteleur"; font-weight: 400; font-display: swap; src: url("fonts/basteleur-moonlight.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0152-0153, U+2000-206F, U+20AC, U+2122; }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+1E00-1E9F; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
+/* Page crossfade, 200 ms, through View Transitions. No striped wipe (dossier §9).
+   Scoped to html.theme-vt so it never retimes the ClientRouter's page transitions. */
+html.theme-vt::view-transition-old(root), html.theme-vt::view-transition-new(root) { animation-duration: 200ms; animation-timing-function: ease; }
 
-:root {
-  color-scheme: light;
-  --bg: #f3f2ee; --surface: #ebe9e3; --ink: #1d1c19; --ink-2: #5a5850; --accent: #1f6b5c;
-  --line: rgb(29 28 25 / .12);
-  --disp: "Basteleur", Georgia, serif; --text: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
-  --pad: clamp(1.25rem, 5vw, 3rem);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .14); }
-}
-:root[data-theme="dark"] { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .14); }
-
-*, *::before, *::after { box-sizing: border-box; }
-html { background: var(--bg); color: var(--ink); }
-body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
-
-/* Page crossfade, 200 ms, through View Transitions. No striped wipe (dossier §9). */
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; animation-timing-function: ease; }
-@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
-
-.head .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
-.mark { font: 400 1.375rem/1 var(--disp); }
-.nav { display: flex; align-items: center; gap: clamp(.9rem, 2vw, 1.75rem); font: 400 .8125rem/1 var(--mono); color: var(--ink-2); }
-.nav .links { display: flex; gap: inherit; }
-.nav .langs { display: flex; gap: .6rem; }
-.nav .langs [aria-current] { color: var(--ink); }
 
 /* ===== Q1 · theme toggle =====
    Two line gratings in a 20 px disc: pitch 2 px, line 1 px, pixel aligned.
@@ -73,36 +44,35 @@ a { color: inherit; text-decoration: none; }
 }
 .q1::after {
   content: ""; position: absolute; inset: 0; border-radius: 50%;
-  box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow .16s ease;
+  box-shadow: inset 0 0 0 1px var(--line);
 }
-.q1:hover::after { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 35%, transparent); }
+html.anim .q1::after { transition: box-shadow .16s ease; }
+.q1:hover::after { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 35%, transparent); }
 .q1 svg { width: 32px; height: 32px; display: block; overflow: visible; }
-.q1 .b { transform-box: view-box; transform-origin: 6px 16px; transform: rotate(0deg); transition: transform .42s cubic-bezier(.2, .8, .2, 1); }
+.q1 .b { transform-box: view-box; transform-origin: 6px 16px; transform: rotate(0deg); }
+html.anim .q1 .b { transition: transform .42s cubic-bezier(.2, .8, .2, 1); }
 :root[data-theme="dark"] .q1 .b { transform: rotate(var(--q1-a)); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .q1 .b { transform: rotate(var(--q1-a)); } }
-@media (prefers-reduced-motion: reduce) { .q1 .b { transition: none; } }
+@media (prefers-reduced-motion: reduce) { html.anim .q1 .b { transition: none; } }
 html:not(.js) .q1 { display: none; }            /* no JS: the system preference applies, no dead button */
 @media (forced-colors: active) {
   .q1 svg .b { display: none; }                 /* plain disc of lines, no moiré */
   .q1::after { box-shadow: inset 0 0 0 1px ButtonText; }
+  .q1 { color: ButtonText; }
 }
 
 /* Specimens (lab only) */
 .spec { padding-block: clamp(3rem, 10vh, 6rem); }
-.spec h1 { margin: 0 0 .5rem; font: 400 clamp(2rem, 4vw, 3rem)/1.1 var(--disp); }
-.spec p { margin: 0 0 2.5rem; max-width: 52ch; color: var(--ink-2); }
+.spec h1 { margin: 0 0 .5rem; font: 400 var(--fs-h2)/1.2 var(--disp); font-feature-settings: "ss01"; letter-spacing: -.01em; }
+.spec p { margin: 0 0 2.5rem; max-width: 52ch; font-size: var(--fs-small); line-height: 1.45; color: var(--ink-2); }
 .grid { display: grid; grid-template-columns: repeat(2, max-content); gap: 1.5rem 4rem; align-items: end; }
 .cell { display: grid; gap: .75rem; justify-items: start; }
-.cell small { font: 400 .75rem/1 var(--mono); color: var(--ink-2); }
+.cell small { font: 400 var(--fs-meta)/1.4 var(--mono); color: var(--ink-2); }
 .row-sizes { display: flex; align-items: end; gap: 1.75rem; }
 .ico { color: var(--ink); }
 .ico .b { transform-box: view-box; transform-origin: 6px 16px; }
 .ico.on .b { transform: rotate(var(--q1-a, 3deg)); }
 
-.lab { position: fixed; right: 12px; bottom: 12px; z-index: 50; display: flex; gap: .5rem; align-items: center; padding: .45rem .6rem; font: 400 11px/1 var(--mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.lab b { color: var(--ink); font-weight: 500; }
-.lab button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: .3rem .45rem; cursor: pointer; }
-.bare .lab { display: none; }
 </style>
 </head>
 <body>
@@ -118,11 +88,11 @@ html:not(.js) .q1 { display: none; }            /* no JS: the system preference 
 
 <header class="head">
   <div class="wrap">
-    <a class="mark" href="#">[w]</a>
-    <nav class="nav" aria-label="Principale">
+    <a class="wordmark" href="#" aria-label="William Moiré, retour à l'accueil">[w]</a>
+    <nav class="nav" aria-label="Sections">
       <span class="links"><a href="#">Projets</a><a href="#">Outils</a><a href="#">Écrits</a><a href="#">Contact</a></span>
       <button class="q1" type="button" data-q1></button>
-      <span class="langs"><a href="#" aria-current="true">FR</a><a href="#">EN</a><a href="#">ES</a></span>
+      <span class="langs" aria-label="Langues"><a href="#" aria-current="true" lang="fr" title="Français">FR</a><a href="#" lang="en" title="English">EN</a><a href="#" lang="es" title="Español">ES</a></span>
     </nav>
   </div>
 </header>
@@ -174,8 +144,10 @@ html:not(.js) .q1 { display: none; }            /* no JS: the system preference 
   btn.addEventListener("click", () => {
     const next = current() === "dark" ? "light" : "dark";
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (document.startViewTransition && !still) document.startViewTransition(() => apply(next));
-    else apply(next);
+    if (document.startViewTransition && !still) {
+      root.classList.add("theme-vt");
+      document.startViewTransition(() => apply(next)).finished.finally(() => root.classList.remove("theme-vt"));
+    } else apply(next);
   });
   sys.addEventListener("change", label);
   label();

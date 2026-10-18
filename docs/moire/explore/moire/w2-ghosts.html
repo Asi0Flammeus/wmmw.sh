@@ -10,51 +10,25 @@
   const t = q.get("theme"); if (t === "light" || t === "dark") d.dataset.theme = t;
   if (q.has("bare")) d.classList.add("bare");
   if (q.has("rm")) d.classList.add("rm");
-  if (q.get("palette") === "lycurgus") d.dataset.palette = "lycurgus";
   const g = q.get("ghost"); if (g === "accent" || g === "ink") d.dataset.ghost = g;
 })();
 </script>
+<link rel="stylesheet" href="tokens.css">
 <style>
-@font-face { font-family: "Basteleur"; font-weight: 400; font-display: swap; src: url("fonts/basteleur-moonlight.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0152-0153, U+2000-206F, U+20AC, U+2122; }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+1E00-1E9F; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+20A0-20C0; }
-
-:root {
-  color-scheme: light;
-  --bg: #f3f2ee; --surface: #ebe9e3; --ink: #1d1c19; --ink-2: #5a5850; --accent: #1f6b5c;
-  --line: rgb(29 28 25 / .12);
-  --fringe: #1d1c19; --fringe-a: .075;
-  --disp: "Basteleur", "JetBrains Mono", Georgia, serif;
-  --text: "Instrument Sans", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
-  --pad: clamp(1.25rem, 5vw, 3rem);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); --fringe: #ebe8e1; --fringe-a: .05; }
-}
-:root[data-theme="dark"] { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); --fringe: #ebe8e1; --fringe-a: .05; }
-/* OPTICS5 Lycurgus, the palette judges' current lead (palettes/optics/palettes.json) */
-:root[data-palette="lycurgus"] { --bg: oklch(.957 .007 172); --surface: oklch(.930 .010 172); --ink: oklch(.278 .022 180); --ink-2: oklch(.413 .018 180); --accent: oklch(.515 .16 5); --line: oklch(.278 .022 180 / .14); --fringe: oklch(.50 .07 172); --fringe-a: .09; }
-@media (prefers-color-scheme: dark) { :root[data-palette="lycurgus"]:not([data-theme="light"]) { --bg: oklch(.195 .012 175); --surface: oklch(.232 .014 175); --ink: oklch(.887 .008 170); --ink-2: oklch(.742 .012 175); --accent: oklch(.705 .12 5); --line: oklch(.887 .008 170 / .14); --fringe: oklch(.78 .08 172); --fringe-a: .06; } }
-:root[data-palette="lycurgus"][data-theme="dark"] { --bg: oklch(.195 .012 175); --surface: oklch(.232 .014 175); --ink: oklch(.887 .008 170); --ink-2: oklch(.742 .012 175); --accent: oklch(.705 .12 5); --line: oklch(.887 .008 170 / .14); --fringe: oklch(.78 .08 172); --fringe-a: .06; }
-
-*, *::before, *::after { box-sizing: border-box; }
-html { background: var(--bg); color: var(--ink); }
-body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
-
 .now { padding-block: clamp(4rem, 14vh, 9rem) 6rem; }
-.now h2 { margin: 0 0 1rem; font: 400 clamp(1.5rem, 2.4vw, 1.875rem)/1.2 var(--disp); }
-.rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.row { border-bottom: 1px solid var(--line); }
-.row > a, .row > .in { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr auto; gap: 1.5rem; align-items: center; min-height: 4.5rem; padding: .9rem 0; }
-.t { margin: 0; font: 400 1.375rem/1.2 var(--disp); }
-.d { margin: 0; color: var(--ink-2); }
-.u { font: 400 .75rem/1 var(--mono); color: var(--ink-2); }
+.row > a, .row > .in { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr auto; gap: .25rem 1.5rem; align-items: baseline; padding: 1rem 0 1.05rem; }
+
+/* « Préviens-moi »: a quiet text button that opens one field in place (copy deck §9.10).
+   Lab context only: it shows that the field lives in the text column, clear of the lens. */
+.notify { margin-top: .35rem; }
+.notify summary { display: inline-flex; align-items: center; gap: .35em; list-style: none; cursor: pointer; font: 500 var(--fs-small)/1.45 var(--text); color: var(--accent-text); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.notify summary::-webkit-details-marker { display: none; }
+.notify form { display: grid; gap: .4rem; max-width: 26rem; margin-top: .75rem; }
+.notify label { font-size: var(--fs-small); }
+.notify .field { display: flex; gap: .5rem; }
+.notify input { flex: 1; min-width: 0; font: inherit; font-size: var(--fs-small); color: var(--ink); background: var(--bg); border: 1px solid color-mix(in oklch, var(--ink) 35%, transparent); border-radius: 8px; padding: .55rem .7rem; }
+.notify button { font: 500 var(--fs-small)/1 var(--text); color: var(--ink); background: transparent; border: 1px solid color-mix(in oklch, var(--ink) 35%, transparent); border-radius: 8px; padding: .55rem .8rem; cursor: pointer; }
+.notify small { font-size: var(--fs-meta); line-height: 1.45; color: var(--ink-2); }
 
 /* ===== W2 · Ghosts lens =====
    Shape moiré, 1D. Base: the ghost squeezed into every 4 px band (p_b = 4).
@@ -63,7 +37,8 @@ a { color: inherit; text-decoration: none; }
    the other way. The lens paints the exact composite (magnified shape masked
    by its slits) from the lens position, instead of rasterising two 4 px
    gratings on top of each other, which aliases at DPR 1. */
-.ghosts .in { grid-template-columns: minmax(10rem, 16rem) 1fr clamp(220px, 30vw, 440px); }
+.ghosts .in { grid-template-columns: minmax(10rem, 16rem) 1fr clamp(220px, 24vw, 340px); }
+.ghosts .gl { align-self: start; }            /* top anchored: opening « Préviens-moi » never moves the lens */
 .gl {
   --pb: 4px; --period: 68px; --gh: 78px; --lens-w: 136px;
   --L: 56px;                    /* lens position; a multiple of --pb puts both ghosts whole and centred (rest frame) */
@@ -72,7 +47,7 @@ a { color: inherit; text-decoration: none; }
 }
 .gl-base {
   position: absolute; inset: 0; pointer-events: none;
-  background: var(--fringe); opacity: calc(var(--fringe-a) * 2.6);
+  background: var(--fringe); opacity: var(--fringe-a);          /* a line layer: §9 alpha cap */
   -webkit-mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
   mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
 }
@@ -81,13 +56,15 @@ a { color: inherit; text-decoration: none; }
   position: absolute; top: 0; left: 0; width: var(--lens-w); height: 100%;
   transform: translateX(var(--L));
   border-radius: 12px; background: var(--bg);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 22%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 24%, transparent);
   cursor: grab; touch-action: pan-y; outline-offset: 4px;
 }
 .gl-lens:active { cursor: grabbing; }
+.gl-lens:hover { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 42%, transparent); }
 .gl-lens::before {               /* the lens grating itself, faint, so the lens reads as a second layer */
   content: ""; position: absolute; inset: 1px; border-radius: 11px; pointer-events: none;
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 9%, transparent) 0 1.7px, transparent 1.7px 4.25px);
+  background: repeating-linear-gradient(90deg, var(--fringe) 0 1.7px, transparent 1.7px 4.25px);
+  opacity: var(--fringe-a);
 }
 .gl-ghosts {
   position: absolute; inset: 1px; border-radius: 11px; pointer-events: none;
@@ -108,32 +85,41 @@ a { color: inherit; text-decoration: none; }
 @media (forced-colors: active) { .gl { display: none; } }
 @media print { .gl { display: none; } }
 @media (max-width: 767px) {
-  .row > a, .row > .in, .ghosts .in { grid-template-columns: 1fr; gap: .35rem; }
+  .row > a { grid-template-columns: 1fr auto; } .row > a .d { grid-column: 1 / -1; grid-row: 2; }
+  .ghosts .in { grid-template-columns: 1fr; gap: .35rem; }
   .gl { margin-top: .6rem; }
 }
 
-/* Lab bar */
-.lab { position: fixed; right: 12px; bottom: 12px; z-index: 50; display: flex; gap: .5rem; align-items: center; padding: .45rem .6rem; font: 400 11px/1 var(--mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.lab b { color: var(--ink); font-weight: 500; }
-.lab button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: .3rem .45rem; cursor: pointer; }
-.lab label { display: flex; gap: .3rem; align-items: center; cursor: pointer; }
-.bare .lab { display: none; }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <main>
   <section class="now">
     <div class="wrap">
       <h2>En ce moment</h2>
       <ul class="rows">
-        <li class="row"><a href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue.</span><span class="u">planb.academy</span></a></li>
-        <li class="row"><a href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="u">alysis.cat</span></a></li>
-        <li class="row"><a href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="u">contact</span></a></li>
+        <li class="row"><a href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li class="row"><a href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li class="row"><a href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-next"/></svg></span></a></li>
         <li class="row ghosts">
           <div class="in">
             <h3 class="t">Ghosts</h3>
-            <p class="d">Des agents au très long cours. J'en dis plus bientôt.</p>
-            <div class="gl" data-w2>
+            <div>
+              <p class="d">Des agents au très long cours. J'en dis plus bientôt.</p>
+              <details class="notify">
+                <summary>Préviens-moi</summary>
+                <form onsubmit="return false">
+                  <label for="gn">Ton email ou ton pseudo</label>
+                  <span class="field"><input id="gn" name="contact" autocomplete="email" placeholder="toi@exemple.fr" aria-describedby="gn-h"><button type="submit">Me prévenir</button></span>
+                  <small id="gn-h">Un pseudo ? Précise le réseau : @camille sur X.</small>
+                </form>
+              </details>
+            </div>
+            <div class="gl" data-w2 data-label="Loupe à fantômes : fais-la glisser">
               <div class="gl-base" aria-hidden="true"></div>
               <div class="gl-fade" aria-hidden="true"></div>
               <div class="gl-lens"><div class="gl-ghosts" aria-hidden="true"></div></div>
@@ -148,7 +134,6 @@ a { color: inherit; text-decoration: none; }
 <div class="lab" role="group" aria-label="Labo">
   <b>W2 Ghosts</b>
   <button type="button" data-act="theme">thème</button>
-  <button type="button" data-act="palette">palette</button>
   <button type="button" data-act="ghost">fantôme</button>
   <label><input type="checkbox" data-act="rm"> mouvement réduit</label>
 </div>
@@ -241,7 +226,7 @@ function mountW2(box) {
 
   // keyboard: the lens is a slider (a toy: it carries no information)
   lens.setAttribute("role", "slider"); lens.tabIndex = 0;
-  if (!lens.hasAttribute("aria-label")) lens.setAttribute("aria-label", "Loupe à fantômes, à faire glisser");
+  if (!lens.hasAttribute("aria-label")) lens.setAttribute("aria-label", box.dataset.label || "Ghosts");
   lens.setAttribute("aria-valuemin", "0"); lens.setAttribute("aria-valuemax", "100");
   lens.setAttribute("aria-orientation", "horizontal");
   on(lens, "keydown", (e) => {
@@ -262,7 +247,7 @@ function mountW2(box) {
   function destroy() {
     ac.abort(); ro.disconnect(); if (raf) cancelAnimationFrame(raf); raf = 0; drag = null;
     for (const p of ["--L", "--gx", "--reveal"]) box.style.removeProperty(p);
-    for (const a of ["role", "tabindex", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-orientation"]) lens.removeAttribute(a);
+    for (const a of ["role", "tabindex", "aria-label", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-orientation"]) lens.removeAttribute(a);
   }
   return { destroy, stats };
 }
@@ -275,7 +260,6 @@ function mountW2(box) {
   document.querySelector(".lab").addEventListener("click", (e) => {
     const b = e.target.closest("[data-act]"); if (!b) return;
     if (b.dataset.act === "theme") { const dark = getComputedStyle(root).colorScheme === "dark"; root.dataset.theme = dark ? "light" : "dark"; }
-    if (b.dataset.act === "palette") { if (root.dataset.palette) delete root.dataset.palette; else root.dataset.palette = "lycurgus"; }
     if (b.dataset.act === "ghost") { root.dataset.ghost = root.dataset.ghost === "accent" ? "ink" : "accent"; }
     if (b.dataset.act === "rm") root.classList.toggle("rm", b.checked);
   });

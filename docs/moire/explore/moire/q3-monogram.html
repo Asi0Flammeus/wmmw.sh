@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Q3 · Monogramme W·M · labo moiré</title>
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -12,36 +13,15 @@
   if (q.has("bare")) d.classList.add("bare");
 })();
 </script>
+<link rel="stylesheet" href="tokens.css">
 <style>
-@font-face { font-family: "Basteleur"; font-weight: 400; font-display: swap; src: url("fonts/basteleur-moonlight.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0152-0153, U+2000-206F, U+20AC, U+2122; }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+1E00-1E9F; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); }
-
-:root {
-  color-scheme: light;
-  --bg: #f3f2ee; --surface: #ebe9e3; --ink: #1d1c19; --ink-2: #5a5850; --accent: #1f6b5c;
-  --line: rgb(29 28 25 / .12);
-  --disp: "Basteleur", Georgia, serif; --text: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
-  --pad: clamp(1.25rem, 5vw, 3rem);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); }
-}
-:root[data-theme="dark"] { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); }
-
-*, *::before, *::after { box-sizing: border-box; }
-html { background: var(--bg); color: var(--ink); }
-body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antialiased; }
-.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
-.lbl { font: 400 .75rem/1.2 var(--mono); color: var(--ink-2); }
+.lbl { font: 400 var(--fs-meta)/1.4 var(--mono); color: var(--ink-2); }
 
 /* Monogram usage: inline <svg><use href="#wm-line"/></svg>. Colour comes from
    currentColor; --mono-b colours the M (and its half of the shared stroke),
    --mono-s colours the shared stroke of the solid mark. */
 .wm { display: block; color: var(--ink); }
 .wm-a { fill: var(--mono-a, currentColor); } .wm-b { fill: var(--mono-b, currentColor); } .wm-s { fill: var(--mono-s, currentColor); }
-.wm.tint { --mono-b: var(--accent); }
 .wm-solid { --mono-s: var(--accent); }
 @media (forced-colors: active) { .wm { color: CanvasText; --mono-b: CanvasText; --mono-s: CanvasText; } }
 
@@ -49,35 +29,32 @@ body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antial
 .top { display: grid; grid-template-columns: auto 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: center; }
 .big { width: clamp(220px, 28vw, 360px); aspect-ratio: 1; }
 .side { display: grid; gap: 1.5rem; }
-.side h1 { margin: 0; font: 400 clamp(2rem, 4.2vw, 3.4rem)/1.1 var(--disp); }
-.side p { margin: 0; color: var(--ink-2); max-width: 40ch; }
+.side h1 { margin: 0; font: 400 var(--fs-h2)/1.2 var(--disp); font-feature-settings: "ss01"; letter-spacing: -.01em; }
+.side p { margin: 0; color: var(--ink-2); max-width: 40ch; font-size: var(--fs-small); line-height: 1.45; }
 .pal { display: flex; align-items: center; gap: 0; }
-.pal .wm { width: 112px; height: 112px; }
+.pal .wm { width: 192px; height: 192px; }   /* line pitch 8/512 x 192 = 3 px: crisp at DPR 1 */
 .pal .wm.turn { transform: scaleX(-1); }   /* mirror: W·M | M·W */
-.pal .axis { width: 1px; height: 64px; background: var(--ink); opacity: .28; margin-inline: 2px; }
-.pal-read { display: flex; gap: 2.2rem; font: 400 .75rem/1 var(--mono); color: var(--ink-2); padding-left: 30px; }
+.pal .axis { width: 1px; height: 112px; background: var(--ink); opacity: .28; margin-inline: 2px; }
+.pal-read { display: flex; gap: 5.5rem; font: 400 var(--fs-meta)/1.4 var(--mono); color: var(--ink-2); padding-left: 30px; }
 
 .sizes { display: flex; flex-wrap: wrap; align-items: end; gap: 2rem 2.25rem; padding-top: 2rem; border-top: 1px solid var(--line); }
 .sizes figure { margin: 0; display: grid; gap: .6rem; justify-items: start; }
-.tab { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .8rem .45rem .6rem; border-radius: 9px 9px 0 0; background: var(--surface); font: 400 .75rem/1 var(--text); color: var(--ink); }
+.tab { display: inline-flex; align-items: center; gap: .5rem; padding: .45rem .8rem .45rem .6rem; border-radius: 9px 9px 0 0; background: var(--surface); font: 400 .8125rem/1 var(--text); color: var(--ink); }
 .tab img { width: 16px; height: 16px; }
 
 .og { display: grid; grid-template-columns: auto 1fr; gap: 2.5rem; align-items: start; padding-top: 2rem; border-top: 1px solid var(--line); }
 .og img { width: min(600px, 80vw); height: auto; border-radius: 8px; box-shadow: 0 0 0 1px var(--line); }
-.og p { margin: .4rem 0 0; color: var(--ink-2); max-width: 34ch; }
+.og p { margin: .4rem 0 0; color: var(--ink-2); max-width: 34ch; font-size: var(--fs-small); line-height: 1.45; }
 
 .foot { padding-top: 2rem; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .sig { display: flex; align-items: center; }
-.sig .wm { width: 34px; height: 34px; }
+.sig .wm { width: 32px; height: 32px; }   /* 48 px and below: solid mark only (dossier §9) */
 .sig .wm.turn { transform: scaleX(-1); }
-.sig .axis { width: 1px; height: 18px; background: var(--ink); opacity: .3; }
-.foot p { margin: 0; font-size: .875rem; color: var(--ink-2); }
+.sig .axis { width: 1px; height: 18px; margin-inline: 3px; background: var(--ink); opacity: .3; }
+.foot p { margin: 0; font-size: var(--fs-small); line-height: 1.45; color: var(--ink-2); }
+.foot .bar { display: inline-block; width: 1px; height: 1em; margin-inline: .35em; vertical-align: -.15em; background: currentColor; opacity: .5; }
 
 @media (max-width: 767px) { .top, .og { grid-template-columns: 1fr; } }
-.lab { position: fixed; right: 12px; bottom: 12px; z-index: 50; display: flex; gap: .5rem; align-items: center; padding: .45rem .6rem; font: 400 11px/1 var(--mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.lab b { color: var(--ink); font-weight: 500; }
-.lab button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: .3rem .45rem; cursor: pointer; }
-.bare .lab { display: none; }
 </style>
 </head>
 <body>
@@ -90,9 +67,9 @@ body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antial
       <p>Le W porte une trame, le M une autre. Elles ne se croisent que dans le trait commun : c'est là que naît le motif. En miroir, il se lit M·W.</p>
       <div>
         <div class="pal" aria-hidden="true">
-          <svg class="wm tint" viewBox="0 0 512 512"><use href="#wm-line"/></svg>
+          <svg class="wm" viewBox="0 0 512 512"><use href="#wm-line"/></svg>
           <span class="axis"></span>
-          <svg class="wm tint turn" viewBox="0 0 512 512"><use href="#wm-line"/></svg>
+          <svg class="wm turn" viewBox="0 0 512 512"><use href="#wm-line"/></svg>
         </div>
         <div class="pal-read"><span>W·M William Moiré</span><span>M·W Mycelic Wealth</span></div>
       </div>
@@ -100,9 +77,7 @@ body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antial
   </section>
 
   <section class="sizes" aria-label="Tailles">
-    <figure><svg class="wm" viewBox="0 0 512 512" width="128" height="128" aria-hidden="true"><use href="#wm-line"/></svg><figcaption class="lbl">trames · 128</figcaption></figure>
-    <figure><svg class="wm" viewBox="0 0 512 512" width="96" height="96" aria-hidden="true"><use href="#wm-line"/></svg><figcaption class="lbl">96</figcaption></figure>
-    <figure><svg class="wm" viewBox="0 0 512 512" width="64" height="64" aria-hidden="true"><use href="#wm-line"/></svg><figcaption class="lbl">64</figcaption></figure>
+    <figure><svg class="wm" viewBox="0 0 512 512" width="192" height="192" aria-hidden="true"><use href="#wm-line"/></svg><figcaption class="lbl">trames · 192 et plus</figcaption></figure>
     <figure><svg class="wm wm-solid" viewBox="0 0 512 512" width="48" height="48" aria-hidden="true"><use href="#wm-solid"/></svg><figcaption class="lbl">plein · 48</figcaption></figure>
     <figure><svg class="wm wm-solid" viewBox="0 0 512 512" width="32" height="32" aria-hidden="true"><use href="#wm-solid"/></svg><figcaption class="lbl">32</figcaption></figure>
     <figure><svg class="wm wm-solid" viewBox="0 0 512 512" width="16" height="16" aria-hidden="true"><use href="#wm-solid"/></svg><figcaption class="lbl">16</figcaption></figure>
@@ -110,15 +85,15 @@ body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antial
   </section>
 
   <section class="og" aria-label="Image de partage">
-    <img src="og.svg" width="1200" height="630" alt="William Moiré. Deux trames. Un troisième motif.">
+    <img src="og.svg" width="1200" height="630" alt="William Moiré. Deux trames de lignes superposées, un troisième motif.">
     <div><span class="lbl">og.svg · 1200 × 630</span><p>Rendue en PNG au build. Polices sous-ensemble embarquées, le fichier tient seul.</p></div>
   </section>
 
   <footer class="foot">
     <span class="sig" aria-hidden="true">
-      <svg class="wm" viewBox="0 0 512 512"><use href="#wm-line"/></svg><span class="axis"></span><svg class="wm turn" viewBox="0 0 512 512"><use href="#wm-line"/></svg>
+      <svg class="wm" viewBox="0 0 512 512"><use href="#wm-solid"/></svg><span class="axis"></span><svg class="wm turn" viewBox="0 0 512 512"><use href="#wm-solid"/></svg>
     </span>
-    <p>William Moiré · Mycelic Wealth. WM | MW, un palindrome. Ce qui sort du réseau y revient.</p>
+    <p>William Moiré · Mycelic Wealth. WM<span class="bar"><span class="sr">|</span></span>MW, un palindrome. Ce qui sort du réseau y revient.</p>
   </footer>
 </main>
 <div class="lab" role="group" aria-label="Labo"><b>Q3 monogramme</b><button type="button" data-act="theme">thème</button></div>

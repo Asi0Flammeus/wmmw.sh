@@ -13,50 +13,20 @@
   d.classList.add("anim");        /* production: html.anim gates every transition (kept across astro:before-swap) */
 })();
 </script>
+<link rel="stylesheet" href="tokens.css">
 <style>
-@font-face { font-family: "Basteleur"; font-weight: 400; font-display: swap; src: url("fonts/basteleur-moonlight.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0152-0153, U+2000-206F, U+20AC, U+2122; }
-@font-face { font-family: "Instrument Sans"; font-weight: 400 700; font-display: swap; src: url("fonts/instrument-sans-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+1E00-1E9F; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F, U+2190-2199; }
-@font-face { font-family: "JetBrains Mono"; font-weight: 100 800; font-display: swap; src: url("fonts/jetbrains-mono-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02AF, U+20A0-20C0; }
-
-:root {
-  color-scheme: light;
-  --bg: #f3f2ee; --surface: #ebe9e3; --ink: #1d1c19; --ink-2: #5a5850; --accent: #1f6b5c;
-  --line: rgb(29 28 25 / .12);
-  --fringe: #1d1c19; --fringe-a: .075;
-  --disp: "Basteleur", "JetBrains Mono", Georgia, serif; --text: "Instrument Sans", system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
-  --pad: clamp(1.25rem, 5vw, 3rem);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); --fringe: #ebe8e1; --fringe-a: .055; }
-}
-:root[data-theme="dark"] { color-scheme: dark; --bg: #141413; --surface: #1c1b19; --ink: #ebe8e1; --ink-2: #a9a69c; --accent: #7cc4b0; --line: rgb(235 232 225 / .12); --fringe: #ebe8e1; --fringe-a: .055; }
-
-*, *::before, *::after { box-sizing: border-box; }
-html { background: var(--bg); color: var(--ink); }
-body { margin: 0; font: 400 1rem/1.5 var(--text); -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration: none; }
-.wrap { max-width: 1200px; margin: 0 auto; padding-inline: var(--pad); }
-
 .now { padding-block: clamp(4rem, 14vh, 9rem) 6rem; }
-.now h2 { margin: 0 0 1rem; font: 400 clamp(1.5rem, 2.4vw, 1.875rem)/1.2 var(--disp); }
-.rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.rows li { border-bottom: 1px solid var(--line); }
 
 .row {
-  display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr auto clamp(96px, 12vw, 168px);
-  gap: 0 1.5rem; align-items: center; min-height: 4.5rem; padding: .9rem 0;
+  display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr clamp(96px, 12vw, 168px) auto;
+  gap: .25rem 1.5rem; align-items: center; padding: 1rem 0 1.05rem;
   border-radius: 6px; outline-offset: 4px;
 }
-.row:focus-visible { outline: 2px solid var(--accent); }
-.t { font: 400 1.375rem/1.2 var(--disp); }
-.d { color: var(--ink-2); }
-.u { font: 400 .75rem/1 var(--mono); color: var(--ink-2); display: inline-flex; gap: .4em; align-items: baseline; }
-.u i { font-style: normal; display: inline-block; }
-html.anim .u, html.anim .u i { transition: color .24s ease, transform .24s cubic-bezier(.2, .8, .2, 1); }
+.row:focus-visible { outline: 2px solid var(--focus); }
+html.anim .u, html.anim .u .arrow { transition: color .24s ease, transform .24s cubic-bezier(.2, .8, .2, 1); }
 .row:is(:hover, :focus-visible) .u { color: var(--ink); }
-.row:is(:hover, :focus-visible) .u i { transform: translateX(2px); }
+.row:is(:hover, :focus-visible) .u .arrow { transform: translateX(2px); }
+.row:is(:hover, :focus-visible) .u .arrow.ext { transform: translate(1.5px, -1.5px); }
 
 /* ===== Q2 · running-row strip =====
    Its own grid column: text never sits on it. Two line layers (pitch 5 px)
@@ -64,10 +34,10 @@ html.anim .u, html.anim .u i { transition: color .24s ease, transform .24s cubic
    opacity, so the layers combine before they fade and the fringe stays visible
    at a faint line alpha. Hover or focus turns layer B from 4 deg to 1.2 deg
    about the strip's left edge: fringe period 72 px to 239 px, the bands slide
-   out toward the link's destination and widen. Transform only, compositor. */
+   out toward the arrow and widen. Transform only, compositor. */
 .q2 {
   position: relative; height: 32px; overflow: hidden; isolation: isolate; pointer-events: none;
-  opacity: calc(var(--fringe-a) * 1.5);
+  opacity: var(--fringe-a);                       /* a line layer: §9 alpha cap */
   -webkit-mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
   mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
 }
@@ -85,30 +55,29 @@ html.rm .q2::after { transition: none !important; }
 @media print { .q2 { display: none; } }
 @media (hover: none) { .q2 { display: none; } }          /* hover only (dossier): no strip on touch */
 @media (max-width: 767px) {
-  .row { grid-template-columns: 1fr; gap: .3rem; }
+  .row { grid-template-columns: 1fr auto; } .row .d { grid-column: 1 / -1; grid-row: 2; }
   .q2 { display: none; }
 }
 
 .ghosts .row { grid-template-columns: minmax(10rem, 16rem) 1fr auto; }
-.note { font: 400 .75rem/1 var(--mono); color: var(--ink-2); }
+.note { font: 400 var(--fs-meta)/1.4 var(--mono); color: var(--ink-3); }
 
-.lab { position: fixed; right: 12px; bottom: 12px; z-index: 50; display: flex; gap: .5rem; align-items: center; padding: .45rem .6rem; font: 400 11px/1 var(--mono); color: var(--ink-2); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
-.lab b { color: var(--ink); font-weight: 500; }
-.lab button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: .3rem .45rem; cursor: pointer; }
-.lab label { display: flex; gap: .3rem; align-items: center; cursor: pointer; }
-.bare .lab { display: none; }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
 <main>
   <section class="now">
     <div class="wrap">
       <h2>En ce moment</h2>
       <ul class="rows">
-        <li><a class="row" href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue.</span><span class="u">planb.academy <i aria-hidden="true">↗</i></span><span class="q2" aria-hidden="true"></span></a></li>
-        <li><a class="row" href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="u">alysis.cat <i aria-hidden="true">↗</i></span><span class="q2" aria-hidden="true"></span></a></li>
-        <li><a class="row" href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="u">contact <i aria-hidden="true">→</i></span><span class="q2" aria-hidden="true"></span></a></li>
-        <li class="ghosts"><div class="row"><span class="t">Ghosts</span><span class="d">Des agents au très long cours. J'en dis plus bientôt.</span><span class="note">W2 vit ici</span></div></li>
+        <li><a class="row" href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow ext" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow ext" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-next"/></svg></span></a></li>
+        <li class="ghosts"><div class="row"><span class="t">Ghosts</span><span class="d">Des agents au très long cours. J'en dis plus bientôt.</span><span class="note">W2</span></div></li>
       </ul>
     </div>
   </section>
