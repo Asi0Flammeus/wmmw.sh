@@ -6,8 +6,9 @@
     {
       "name": "tokens",
       "type": "registry:item",
-      "title": "wmmw design tokens",
-      "description": "Palette humus/bone/or, type scale, spacing, radii and motion tokens (vanilla CSS custom properties). The base every other item assumes.",
+      "title": "William Moiré design tokens",
+      "description": "Lycurgus palette, light and dark, type scale a3, spacing, motion, glass. Vanilla CSS custom properties plus the font faces; the base every other item assumes.",
+      "dependencies": ["@fontsource-variable/schibsted-grotesk", "@fontsource-variable/jetbrains-mono"],
       "files": [
         {
           "path": "src/styles/tokens.css",
@@ -18,6 +19,11 @@
           "path": "src/styles/reset.css",
           "type": "registry:file",
           "target": "src/styles/reset.css"
+        },
+        {
+          "path": "src/styles/fonts.css",
+          "type": "registry:file",
+          "target": "src/styles/fonts.css"
         }
       ]
     },
@@ -25,12 +31,143 @@
       "name": "editorial-css",
       "type": "registry:item",
       "title": "Editorial primitives",
-      "description": "Section heads with mycelium filament underline, sec-intro, arrow links, ruled rows, meta labels. Global CSS on top of the tokens (add the tokens item first).",
+      "description": "Base elements, primitives, prose, legacy editorial classes. Global CSS on top of the tokens (add the tokens item first).",
       "files": [
         {
           "path": "src/styles/global.css",
           "type": "registry:file",
           "target": "src/styles/global.css"
+        },
+        {
+          "path": "src/styles/prose.css",
+          "type": "registry:file",
+          "target": "src/styles/prose.css"
+        }
+      ]
+    },
+    {
+      "name": "ui-primitives",
+      "type": "registry:item",
+      "title": "UI primitives",
+      "description": "Arrow (inline SVG), Button (primary ruby loupe, secondary, text), link Chip and PageHead. Needs the tokens and editorial-css items.",
+      "files": [
+        {
+          "path": "src/components/ui/Arrow.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Arrow.astro"
+        },
+        {
+          "path": "src/components/ui/Button.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Button.astro"
+        },
+        {
+          "path": "src/components/ui/Chip.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Chip.astro"
+        },
+        {
+          "path": "src/components/ui/PageHead.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/PageHead.astro"
+        }
+      ]
+    },
+    {
+      "name": "theme-toggle",
+      "type": "registry:item",
+      "title": "Theme toggle (Q1)",
+      "description": "Two line gratings in a 20 px disc: one even hatch by day, a half moon by night. Persists the choice, follows the system until clicked, crossfades through View Transitions.",
+      "files": [
+        {
+          "path": "src/components/ThemeToggle.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/ThemeToggle.astro"
+        },
+        {
+          "path": "src/lib/theme.ts",
+          "type": "registry:file",
+          "target": "src/lib/theme.ts"
+        }
+      ]
+    },
+    {
+      "name": "monogram",
+      "type": "registry:item",
+      "title": "W·M monogram (Q3)",
+      "description": "Line monogram (two gratings meeting in the shared stroke, 192 px and up) and solid monogram, as inline SVG symbols.",
+      "files": [
+        {
+          "path": "src/components/Monogram.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/Monogram.astro"
+        },
+        {
+          "path": "src/components/MonogramDefs.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/MonogramDefs.astro"
+        }
+      ]
+    },
+    {
+      "name": "moire-field",
+      "type": "registry:item",
+      "title": "Moiré field (W1)",
+      "description": "Two-source ring interference anchored on a glyph, WebGL2 on demand over a static CSS frame, masked around text.",
+      "files": [
+        {
+          "path": "src/components/moire/MoireField.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/MoireField.astro"
+        },
+        {
+          "path": "src/components/moire/w1.ts",
+          "type": "registry:file",
+          "target": "src/components/wmmw/w1.ts"
+        }
+      ]
+    },
+    {
+      "name": "ghosts-lens",
+      "type": "registry:item",
+      "title": "Ghosts lens (W2)",
+      "description": "Draggable slit lens over a squeezed ghost base: a 1D shape moiré, keyboard slider included.",
+      "files": [
+        {
+          "path": "src/components/moire/GhostsLens.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/GhostsLens.astro"
+        },
+        {
+          "path": "src/components/moire/w2.ts",
+          "type": "registry:file",
+          "target": "src/components/wmmw/w2.ts"
+        }
+      ]
+    },
+    {
+      "name": "steps-line",
+      "type": "registry:item",
+      "title": "Steps line (V1)",
+      "description": "Four beats on one line as a real ordered list: tell, scope, build, maintain (optional).",
+      "files": [
+        {
+          "path": "src/components/visual/StepsLine.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/StepsLine.astro"
+        }
+      ]
+    },
+    {
+      "name": "five-strands",
+      "type": "registry:item",
+      "title": "Five strands (V2)",
+      "description": "Five woven strands, the money strand bolder in ink: wealth has five dimensions.",
+      "files": [
+        {
+          "path": "src/components/visual/FiveStrands.astro",
+          "type": "registry:file",
+          "target": "src/components/wmmw/FiveStrands.astro"
         }
       ]
     },
@@ -176,6 +313,70 @@
           "path": "src/pages/r/[id].ts",
           "type": "registry:file",
           "target": "src/pages/r/[id].ts"
+        }
+      ]
+    },
+    {
+      "name": "intake-inbox",
+      "type": "registry:item",
+      "title": "Intake inbox",
+      "description": "Qualified intake API: signed start token, honeypot, rate limits, one JSON file per request, Bearer-token read and delete. Needs INTAKE_TOKEN and an INTAKE_DIR volume.",
+      "dependencies": ["zod"],
+      "files": [
+        {
+          "path": "src/lib/intake/rules.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/rules.ts"
+        },
+        {
+          "path": "src/lib/intake/schema.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/schema.ts"
+        },
+        {
+          "path": "src/lib/intake/token.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/token.ts"
+        },
+        {
+          "path": "src/lib/intake/ratelimit.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/ratelimit.ts"
+        },
+        {
+          "path": "src/lib/intake/store.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/store.ts"
+        },
+        {
+          "path": "src/lib/intake/fit.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/fit.ts"
+        },
+        {
+          "path": "src/lib/intake/process.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/process.ts"
+        },
+        {
+          "path": "src/lib/intake/auth.ts",
+          "type": "registry:file",
+          "target": "src/lib/intake/auth.ts"
+        },
+        {
+          "path": "src/pages/api/intake/index.ts",
+          "type": "registry:file",
+          "target": "src/pages/api/intake/index.ts"
+        },
+        {
+          "path": "src/pages/api/intake/[id].ts",
+          "type": "registry:file",
+          "target": "src/pages/api/intake/[id].ts"
+        },
+        {
+          "path": "src/pages/api/intake/start.ts",
+          "type": "registry:file",
+          "target": "src/pages/api/intake/start.ts"
         }
       ]
     }

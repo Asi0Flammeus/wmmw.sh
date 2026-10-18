@@ -1,0 +1,140 @@
+---
+/**
+ * V1 « Comment on travaille » (copy deck §3.5): four beats on one line, a real
+ * ordered list whose labels stay live text. Stub by WP1a with the final props;
+ * WP2 owns the drawing (double segment 2 to 3, dashed optional beat 4) and M4,
+ * the travelling dot played by the nearest [data-steps-host] ancestor.
+ */
+import { type Locale, t } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  /** compact: home, labels only; detailed: /contact, labels + subs. */
+  variant?: "compact" | "detailed";
+  /** 1: node 1 filled in accent (M6), used on the intake confirmation. */
+  done?: 0 | 1;
+  class?: string;
+}
+
+const { locale, variant = "compact", done = 0, class: className } = Astro.props;
+const steps = t(locale).steps;
+const beats = [
+  { key: "tell", ...steps.tell },
+  { key: "scope", ...steps.scope },
+  { key: "build", ...steps.build },
+  { key: "care", ...steps.care },
+] as const;
+---
+
+<ol
+  class:list={["steps-line", `steps-${variant}`, className]}
+  aria-label={steps.label}
+  data-done={done}
+  data-qa="visual-v1"
+>
+  {
+    beats.map((beat) => (
+      <li class:list={["beat", `beat-${beat.key}`]}>
+        <span class="node" aria-hidden="true" />
+        <span class="label">
+          {beat.label}
+          {beat.key === "care" && <span class="sr"> {steps.care.optional}</span>}
+        </span>
+        {variant === "detailed" && <span class="sub">{beat.sub}</span>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps-line {
+    list-style: none;
+    display: grid;
+    gap: 0.25rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-2);
+  }
+  .steps-compact {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 420px;
+  }
+  .beat {
+    position: relative;
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  /* the line: a hairline from this node to the next */
+  .steps-compact .beat:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    right: 0;
+    height: 1px;
+    background: var(--ink-3);
+  }
+  .steps-compact .beat-build::after {
+    background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
+  }
+  .steps-compact .beat:last-child {
+    justify-items: end;
+    text-align: right;
+  }
+  .node {
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--ink-2);
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .beat-care .node {
+    border-style: dashed;
+  }
+  .beat-care .label {
+    color: var(--ink-3);
+  }
+  [data-done="1"] .beat-tell .node {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .steps-detailed {
+    gap: 1rem;
+  }
+  .steps-detailed .beat {
+    grid-template-columns: 9px minmax(0, 1fr);
+    column-gap: 0.85rem;
+    row-gap: 0.15rem;
+  }
+  .steps-detailed .node {
+    grid-row: span 2;
+    margin-top: 0.3em;
+  }
+  .steps-detailed .label {
+    color: var(--ink);
+  }
+  .sub {
+    font-family: var(--text);
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    letter-spacing: normal;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 339px) {
+    .steps-compact {
+      grid-template-columns: 1fr;
+    }
+    .steps-compact .beat::after {
+      display: none;
+    }
+    .steps-compact .beat:last-child {
+      justify-items: start;
+      text-align: left;
+    }
+  }
+</style>

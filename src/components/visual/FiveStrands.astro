@@ -1,0 +1,81 @@
+---
+/**
+ * V2 « Cinq fils » (copy deck §3.5): five woven strands, the fourth (money)
+ * drawn bolder in ink, by contrast and weight, never by hue. Stub by WP1a
+ * with the final props; WP2 owns the drawing and M5, the weave played by the
+ * nearest [data-strands-host] ancestor. Path data is computed here at build:
+ * no client JS.
+ */
+interface Props {
+  /** figure: 120 x 40 (home); stub: 16 x 8 bullet (/contact). */
+  variant?: "figure" | "stub";
+  /** stub only; 3 is the money strand (bold ink). */
+  strand?: 0 | 1 | 2 | 3 | 4;
+  /** figure only: role="img" + aria-label; absent => aria-hidden. */
+  label?: string;
+  class?: string;
+}
+
+const { variant = "figure", strand = 0, label, class: className } = Astro.props;
+const MONEY = 3;
+
+/** One strand as a sampled sine, `periods` across `w`, centred on y0. */
+const wave = (w: number, y0: number, amp: number, phase: number, periods: number): string => {
+  const steps = Math.max(8, Math.round(w / 2));
+  let d = "";
+  for (let i = 0; i <= steps; i++) {
+    const x = (w * i) / steps;
+    const y = y0 + amp * Math.sin((2 * Math.PI * periods * i) / steps + phase);
+    d += `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+  }
+  return d;
+};
+
+const figure = variant === "figure";
+const width = figure ? 120 : 16;
+const height = figure ? 40 : 8;
+const strands = figure
+  ? [0, 1, 2, 3, 4].map((i) => ({
+      i,
+      d: wave(120, 8 + i * 6, 3, (i * 2 * Math.PI) / 5, 1.5),
+    }))
+  : [{ i: strand, d: wave(16, 4, 2, (strand * 2 * Math.PI) / 5, 1) }];
+const named = figure && label;
+---
+
+<svg
+  class:list={["five-strands", `strands-${variant}`, className]}
+  viewBox={`0 0 ${width} ${height}`}
+  width={width}
+  height={height}
+  fill="none"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  role={named ? "img" : undefined}
+  aria-label={named ? label : undefined}
+  aria-hidden={named ? undefined : "true"}
+  focusable="false"
+  data-qa="visual-v2"
+>
+  {
+    strands.map((s) => (
+      <path class:list={["strand", { money: s.i === MONEY }]} data-strand={s.i} d={s.d} />
+    ))
+  }
+</svg>
+
+<style>
+  .five-strands {
+    display: block;
+    flex: none;
+    overflow: visible;
+  }
+  .strand {
+    stroke: var(--ink-3);
+    stroke-width: 1.25;
+  }
+  .strand.money {
+    stroke: var(--ink);
+    stroke-width: 1.75;
+  }
+</style>

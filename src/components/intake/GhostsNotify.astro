@@ -1,0 +1,181 @@
+---
+/**
+ * Ghosts « Préviens-moi » (copy deck §9.10). Stub by WP1a with the final
+ * props: a plain form, no enhancement. WP3 owns it from here: JS upgrade of
+ * the disclosure, token fetch, JSON post, the POST handling of the open
+ * instance on /projets, and the move of these strings to `intake.ghosts.*`.
+ *
+ * Without JS the form posts to /projets#ghosts (the open instance there
+ * handles it). Field names follow the deck §9.8 payload, flattened.
+ */
+import { type Locale, localePath } from "@i18n/index";
+import Button from "@components/ui/Button.astro";
+
+interface Props {
+  locale: Locale;
+  /** false: closed disclosure under the home Ghosts line; true: always open (/projets#ghosts). */
+  open?: boolean;
+  /** Logical path stored in the payload: "/" or "/projets". */
+  page: string;
+  class?: string;
+}
+
+const { locale, open = false, page, class: className } = Astro.props;
+
+/* Deck §9.10 strings, local until WP3 adds them to ns/intake.ts. */
+const COPY = {
+  fr: {
+    open: "Préviens-moi",
+    label: "Ton email ou ton pseudo",
+    ph: "toi@exemple.fr",
+    hint: "Un pseudo ? Précise le réseau : @camille sur X.",
+    submit: "Me prévenir",
+    fine: "Un seul message, à la sortie de Ghosts. Ensuite, ton contact est effacé.",
+    legal: "Détails",
+    honeypot: "Si tu es humain, laisse cette case vide.",
+  },
+  en: {
+    open: "Tell me when",
+    label: "Your email or handle",
+    ph: "you@example.com",
+    hint: "A handle? Add the network: @sam on X.",
+    submit: "Notify me",
+    fine: "One message, when Ghosts ships. Then your contact is deleted.",
+    legal: "Details",
+    honeypot: "If you’re human, leave this box empty.",
+  },
+  es: {
+    open: "Avísame",
+    label: "Tu email o tu usuario",
+    ph: "tu@ejemplo.es",
+    hint: "¿Un usuario? Indica la red: @lucia en X.",
+    submit: "Avisarme",
+    fine: "Un solo mensaje, cuando salga Ghosts. Después, tu contacto se borra.",
+    legal: "Detalles",
+    honeypot: "Si eres humano, deja esta casilla vacía.",
+  },
+} as const;
+const copy = COPY[locale];
+
+const uid = `ghosts-${crypto.randomUUID().slice(0, 6)}`;
+const action = `${localePath(locale, "/projets")}#ghosts`;
+/* closed: a <details> disclosure (works without JS); open: always shown */
+const Wrap = open ? "div" : "details";
+---
+
+<div
+  class:list={["ghosts-notify", className]}
+  data-ghosts-notify
+  data-open={open ? "true" : "false"}
+  data-qa="ghosts"
+>
+  <Wrap class="gn-wrap">
+    {
+      !open && (
+        <summary class="gn-open" data-qa="ghosts-open">
+          {copy.open}
+        </summary>
+      )
+    }
+    <form class="gn-form" method="post" action={action} data-astro-reload>
+      <div class="gn-field">
+        <label class="gn-label" for={`${uid}-value`}>{copy.label}</label>
+        <input
+          id={`${uid}-value`}
+          class="gn-input"
+          type="text"
+          name="contact.value"
+          inputmode="email"
+          autocomplete="email"
+          placeholder={copy.ph}
+          aria-describedby={`${uid}-hint`}
+          data-qa="ghosts-input"
+        />
+        <p class="gn-hint" id={`${uid}-hint`}>{copy.hint}</p>
+      </div>
+      <Button variant="secondary" type="submit" locale={locale} data-qa="ghosts-submit">
+        {copy.submit}
+      </Button>
+      <p class="gn-fine">
+        {copy.fine}{" "}
+        <a href={`${localePath(locale, "/mentions-legales")}#donnees`}>{copy.legal}</a>
+      </p>
+      <input type="hidden" name="path" value="ghosts" />
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="page" value={page} />
+      <div class="gn-trap" aria-hidden="true">
+        <label for={`${uid}-trap`}>{copy.honeypot}</label>
+        <input id={`${uid}-trap`} type="text" name="site_web" tabindex="-1" autocomplete="off" />
+      </div>
+    </form>
+  </Wrap>
+</div>
+
+<style>
+  .ghosts-notify {
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+  }
+  /* quiet text button: JBM, ink-2, underline in line-strong; never a fill */
+  .gn-open {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-family: var(--mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-2);
+    text-decoration-line: underline;
+    text-decoration-color: var(--line-strong);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    cursor: pointer;
+    list-style: none;
+  }
+  .gn-open::-webkit-details-marker {
+    display: none;
+  }
+  .gn-open:hover {
+    color: var(--ink);
+  }
+  .gn-form {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    max-width: 30rem;
+    padding-top: 0.5rem;
+  }
+  .gn-field {
+    display: grid;
+    gap: 0.35rem;
+    width: 100%;
+  }
+  .gn-label {
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .gn-input {
+    width: 100%;
+    min-height: var(--tap);
+    padding: 0 0.85rem;
+    font-size: 1.0625rem;
+    color: var(--ink);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--r-2);
+  }
+  .gn-hint,
+  .gn-fine {
+    color: var(--ink-2);
+  }
+  .gn-fine {
+    font-size: var(--fs-meta);
+  }
+  .gn-trap {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>
