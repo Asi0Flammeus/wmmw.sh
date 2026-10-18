@@ -1,6 +1,13 @@
 ---
+/**
+ * Site footer (spec §6.2, A5). Row 1: the W·M | M·W signature (solid mark,
+ * the line mark is illegible this small) beside the thesis, whose " | " is
+ * the mirror axis. Row 2: the four sections again, so no page ends in a dead
+ * end on phones. Row 3: manifesto, profiles, feed, legal. Row 4: publisher.
+ */
 import { type Locale, t, localePath } from "@i18n/index";
-import { GITHUB_URL } from "@lib/site";
+import { GITHUB_URL, X_URL } from "@lib/site";
+import Monogram from "./Monogram.astro";
 
 interface Props {
   locale: Locale;
@@ -9,69 +16,200 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 
-const rssHref = localePath(locale, "/rss.xml");
+const AXIS = " | ";
+const at = dict.footer.thesis.indexOf(AXIS);
+const thesisBefore = at >= 0 ? dict.footer.thesis.slice(0, at) : dict.footer.thesis;
+const thesisAfter = at >= 0 ? dict.footer.thesis.slice(at + AXIS.length) : "";
+
+const sections = [
+  { label: dict.nav.projets, href: localePath(locale, "/projets") },
+  { label: dict.nav.outils, href: localePath(locale, "/outils") },
+  { label: dict.nav.ecrits, href: localePath(locale, "/ecrits") },
+  { label: dict.nav.contact, href: localePath(locale, "/contact") },
+];
+
+const links: { label: string; href: string; rel?: string }[] = [
+  { label: dict.footer.manifeste, href: localePath(locale, "/manifeste") },
+  { label: dict.footer.github, href: GITHUB_URL, rel: "me" },
+  { label: dict.footer.x, href: X_URL, rel: "me" },
+  { label: dict.footer.rss, href: localePath(locale, "/rss.xml") },
+  { label: dict.footer.legal, href: localePath(locale, "/mentions-legales") },
+];
 ---
 
-<footer class="site-foot">
+<footer class="site-foot" data-qa="footer">
   <div class="wrap">
     <div class="foot-inner">
-      <p class="foot-mark" aria-hidden="true">w·m·m·w</p>
-      <p class="foot-thesis">{dict.footer.thesis}</p>
-      <nav class="foot-links">
-        <a href={GITHUB_URL} rel="me">GitHub</a>
-        <a href={rssHref}>{dict.footer.rss}</a>
-        <a href={localePath(locale, "/contact")}>{dict.footer.contact}</a>
-      </nav>
+      <div class="foot-sig-row">
+        <span class="foot-sig" aria-hidden="true">
+          <Monogram variant="solid" size={32} />
+          <span class="sig-axis"></span>
+          <Monogram variant="solid" size={32} mirrored />
+        </span>
+        <p class="foot-thesis">
+          {thesisBefore}{
+            thesisAfter && (
+              <>
+                <span class="axis" aria-hidden="true" />
+                <span class="sr">|</span>
+                {thesisAfter}
+              </>
+            )
+          }
+        </p>
+      </div>
+
+      <div class="foot-nav">
+        <ul class="foot-sections" role="list">
+          {
+            sections.map((s) => (
+              <li>
+                <a href={s.href}>{s.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <ul class="foot-links" role="list">
+          {
+            links.map((l, i) => (
+              <li>
+                {i > 0 && (
+                  <span class="sep" aria-hidden="true">
+                    ·
+                  </span>
+                )}
+                <a href={l.href} rel={l.rel}>
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <p class="foot-publisher">{dict.footer.publisher}</p>
     </div>
   </div>
 </footer>
 
 <style>
   .site-foot {
-    position: relative;
-    z-index: 2;
-    margin-top: clamp(4rem, 11vh, 8rem);
-    border-top: 1px solid var(--hair-2);
+    margin-top: var(--section-gap);
   }
   .foot-inner {
-    padding-block: clamp(2.5rem, 6vh, 4rem);
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 1.25rem;
+    padding-block: clamp(2.5rem, 6svh, 4rem);
+    border-top: 1px solid var(--line);
   }
-  .foot-mark {
-    font-family: var(--mono);
-    font-size: var(--fs-meta);
-    letter-spacing: 0.35em;
-    color: var(--accent);
+
+  .foot-sig-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .foot-sig {
+    display: flex;
+    flex: none;
+    align-items: center;
+    color: var(--ink-2);
+  }
+  .sig-axis {
+    width: 1px;
+    height: 18px;
+    margin-inline: 3px;
+    background: color-mix(in oklch, var(--ink) 28%, transparent);
   }
   .foot-thesis {
     max-width: 52ch;
-    color: var(--ink-2);
     font-size: var(--fs-small);
-    text-wrap: pretty;
+    line-height: var(--lh-small);
+    color: var(--ink-2);
   }
+  /* the | of "WM | MW": a thin mirror axis, the text | stays for screen readers */
+  .axis {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-inline: 0.4em;
+    vertical-align: -0.15em;
+    background: currentColor;
+    opacity: 0.5;
+  }
+
+  .foot-nav {
+    display: grid;
+  }
+  .foot-sections,
   .foot-links {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 1.6rem;
+    align-items: center;
+    list-style: none;
+  }
+  .foot-sections {
+    column-gap: 1.5rem;
+  }
+  .foot-sections a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-family: var(--mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .foot-links li {
+    display: inline-flex;
+    align-items: center;
   }
   .foot-links a {
-    color: var(--bone);
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
     font-size: var(--fs-small);
+    color: var(--ink);
     text-decoration: none;
-    border-bottom: 1px solid var(--hair);
-    padding-bottom: 0.1em;
   }
-  .foot-links a:hover,
-  .foot-links a:focus-visible {
-    color: var(--accent);
-    border-color: var(--accent);
+  .sep {
+    padding-inline: 0.6em;
+    color: var(--ink-3);
   }
-  :global(html.anim) .foot-links a {
-    transition:
-      color var(--t-base) ease,
-      border-color var(--t-base) ease;
+  .foot-sections a:hover,
+  .foot-links a:hover {
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  :global(html.anim) .foot-sections a {
+    transition: color 160ms ease;
+  }
+
+  .foot-publisher {
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    color: var(--ink-3);
+  }
+
+  /* narrow: rows wrap, so drop the dots (a wrapped line would start with one) */
+  @media (max-width: 639px) {
+    .foot-links {
+      column-gap: 1.25rem;
+    }
+    .sep {
+      display: none;
+    }
+  }
+  @media (max-width: 767px) {
+    .foot-inner {
+      gap: 1rem;
+    }
+    .foot-sig-row {
+      align-items: flex-start;
+    }
   }
 </style>

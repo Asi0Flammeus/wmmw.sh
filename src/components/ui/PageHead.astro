@@ -1,0 +1,84 @@
+---
+/**
+ * Inner page head (spec §6.3): the page's single h1, an optional lead, a
+ * `meta` slot under the title (bylines, dates) and an `aside` slot that sits
+ * beside the title from 1100 px. Not used on home (the hero owns its h1).
+ */
+interface Props {
+  title: string;
+  lead?: string;
+  /** "post": the smaller title scale for long writing titles. */
+  size?: "page" | "post";
+  /** id of the h1, for aria-labelledby (default "page-title"). */
+  id?: string;
+  class?: string;
+}
+
+const { title, lead, size = "page", id = "page-title", class: className } = Astro.props;
+const hasMeta = Astro.slots.has("meta");
+const hasAside = Astro.slots.has("aside");
+---
+
+<header class:list={["page-head", `page-head-${size}`, { "has-aside": hasAside }, className]}>
+  <div class="page-head-main">
+    <h1 id={id}>{title}</h1>
+    {lead && <p class="page-lead">{lead}</p>}
+    {
+      hasMeta && (
+        <div class="page-meta">
+          <slot name="meta" />
+        </div>
+      )
+    }
+  </div>
+  {
+    hasAside && (
+      <div class="page-aside">
+        <slot name="aside" />
+      </div>
+    )
+  }
+</header>
+
+<style>
+  .page-head {
+    padding-top: clamp(1.5rem, 5svh, 3.5rem);
+  }
+  h1 {
+    margin: 0;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+  }
+  .page-head-post h1 {
+    font-size: var(--fs-h1-post);
+  }
+  .page-lead {
+    margin-top: 0.75rem;
+    max-width: var(--measure-lead);
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    letter-spacing: var(--ls-lead);
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+  .page-meta {
+    margin-top: 1rem;
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    color: var(--ink-2);
+  }
+  .page-aside {
+    margin-top: var(--block-gap);
+  }
+  @media (min-width: 1100px) {
+    .page-head.has-aside {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      column-gap: clamp(2.5rem, 5vw, 4.5rem);
+      align-items: end;
+    }
+    .page-aside {
+      margin-top: 0;
+    }
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+/**
+ * Q1 theme toggle (spec §5.3): two 2 px line gratings in a 20 px disc.
+ * Light: set B lies on set A, one even jade hatch (the cup in front light).
+ * Dark: set B turns 3° about the disc's left edge; the 38 px fringe closes the
+ * hatch into a half moon, set B in ruby (the cup in back light).
+ * Hidden without JS: the system preference applies and no dead button shows.
+ */
+import { type Locale, t } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className } = Astro.props;
+const dict = t(locale);
+/* one clipPath per instance, so two toggles on a page never share an id */
+const clipId = `q1-${crypto.randomUUID().slice(0, 8)}`;
+
+const lines = (x0: number, x1: number, from: number, to: number): string => {
+  let d = "";
+  for (let y = from; y <= to; y += 2) d += `M${x0} ${y}H${x1}`;
+  return d;
+};
+const setA = lines(0, 32, 0.5, 30.5);
+const setB = lines(-8, 40, -3.5, 34.5);
+const labels = JSON.stringify({ toLight: dict.theme.toLight, toDark: dict.theme.toDark });
+---
+
+<button
+  type="button"
+  class:list={["theme-toggle", className]}
+  aria-label={dict.theme.toDark}
+  data-tip={dict.theme.toDark}
+  data-tip-align="end"
+  data-theme-toggle
+  data-qa="theme-toggle"
+>
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <defs><clipPath id={clipId}><circle cx="16" cy="16" r="10"></circle></clipPath></defs>
+    <g clip-path={`url(#${clipId})`} fill="none" stroke-width="1" shape-rendering="geometricPrecision">
+      <path class="q1-a" d={setA}></path>
+      <path class="q1-b" d={setB} data-moire-layer="q1"></path>
+    </g>
+  </svg>
+  <script is:inline type="application/json" data-i18n set:html={labels} />
+</button>
+
+<script>
+  import { currentTheme, setTheme, THEME_EVENT } from "@lib/theme";
+
+  let ac: AbortController | undefined;
+
+  const init = (): void => {
+    ac?.abort();
+    ac = new AbortController();
+    const { signal } = ac;
+    for (const btn of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")) {
+      const labels = JSON.parse(
+        btn.querySelector("script[data-i18n]")?.textContent ?? "{}",
+      ) as { toLight: string; toDark: string };
+      const label = (): void => {
+        const text = currentTheme() === "dark" ? labels.toLight : labels.toDark;
+        btn.setAttribute("aria-label", text);
+        btn.dataset.tip = text;
+      };
+      label();
+      btn.addEventListener(
+        "click",
+        () => setTheme(currentTheme() === "dark" ? "light" : "dark"),
+        { signal },
+      );
+      document.addEventListener(THEME_EVENT, label, { signal });
+    }
+  };
+
+  // The header is swapped on every navigation: re-run on each page load.
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", () => ac?.abort());
+</script>
+
+<style>
+  .theme-toggle {
+    --q1-a: var(--fringe);
+    --q1-b: var(--fringe);
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* 44 px hit area around the 32 px disc */
+  .theme-toggle::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+  :global([data-theme="dark"]) .theme-toggle {
+    --q1-a: currentColor;
+    --q1-b: var(--accent-text);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .theme-toggle:hover {
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 35%, transparent);
+    }
+  }
+  svg {
+    display: block;
+    width: 32px;
+    height: 32px;
+    overflow: visible;
+  }
+  .q1-a {
+    stroke: var(--q1-a);
+  }
+  .q1-b {
+    stroke: var(--q1-b);
+    transform-box: view-box;
+    transform-origin: 6px 16px;
+  }
+  :global([data-theme="dark"]) .q1-b {
+    transform: rotate(3deg);
+  }
+  :global(html.anim) .theme-toggle {
+    transition:
+      color 160ms ease,
+      box-shadow 160ms ease;
+  }
+  :global(html.anim) .q1-b {
+    transition: transform var(--t-4) var(--ease-out);
+  }
+  /* the grating turn is the toggle's answer: keep it through theme.ts's
+     no-transition frame */
+  :global(html.anim.theme-switching) .theme-toggle .q1-b {
+    transition: transform var(--t-4) var(--ease-out) !important;
+  }
+  :global(html:not(.js)) .theme-toggle {
+    display: none;
+  }
+  @media (forced-colors: active) {
+    .theme-toggle {
+      --q1-a: ButtonText;
+      color: ButtonText;
+      box-shadow: inset 0 0 0 1px ButtonText;
+    }
+    .q1-b {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+/**
+ * Link chip (spec §6.3): a secondary door, never the page's primary action.
+ * Carries an arrow (right, or external with a screen-reader suffix). The
+ * label is the default slot; labels are never shortened, chips wrap.
+ */
+import { type Locale, t } from "@i18n/index";
+import Arrow from "./Arrow.astro";
+
+interface Props {
+  href: string;
+  locale: Locale;
+  external?: boolean;
+  class?: string;
+  "data-qa"?: string;
+}
+
+const { href, locale, external = false, class: className, "data-qa": qa } = Astro.props;
+const dict = t(locale);
+---
+
+<a
+  class:list={["chip", className]}
+  href={href}
+  rel={external ? "noopener" : undefined}
+  data-qa={qa}
+>
+  <span class="chip-label"><slot /></span>
+  <Arrow dir={external ? "external" : "right"} />
+  {external && <span class="sr">{dict.a11y.external}</span>}
+</a>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-height: var(--tap);
+    padding: 0 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-pill);
+    font: 500 0.9375rem/1.2 var(--text);
+    color: var(--ink);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chip :global(.arrow) {
+    color: var(--ink-2);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .chip:hover {
+      border-color: var(--ink);
+      background-color: var(--surface);
+    }
+    .chip:hover :global(.arrow) {
+      color: var(--ink);
+    }
+    :global(html.anim) .chip:hover :global(.arrow) {
+      transform: translateX(2px);
+    }
+  }
+  .chip:focus-visible {
+    border-color: var(--ink);
+  }
+  :global(html.anim) .chip {
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease;
+  }
+  :global(html.anim) .chip :global(.arrow) {
+    transition:
+      transform 240ms var(--ease-out),
+      color 160ms ease;
+  }
+  @media (forced-colors: active) {
+    .chip {
+      border-color: LinkText;
+    }
+  }
+</style>

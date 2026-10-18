@@ -1,75 +1,95 @@
 ---
-import "@fontsource-variable/jetbrains-mono/index.css";
 import "@styles/global.css";
 
 import { ClientRouter } from "astro:transitions";
-import { type Locale, t, localePath, alternates } from "@i18n/index";
-import { SITE_URL, SITE_NAME } from "@lib/site";
-import Mycelium from "@components/Mycelium.astro";
+import { type Locale, LOCALES, t, localePath } from "@i18n/index";
+import { SITE_URL, BRAND_NAME, THEME_COLOR, PARKED_PATHS } from "@lib/site";
+import MonogramDefs from "@components/MonogramDefs.astro";
 import Header from "@components/Header.astro";
-import Hero from "@components/Hero.astro";
 import Footer from "@components/Footer.astro";
+import PageHead from "@components/ui/PageHead.astro";
 import AnnotationOverlay from "@components/AnnotationOverlay.astro";
 
 interface Props {
   locale: Locale;
+  /** Page name; <title> is `${title} · William Moiré` unless rawTitle. */
   title: string;
+  /** Home and 404: title used verbatim. */
+  rawTitle?: boolean;
   description: string;
+  /** Logical unprefixed path, e.g. "/ecrits/talking-to-silicon". */
   path: string;
+  /** Default `/og/default-${locale}.png`. */
   ogImage?: string;
-  /** Both variants are 100dvh; "full" = home thesis copy, "band" = page-title copy. */
-  heroVariant?: "full" | "band";
-  /** Display heading for the band hero; defaults to `title`. */
-  heroTitle?: string;
+  /** Default t(locale).site.ogAlt. */
+  ogImageAlt?: string;
+  /** Default "website"; posts pass "article". */
+  ogType?: "website" | "article";
   jsonLd?: Record<string, unknown>;
-  /** Unlisted pages (/lego): robots noindex, excluded from the sitemap via astro.config. */
   noindex?: boolean;
+  /** Locales where this path exists (default all): drives hreflang and the language switch. */
+  alternatesFor?: Locale[];
+  /** Where the switch sends a locale missing from alternatesFor (default "/"). */
+  langFallbackPath?: string;
+  /** @deprecated ignored; kept so the untracked /lectures-sf page and pre-rewrite pages compile */
+  heroVariant?: string;
+  /** Legacy: titles the head BaseLayout renders for a page without its own h1. */
+  heroTitle?: string;
 }
 
 const {
   locale,
   title,
+  rawTitle = false,
   description,
   path,
   ogImage,
-  heroVariant = "band",
-  heroTitle,
+  ogImageAlt,
+  ogType = "website",
   jsonLd,
   noindex = false,
+  alternatesFor = [...LOCALES],
+  langFallbackPath = "/",
+  heroTitle,
 } = Astro.props;
 
-/** QA annotation overlay — opt-in via ANNOTATION_SYSTEM=true (or PUBLIC_ variant). */
+const dict = t(locale);
+
+/** QA annotation overlay: opt-in via ANNOTATION_SYSTEM=true (or PUBLIC_ variant). */
 const annotationEnabled =
   import.meta.env.ANNOTATION_SYSTEM === "true" ||
   import.meta.env.PUBLIC_ANNOTATION_SYSTEM === "true";
 
-const dict = t(locale);
+const robotsNoindex =
+  noindex || annotationEnabled || (PARKED_PATHS as readonly string[]).includes(path);
 
-const isHome = path === "/";
-const pageTitle = isHome
-  ? "wmmw.sh : WilliaM Mycelic Wealth"
-  : `${title} · ${SITE_NAME}`;
-
+const pageTitle = rawTitle ? title : `${title} · ${BRAND_NAME}`;
 const canonical = SITE_URL + localePath(locale, path);
 
-/** Absolute alternates for hreflang (relative paths from i18n helper). */
-const alts = alternates(path).map((a) => ({
-  locale: a.locale,
-  href: SITE_URL + a.href,
+/* hreflang only where the page exists; x-default is the French page when it does */
+const hreflangs = alternatesFor.map((l) => ({ locale: l, href: SITE_URL + localePath(l, path) }));
+const xDefaultLocale = alternatesFor.includes("fr") ? "fr" : alternatesFor[0];
+const xDefault = xDefaultLocale ? SITE_URL + localePath(xDefaultLocale, path) : undefined;
+
+/* language switch: every locale, falling back where this page has no version */
+const langHrefs = LOCALES.map((l) => ({
+  locale: l,
+  href: localePath(l, alternatesFor.includes(l) ? path : langFallbackPath),
 }));
-const xDefault = SITE_URL + localePath("fr", path);
 
-const ogLocale: Record<Locale, string> = {
-  fr: "fr_FR",
-  en: "en_US",
-  es: "es_ES",
-};
+const OG_LOCALE: Record<Locale, string> = { fr: "fr_FR", en: "en_US", es: "es_ES" };
+const ogSrc = ogImage ?? `/og/default-${locale}.png`;
+const ogAbsolute = ogSrc.startsWith("http") ? ogSrc : SITE_URL + ogSrc;
+const ogAlt = ogImageAlt ?? dict.site.ogAlt;
 
-const absoluteOg = ogImage
-  ? ogImage.startsWith("http")
-    ? ogImage
-    : SITE_URL + ogImage
-  : undefined;
+/* Legacy head: a page that renders no h1 of its own (the parked pages, and
+   pages awaiting their rewrite) gets a PageHead titled heroTitle ?? title.
+   It retires by itself once the page renders its own PageHead or hero. */
+const content = (await Astro.slots.render("default")) ?? "";
+const legacyHead = !/<h1[\s>]/i.test(content);
+
+/* JSON-LD inside <script>: never let a string close the element */
+const jsonLdText = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : undefined;
 ---
 
 <!doctype html>
@@ -77,136 +97,124 @@ const absoluteOg = ogImage
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content={THEME_COLOR.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={THEME_COLOR.dark} media="(prefers-color-scheme: dark)" />
     <script is:inline>
-      /* js + anim flags before first paint; animation only when motion is welcome */
+      /* Theme before first paint: a stored choice, else the system. Also the
+         js flag, and anim when motion is welcome. Must precede every stylesheet. */
       (function () {
-        var c = "js";
-        try {
-          if (!matchMedia("(prefers-reduced-motion: reduce)").matches) c += " anim";
-        } catch (e) {}
-        document.documentElement.className = c;
+        var d = document.documentElement, t = null, src = "user";
+        try { t = localStorage.getItem("theme"); } catch (e) {}
+        if (t !== "light" && t !== "dark") {
+          src = "system";
+          t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
+        d.setAttribute("data-theme", t);
+        d.setAttribute("data-theme-source", src);
+        d.classList.add("js");
+        try { if (!matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("anim"); } catch (e) {}
+        if (src === "user") {
+          var c = t === "dark" ? "#121917" : "#ecf2f0", m = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < m.length; i++) m[i].setAttribute("content", c);
+        }
       })();
     </script>
-    <meta name="generator" content={Astro.generator} />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#12100d" />
+    <link
+      rel="preload"
+      href="/fonts/basteleur-moonlight.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <title>{pageTitle}</title>
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {robotsNoindex && <meta name="robots" content="noindex, nofollow" />}
 
-    <meta property="og:type" content={isHome ? "website" : "article"} />
-    <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={BRAND_NAME} />
+    <meta property="og:locale" content={OG_LOCALE[locale]} />
+    {
+      alternatesFor
+        .filter((l) => l !== locale)
+        .map((l) => <meta property="og:locale:alternate" content={OG_LOCALE[l]} />)
+    }
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {absoluteOg && <meta property="og:image" content={absoluteOg} />}
+    <meta property="og:image" content={ogAbsolute} />
+    <meta property="og:image:alt" content={ogAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
-    {absoluteOg && <meta name="twitter:image" content={absoluteOg} />}
+    <meta name="twitter:image" content={ogAbsolute} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+
+    {hreflangs.map((a) => <link rel="alternate" hreflang={a.locale} href={a.href} />)}
+    {xDefault && <link rel="alternate" hreflang="x-default" href={xDefault} />}
 
     {
-      alts.map((a) => (
-        <link rel="alternate" hreflang={a.locale} href={a.href} />
-      ))
-    }
-    <link rel="alternate" hreflang="x-default" href={xDefault} />
-
-    {
-      alternates("/rss.xml").map((a) => (
+      LOCALES.map((l) => (
         <link
           rel="alternate"
           type="application/rss+xml"
-          title={t(a.locale).rss.title}
-          href={SITE_URL + a.href}
+          title={t(l).rss.title}
+          href={SITE_URL + localePath(l, "/rss.xml")}
         />
       ))
     }
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <script
       is:inline
       defer
       src="https://umami.crqpt.com/script.js"
-      data-website-id="3d240735-3660-427b-b997-4421c359d435"></script>
+      data-website-id="3d240735-3660-427b-b997-4421c359d435"
+      data-domains="wmmw.sh"></script>
 
-    {
-      jsonLd && (
-        <script
-          is:inline
-          type="application/ld+json"
-          set:html={JSON.stringify(jsonLd)}
-        />
-      )
-    }
+    {jsonLdText && <script is:inline type="application/ld+json" set:html={jsonLdText} />}
+    <meta name="generator" content={Astro.generator} />
     <ClientRouter />
   </head>
   <body>
     <a class="skip" href="#contenu">{dict.skip}</a>
-    <Mycelium />
-    <Header locale={locale} path={path} />
-    <Hero locale={locale} variant={heroVariant} heading={heroTitle ?? title} />
+    <MonogramDefs />
+    <Header locale={locale} path={path} langHrefs={langHrefs} />
     <main id="contenu">
-      <slot />
+      {
+        legacyHead && (
+          <div class="wrap">
+            <PageHead title={heroTitle ?? title} />
+          </div>
+        )
+      }
+      <Fragment set:html={content} />
     </main>
     <Footer locale={locale} />
     {annotationEnabled && <AnnotationOverlay />}
 
     <script>
-      import { initTermTyping } from "@lib/term-type";
+      import { followSystem, syncThemeColor } from "@lib/theme";
 
-      let revealObserver: IntersectionObserver | undefined;
-
-      // The mycelium dispatches myc:reach on its branch targets (non-bubbling);
-      // a capture listener still sees it. Editorial section heads react with a
-      // drawn filament underline.
-      document.addEventListener(
-        "myc:reach",
-        (event) => {
-          const el = event.target;
-          if (el instanceof HTMLElement) el.classList.add("myc-touched");
-        },
-        true,
-      );
-
-      const boot = (): void => {
-        initTermTyping();
-
-        revealObserver?.disconnect();
-        const anim = document.documentElement.classList.contains("anim");
-        if (anim && "IntersectionObserver" in window) {
-          const ro = new IntersectionObserver(
-            (entries) => {
-              for (const entry of entries) {
-                if (entry.isIntersecting) {
-                  entry.target.classList.add("in");
-                  ro.unobserve(entry.target);
-                }
-              }
-            },
-            { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
-          );
-          document.querySelectorAll(".reveal").forEach((el) => ro.observe(el));
-          revealObserver = ro;
-        }
-      };
-
-      // ClientRouter swaps <html> attributes from the incoming static document,
-      // which wipes the runtime js/anim/armed flags. Carry them over.
+      // ClientRouter copies <html> attributes from the incoming static
+      // document, which carries none of ours: carry the flags and the theme.
       document.addEventListener("astro:before-swap", (event) => {
-        const { newDocument } = event as Event & { newDocument: Document };
-        newDocument.documentElement.className =
-          document.documentElement.className;
+        const from = document.documentElement;
+        const to = (event as Event & { newDocument: Document }).newDocument.documentElement;
+        for (const c of ["js", "anim"]) to.classList.toggle(c, from.classList.contains(c));
+        to.dataset.theme = from.dataset.theme ?? "light";
+        to.dataset.themeSource = from.dataset.themeSource ?? "system";
       });
-
-      // astro:page-load fires on initial load and after every ClientRouter swap.
-      document.addEventListener("astro:page-load", boot);
+      // the swapped head brings default theme-color metas
+      document.addEventListener("astro:after-swap", syncThemeColor);
+      // no stored choice: follow the system live (module scripts run once)
+      followSystem();
     </script>
   </body>
 </html>

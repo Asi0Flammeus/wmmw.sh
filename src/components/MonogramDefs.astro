@@ -1,0 +1,76 @@
+---
+/**
+ * Q3 monogram symbols, rendered once at the top of <body> (spec §5.5).
+ * Geometry from docs/moire/explore/moire/q3-monogram.html (512 box):
+ * - #wm-line: the W carries grating A (4 px bars, 8 px pitch), the M grating B
+ *   (4.32 px bars, 8.64 px pitch); they meet only in the shared stroke, where
+ *   the beat shows. Legible from 192 px up only.
+ * - #wm-solid: seven solid strokes; the shared one (.wm-s) can take a tint.
+ * Colours: currentColor, overridable per use with --wm-a, --wm-b, --wm-s.
+ * Not display:none, which would break the clip references.
+ */
+const bars = (pitch: number, bar: number, count: number): string => {
+  let d = "";
+  for (let i = 0; i < count; i++) {
+    const y = (94 + i * pitch).toFixed(3);
+    d += `M-10 ${y}H522v${bar.toFixed(3)}H-10z`;
+  }
+  return d;
+};
+const gratingA = bars(8, 4, 41);
+const gratingB = bars(8.64, 4.32, 38);
+
+const strokesW = [
+  "M19.00 104H77.00L136.43 408H78.43Z",
+  "M137.86 104H195.86L136.43 408H78.43Z",
+  "M137.86 104H195.86L255.29 408H197.29Z",
+  "M256.71 104H314.71L255.29 408H197.29Z",
+];
+const strokesM = [
+  "M256.71 104H314.71L255.29 408H197.29Z",
+  "M256.71 104H314.71L374.14 408H316.14Z",
+  "M375.57 104H433.57L374.14 408H316.14Z",
+  "M375.57 104H433.57L493.00 408H435.00Z",
+];
+const solid: { d: string; shared?: boolean }[] = [
+  { d: "M7.00 116H73.00L134.71 396H68.71Z" },
+  { d: "M130.43 116H196.43L134.71 396H68.71Z" },
+  { d: "M130.43 116H196.43L258.14 396H192.14Z" },
+  { d: "M253.86 116H319.86L258.14 396H192.14Z", shared: true },
+  { d: "M253.86 116H319.86L381.57 396H315.57Z" },
+  { d: "M377.29 116H443.29L381.57 396H315.57Z" },
+  { d: "M377.29 116H443.29L505.00 396H439.00Z" },
+];
+---
+
+<svg class="wm-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wm-line" viewBox="0 0 512 512">
+      <clipPath id="wml-w">{strokesW.map((d) => <path d={d} />)}</clipPath>
+      <clipPath id="wml-m">{strokesM.map((d) => <path d={d} />)}</clipPath>
+      <path class="wm-a" clip-path="url(#wml-w)" d={gratingA}></path>
+      <path class="wm-b" clip-path="url(#wml-m)" d={gratingB}></path>
+    </symbol>
+    <symbol id="wm-solid" viewBox="0 0 512 512">
+      {solid.map((s) => <path class={s.shared ? "wm-s" : "wm-a"} d={s.d} />)}
+    </symbol>
+  </defs>
+</svg>
+
+<style is:global>
+  .wm-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  .wm-a {
+    fill: var(--wm-a, currentColor);
+  }
+  .wm-b {
+    fill: var(--wm-b, currentColor);
+  }
+  .wm-s {
+    fill: var(--wm-s, currentColor);
+  }
+</style>

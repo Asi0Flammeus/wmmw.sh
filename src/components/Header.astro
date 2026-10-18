@@ -1,12 +1,23 @@
 ---
-import { type Locale, t, localePath, alternates } from "@i18n/index";
+/**
+ * Site header (spec §6.2). From 768 px: a sticky two-pill glass dock, the
+ * wordmark pill on the left, the nav pill (sections, theme toggle, languages)
+ * on the right. Below 768 px: a static two-row header, no glass.
+ * Swapped on every navigation (not persisted); transition:animate="none"
+ * keeps it from blinking during the page fade.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import ThemeToggle from "./ThemeToggle.astro";
 
 interface Props {
   locale: Locale;
+  /** Logical unprefixed path of the page, e.g. "/ecrits/talking-to-silicon". */
   path: string;
+  /** Language switch targets, one per locale (BaseLayout resolves fallbacks). */
+  langHrefs: { locale: Locale; href: string }[];
 }
 
-const { locale, path } = Astro.props;
+const { locale, path, langHrefs } = Astro.props;
 const dict = t(locale);
 
 const navItems = [
@@ -17,250 +28,356 @@ const navItems = [
 ] as const;
 
 /** Active when the logical path is the section root or nested under it. */
-const isActive = (href: string): boolean =>
-  path === href || path.startsWith(`${href}/`);
+const isActive = (href: string): boolean => path === href || path.startsWith(`${href}/`);
 
-const langHrefs = alternates(path);
 const langLabel: Record<Locale, string> = { fr: "FR", en: "EN", es: "ES" };
+const isHome = path === "/";
 ---
 
-<header class="site-head">
-  <a
-    class="wordmark"
-    href={localePath(locale, "/")}
-    aria-label={dict.nav.home}
-    ><span class="br" aria-hidden="true">[</span><span class="lead">w</span
-    ><span class="rest" aria-hidden="true"><i>m</i><i>m</i><i>w</i></span
-    ><span class="br" aria-hidden="true">]</span></a
-  >
-  <nav class="site-nav" aria-label={dict.nav.ariaLabel}>
-    {
-      navItems.map((item) => {
-        const active = isActive(item.href);
-        return (
-          <a
-            href={localePath(locale, item.href)}
-            class:list={{ on: active }}
-            aria-current={active ? "page" : undefined}
-          >
-            {dict.nav[item.key]}
-          </a>
-        );
-      })
-    }
-  </nav>
-  <nav class="lang" aria-label={dict.lang.label}>
-    {
-      langHrefs.map((alt, i) => (
-        <>
-          {i > 0 && <span class="dot" aria-hidden="true">·</span>}
-          <a
-            href={alt.href}
-            hreflang={alt.locale}
-            class:list={{ on: alt.locale === locale }}
-            aria-current={alt.locale === locale ? "true" : undefined}
-            aria-label={dict.lang.switchTo[alt.locale]}
-            >{langLabel[alt.locale]}</a
-          >
-        </>
-      ))
-    }
-  </nav>
+<header class="site-head" data-qa="header" transition:animate="none">
+  <div class="wrap dock">
+    <a
+      class="dock-pill dock-mark wordmark"
+      href={localePath(locale, "/")}
+      aria-label={dict.nav.home}
+      data-tip={dict.nav.logoTip}
+      data-tip-align="start"
+      data-wordmark
+      data-home={isHome ? "" : undefined}
+      data-w1-mask
+      data-qa="wordmark"
+      ><span class="br" aria-hidden="true">[</span><span class="lead">w</span><span
+        class="rest"
+        aria-hidden="true"><i>m</i><i>m</i><i>w</i></span
+      ><span class="br" aria-hidden="true">]</span></a
+    >
+    <div class="dock-pill dock-nav" data-w1-mask>
+      <nav class="site-nav" aria-label={dict.nav.ariaLabel}>
+        {
+          navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <a href={localePath(locale, item.href)} aria-current={active ? "page" : undefined}>
+                {dict.nav[item.key]}
+              </a>
+            );
+          })
+        }
+      </nav>
+      <div class="dock-tools">
+        <ThemeToggle locale={locale} />
+        <nav class="lang" aria-label={dict.lang.label}>
+          {
+            langHrefs.map((alt) => (
+              <a
+                href={alt.href}
+                hreflang={alt.locale}
+                lang={alt.locale}
+                aria-current={alt.locale === locale ? "true" : undefined}
+                aria-label={dict.lang.switchTo[alt.locale]}
+              >
+                {langLabel[alt.locale]}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </div>
+  </div>
 </header>
 
-<style>
-  /* Always overlays the hero canvas, on every page: one consistent style. */
-  .site-head {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 20;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: "mark nav lang";
-    align-items: center;
-    gap: 1rem 2rem;
-    min-height: 4.25rem;
-    padding: 1.1rem var(--pad);
-  }
-  /* Soft top scrim for legibility over bright sim regions. No hard bar. */
-  .site-head::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: -2rem;
-    background: linear-gradient(
-      to bottom,
-      rgba(18, 16, 13, 0.75),
-      rgba(18, 16, 13, 0)
+<script>
+  /* M1 on touch (spec §4.1): a logo tap plays [w] -> [wmmw] -> [w].
+     On home it scrolls to the top instead of reloading; from another page the
+     tap navigates and home plays the sequence once on arrival. Fine pointers
+     get the same expansion from :hover and :focus-visible in CSS. */
+  const FLAG = "wm-m1";
+  const EXPAND_MS = 600;
+  const HOLD_MS = 900;
+
+  let ac: AbortController | undefined;
+  let timer: number | undefined;
+
+  const init = (): void => {
+    ac?.abort();
+    ac = new AbortController();
+    const mark = document.querySelector<HTMLAnchorElement>("[data-wordmark]");
+    if (!mark) return;
+    const touch = matchMedia("(hover: none)");
+    const onHome = mark.hasAttribute("data-home");
+
+    const play = (): void => {
+      window.clearTimeout(timer);
+      mark.classList.add("is-playing");
+      timer = window.setTimeout(() => mark.classList.remove("is-playing"), EXPAND_MS + HOLD_MS);
+    };
+
+    mark.addEventListener(
+      "click",
+      (event) => {
+        if (!touch.matches) return;
+        if (onHome) {
+          event.preventDefault();
+          const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+          window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" });
+          play();
+        } else {
+          try {
+            sessionStorage.setItem(FLAG, "1");
+          } catch {
+            /* storage blocked: no replay on arrival */
+          }
+        }
+      },
+      { signal: ac.signal },
     );
+
+    if (onHome && touch.matches) {
+      let flagged = false;
+      try {
+        flagged = sessionStorage.getItem(FLAG) === "1";
+        sessionStorage.removeItem(FLAG);
+      } catch {
+        /* storage blocked */
+      }
+      if (flagged) play();
+    }
+  };
+
+  document.addEventListener("astro:page-load", init);
+  document.addEventListener("astro:before-swap", () => {
+    ac?.abort();
+    window.clearTimeout(timer);
+  });
+</script>
+
+<style>
+  /* ---- Dock (768 px and up) --------------------------------------------- */
+  .site-head {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    height: var(--header-h);
+    padding-top: 0.625rem;
+    /* the band between the pills lets clicks through to the page */
     pointer-events: none;
-    z-index: -1;
   }
-  /* Membrane: frost the top strip so nav stays legible over bright sim
-     regions without a hard bar. The gradient above is the fallback. */
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-    .site-head::before {
-      background: linear-gradient(
-        to bottom,
-        rgba(18, 16, 13, 0.55),
-        rgba(18, 16, 13, 0)
-      );
-      -webkit-backdrop-filter: blur(9px) saturate(var(--glass-sat));
-      backdrop-filter: blur(9px) saturate(var(--glass-sat));
-      -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
-      mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+  .dock {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .dock-pill {
+    display: flex;
+    align-items: center;
+    height: 52px;
+    pointer-events: auto;
+    border: 1px solid var(--dock-edge);
+    border-radius: var(--r-pill);
+    background: var(--dock-bg);
+    -webkit-backdrop-filter: blur(var(--dock-blur)) saturate(var(--dock-sat));
+    backdrop-filter: blur(var(--dock-blur)) saturate(var(--dock-sat));
+    box-shadow: var(--dock-highlight), var(--dock-shadow);
+  }
+  @media (max-height: 600px) and (min-width: 768px) {
+    .dock-pill {
+      height: 44px;
     }
   }
-
-  .wordmark {
-    grid-area: mark;
-    display: inline-flex;
+  .dock-nav {
+    gap: clamp(1rem, 2.4vw, 1.75rem);
+    padding: 0 0.625rem 0 1.375rem;
+  }
+  .dock-tools {
+    display: flex;
     align-items: center;
-    justify-content: flex-start;
-    /* Reserve the full [wmmw] width so expanding the logo moves only its own
-       letters, never the (centered) nav or the grid columns. */
-    min-width: 6.2ch;
+    gap: clamp(0.75rem, 1.6vw, 1.1rem);
+  }
+
+  /* ---- Wordmark [w] -> [wmmw] (M1) --------------------------------------- */
+  .wordmark {
+    padding: 0 1.15rem;
     font-family: var(--mono);
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: var(--fs-wordmark);
     line-height: 1;
-    letter-spacing: 0.01em;
+    letter-spacing: var(--ls-mono);
+    color: var(--ink);
     text-decoration: none;
-    color: var(--bone);
-    border-radius: 8px;
   }
   .wordmark .br {
-    color: var(--accent);
+    color: var(--ink-2);
   }
   .wordmark .rest {
     display: inline-flex;
+    max-width: 0;
     overflow: hidden;
   }
   .wordmark .rest i {
-    font-style: normal;
     display: inline-block;
-  }
-  .wordmark:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  /* Always collapsed to [w] (asi0 review, 2026-09-04: "just [w]" on every
-     device); expands to [wmmw] on hover/focus. */
-  .wordmark .rest {
-    max-width: 0;
-  }
-  .wordmark .rest i {
+    font-style: normal;
     opacity: 0;
   }
-  .wordmark:hover .rest,
-  .wordmark:focus-visible .rest {
+  @media (hover: hover) and (pointer: fine) {
+    .wordmark:hover .rest {
+      max-width: 3.2ch;
+    }
+    .wordmark:hover .rest i {
+      opacity: 1;
+    }
+  }
+  .wordmark:focus-visible .rest,
+  .wordmark.is-playing .rest {
     max-width: 3.2ch;
   }
-  .wordmark:hover .rest i,
-  .wordmark:focus-visible .rest i {
+  .wordmark:focus-visible .rest i,
+  .wordmark.is-playing .rest i {
     opacity: 1;
   }
-
-  .site-nav {
-    grid-area: nav;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(1rem, 3vw, 2.2rem);
-    font-size: 0.92rem;
-    line-height: 1;
-  }
-  .site-nav a {
-    color: var(--ink-2);
-    text-decoration: none;
-  }
-  .site-nav a:hover,
-  .site-nav a.on {
-    color: var(--bone);
-  }
-  .site-nav a.on {
-    font-weight: 500;
-  }
-
-  .lang {
-    grid-area: lang;
-    justify-self: end;
-    align-items: center;
-    /* mono, not disp: Basteleur's decorative capitals make EN/ES unreadable */
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    color: var(--ink-3);
-    display: flex;
-    gap: 0.45rem;
-  }
-  .lang a {
-    color: var(--ink-3);
-    text-decoration: none;
-  }
-  .lang a:hover {
-    color: var(--bone);
-  }
-  .lang a.on {
-    color: var(--accent);
-  }
-  .lang .dot {
-    color: var(--ink-3);
-  }
-
-  :global(html.anim) .site-nav a,
-  :global(html.anim) .lang a {
-    transition: color 0.2s ease;
-  }
-
-  @media (max-width: 767px) {
-    .site-head {
-      grid-template-columns: auto auto;
-      grid-template-areas:
-        "mark lang"
-        "nav  nav";
-      row-gap: 0.8rem;
-    }
-    .site-nav {
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.88rem;
-    }
-  }
-
-  /* Motion only when the site has armed animation (respects reduced-motion).
-     Each letter rotates in half a turn: a "w" flipping over into its mirror
-     "m" (and back to "w" for the last glyph) as [w] grows into [wmmw]. */
+  /* Each letter turns half a turn: a w flips over into its mirror m (and back
+     to w for the last one). Collapse mirrors the expansion. */
   :global(html.anim) .wordmark .rest {
-    transition: max-width 0.44s cubic-bezier(0.2, 0.85, 0.25, 1);
+    transition: max-width 440ms var(--ease-spring);
   }
   :global(html.anim) .wordmark .rest i {
     transform: translateX(-0.28em) rotate(180deg);
     transition:
-      opacity 0.3s ease,
-      transform 0.5s cubic-bezier(0.2, 0.85, 0.25, 1);
+      opacity 300ms ease,
+      transform 500ms var(--ease-spring);
   }
-  :global(html.anim) .wordmark:hover .rest i,
-  :global(html.anim) .wordmark:focus-visible .rest i {
+  :global(html.anim) .wordmark .rest i:nth-child(1) {
+    transition-delay: 100ms;
+  }
+  :global(html.anim) .wordmark .rest i:nth-child(2) {
+    transition-delay: 60ms;
+  }
+  :global(html.anim) .wordmark .rest i:nth-child(3) {
+    transition-delay: 20ms;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.anim) .wordmark:hover .rest i {
+      transform: none;
+    }
+    :global(html.anim) .wordmark:hover .rest i:nth-child(1) {
+      transition-delay: 20ms;
+    }
+    :global(html.anim) .wordmark:hover .rest i:nth-child(3) {
+      transition-delay: 100ms;
+    }
+  }
+  :global(html.anim) .wordmark:is(:focus-visible, .is-playing) .rest i {
     transform: none;
   }
-  :global(html.anim) .wordmark:hover .rest i:nth-child(1),
-  :global(html.anim) .wordmark:focus-visible .rest i:nth-child(1) {
-    transition-delay: 0.03s;
+  :global(html.anim) .wordmark:is(:focus-visible, .is-playing) .rest i:nth-child(1) {
+    transition-delay: 20ms;
   }
-  :global(html.anim) .wordmark:hover .rest i:nth-child(2),
-  :global(html.anim) .wordmark:focus-visible .rest i:nth-child(2) {
-    transition-delay: 0.09s;
+  :global(html.anim) .wordmark:is(:focus-visible, .is-playing) .rest i:nth-child(3) {
+    transition-delay: 100ms;
   }
-  :global(html.anim) .wordmark:hover .rest i:nth-child(3),
-  :global(html.anim) .wordmark:focus-visible .rest i:nth-child(3) {
-    transition-delay: 0.15s;
+
+  /* ---- Sections and languages ------------------------------------------- */
+  .site-nav,
+  .lang {
+    display: flex;
+    align-items: center;
+  }
+  .site-nav {
+    gap: clamp(0.9rem, 2vw, 1.6rem);
+  }
+  .lang {
+    gap: 0.7rem;
+  }
+  .site-nav a,
+  .lang a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-family: var(--mono);
+    font-size: var(--fs-mono);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-2);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-nav a:hover,
+  .lang a:hover,
+  .site-nav a[aria-current],
+  .lang a[aria-current] {
+    color: var(--ink);
+  }
+  .site-nav a[aria-current],
+  .lang a[aria-current] {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+  }
+  :global(html.anim) .site-nav a,
+  :global(html.anim) .lang a {
+    transition: color 160ms ease;
+  }
+
+  /* ---- Below 768 px: static two-row header, no glass -------------------- */
+  @media (max-width: 767px) {
+    .site-head {
+      position: static;
+      height: auto;
+      padding-top: 0;
+      pointer-events: auto;
+      border-bottom: 1px solid var(--line);
+    }
+    .dock {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "mark tools"
+        "nav nav";
+      align-items: center;
+      gap: 0 1rem;
+    }
+    .dock-pill {
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+    .dock-nav {
+      display: contents;
+    }
+    .wordmark {
+      grid-area: mark;
+      justify-self: start;
+      height: 48px;
+      padding: 0;
+    }
+    .dock-tools {
+      grid-area: tools;
+      height: 48px;
+    }
+    .site-nav {
+      grid-area: nav;
+      gap: clamp(1rem, 4vw, 1.25rem);
+      /* 320 px safety: scroll rather than wrap; padding keeps focus rings unclipped */
+      overflow-x: auto;
+      scrollbar-width: none;
+      margin: -6px;
+      padding: 6px;
+    }
+    /* one step smaller, so the longest row (ES) fits a 390 px phone */
+    .site-nav a {
+      font-size: var(--fs-meta);
+    }
+  }
+
+  @media (forced-colors: active) and (min-width: 768px) {
+    .dock-pill {
+      border: 1px solid CanvasText;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
   }
 </style>

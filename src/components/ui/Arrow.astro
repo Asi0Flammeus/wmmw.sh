@@ -1,0 +1,45 @@
+---
+/**
+ * The only arrow on the site (no font carries → or ↗): inline SVG in
+ * currentColor, decorative. Sits on the text baseline; nudge it with the
+ * `.arrow` class from the host (e.g. translateX on hover).
+ */
+interface Props {
+  dir: "right" | "left" | "external" | "down";
+  /** Box size, any CSS length (default .8em, follows the host text). */
+  size?: string;
+  class?: string;
+}
+
+const { dir, size = ".8em", class: className } = Astro.props;
+
+const PATHS: Record<Props["dir"], string> = {
+  right: "M3 8h10M9 4l4 4-4 4",
+  left: "M13 8H3M7 4L3 8l4 4",
+  external: "M5 11L11 5M6 5h5v5",
+  down: "M8 3v10M4 9l4 4 4-4",
+};
+---
+
+<svg
+  class:list={["arrow", className]}
+  viewBox="0 0 16 16"
+  style={`width:${size};height:${size}`}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  data-dir={dir}><path d={PATHS[dir]}></path></svg
+>
+
+<style>
+  .arrow {
+    display: inline-block;
+    flex: none;
+    vertical-align: -0.06em;
+    overflow: visible;
+  }
+</style>

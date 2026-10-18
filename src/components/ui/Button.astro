@@ -1,0 +1,201 @@
+---
+/**
+ * Button or button-styled link (spec §6.3). `<a>` when `href`, else `<button>`.
+ * - primary: the ruby loupe. At most one per page (/contact send, /projets tool action).
+ * - secondary (default): outlined pill.
+ * - text: inline ruby text link with its underline.
+ * The label is the default slot, wrapped in `.btn-label` so a caller can swap
+ * it for a busy label. External links open in the same tab, with the external
+ * arrow and a screen-reader suffix.
+ */
+import { type Locale, t } from "@i18n/index";
+import Arrow from "./Arrow.astro";
+
+interface Props {
+  variant?: "primary" | "secondary" | "text";
+  href?: string;
+  type?: "button" | "submit";
+  arrow?: "right" | "left" | "external" | "none";
+  external?: boolean;
+  locale: Locale;
+  name?: string;
+  value?: string;
+  form?: string;
+  disabled?: boolean;
+  busy?: boolean;
+  id?: string;
+  class?: string;
+  "data-qa"?: string;
+}
+
+const {
+  variant = "secondary",
+  href,
+  type = "button",
+  external = false,
+  locale,
+  name,
+  value,
+  form,
+  disabled = false,
+  busy = false,
+  id,
+  class: className,
+  "data-qa": qa,
+} = Astro.props;
+const arrow = Astro.props.arrow ?? (external ? "external" : "none");
+const dict = t(locale);
+const classes = ["btn", `btn-${variant}`, className];
+---
+
+{
+  href ? (
+    <a
+      class:list={classes}
+      href={disabled ? undefined : href}
+      rel={external ? "noopener" : undefined}
+      id={id}
+      aria-disabled={disabled ? "true" : undefined}
+      aria-busy={busy ? "true" : undefined}
+      data-qa={qa}
+    >
+      {arrow === "left" && <Arrow dir="left" />}
+      <span class="btn-label">
+        <slot />
+      </span>
+      {(arrow === "right" || arrow === "external") && <Arrow dir={arrow} />}
+      {external && <span class="sr">{dict.a11y.external}</span>}
+    </a>
+  ) : (
+    <button
+      class:list={classes}
+      type={type}
+      name={name}
+      value={value}
+      form={form}
+      id={id}
+      disabled={disabled}
+      aria-busy={busy ? "true" : undefined}
+      data-qa={qa}
+    >
+      {arrow === "left" && <Arrow dir="left" />}
+      <span class="btn-label">
+        <slot />
+      </span>
+      {(arrow === "right" || arrow === "external") && <Arrow dir={arrow} />}
+    </button>
+  )
+}
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    border-radius: var(--r-pill);
+    font: 600 1rem/1.2 var(--text);
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* primary: opaque ruby body, glass only in sheen, rim and shadow */
+  .btn-primary {
+    min-height: 48px;
+    padding: 0 1.25rem;
+    border: 0;
+    background-color: var(--accent);
+    background-image: var(--loupe-sheen);
+    color: var(--on-accent);
+    box-shadow: var(--loupe-rim), var(--loupe-shadow);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:not(:disabled, [aria-disabled="true"]):hover {
+      background-color: var(--accent-hover);
+      box-shadow: var(--loupe-rim), var(--loupe-shadow-hover);
+    }
+    :global(html.anim) .btn-primary:not(:disabled, [aria-disabled="true"]):hover {
+      transform: translateY(-1px);
+    }
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--accent-hover);
+  }
+  :global(html.anim) .btn-primary:not(:disabled, [aria-disabled="true"]):active {
+    transform: translateY(0) scale(0.985);
+  }
+  :global(html.anim) .btn-primary {
+    transition:
+      background-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 80ms ease;
+  }
+
+  .btn-secondary {
+    min-height: var(--tap);
+    padding: 0 1.1rem;
+    border: 1px solid var(--line-strong);
+    background-color: transparent;
+    color: var(--ink);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-secondary:not(:disabled, [aria-disabled="true"]):hover {
+      border-color: var(--ink);
+      background-color: var(--surface);
+    }
+  }
+  :global(html.anim) .btn-secondary {
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease;
+  }
+
+  .btn-text {
+    display: inline-flex;
+    gap: 0.4em;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-weight: 500;
+    color: var(--accent-text);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .btn-text:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.55;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .btn[aria-busy="true"] {
+    cursor: progress;
+  }
+
+  /* arrow nudge toward where the link goes */
+  :global(html.anim) .btn :global(.arrow) {
+    transition: transform 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.anim) .btn:hover :global(.arrow[data-dir="right"]),
+    :global(html.anim) .btn:hover :global(.arrow[data-dir="external"]) {
+      transform: translateX(2px);
+    }
+    :global(html.anim) .btn:hover :global(.arrow[data-dir="left"]) {
+      transform: translateX(-2px);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .btn-primary,
+    .btn-secondary {
+      border: 1px solid ButtonText;
+    }
+  }
+</style>
