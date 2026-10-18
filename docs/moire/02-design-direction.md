@@ -650,7 +650,7 @@ Layout: sections 3 and 4 side by side in `.split` at ≥1100 px; stacked below. 
 
 ### 7.2 `/projets` · WP4 (renders on demand)
 
-`export const prerender = false` in `src/pages/projets.astro` and `src/pages/[lang]/projets.astro` (the latter validates `lang` in `["en", "es"]`, else `return Astro.rewrite("/404")`). Reason: the no-JS Ghosts form posts here (§8.6).
+`export const prerender = false` in `src/pages/projets.astro` and `src/pages/[lang]/projets.astro` (the latter validates `lang` in `["en", "es"]`, else `return new Response(null, { status: 404 })`, never `Astro.rewrite("/404")`: see §13 E1). Reason: the no-JS Ghosts form posts here (§8.6).
 
 Order (deck §4): `PageHead` (`projets.heading`, `projets.intro`) → four `<article>` with ids `plan-b-academy`, `alysis`, `outils-sur-mesure`, `ghosts`, separated by a `--line` rule and `--section-gap`:
 
@@ -985,3 +985,17 @@ Le moiré ne vit qu'à deux endroits, ton é et la loupe des Ghosts : il répo
 La page d'accueil tient en moins de 140 mots et montre ce qui tourne avant même qu'on fasse défiler.
 Un seul vrai bouton, au bout d'une conversation qui qualifie la demande au lieu d'un formulaire vide.
 Rien ne bouge derrière le texte : l'expertise se sent dans la retenue.
+
+---
+
+## 13. Errata (2026-10-18, binding, supersedes the sections cited)
+
+Revision 2 announces an Appendix B listing the rejected critiques; it was never written. Rule: **every item of `critique-engineering.md` applies as written unless this spec explicitly addresses the same point with a different decision.** The brief critique (`critique-brief.md`) was absorbed through decisions A5 to A18 and needs no errata. Items confirmed missing from revision 2, binding:
+
+- **E1 (§7.2, §7.7).** An on-demand route never calls `Astro.rewrite("/404")`: Astro 6 throws `ForbiddenRewrite` when an on-demand route rewrites to a prerendered one, which turns every bad-locale URL into a 500. Use `return new Response(null, { status: 404 })`; the node adapter serves `404.html`. T13 adds: GET `/xx/contact` and `/xx/projets` return 404 with the 404 page's h1.
+- **E2 (T3, §10 gates).** Copy lint scans text extensions only (`.astro .ts .mjs .js .css .md .mdx .json .html .svg .txt .xml .yml`). `copy-lint.mjs --owned <globs>` is the package gate; the full-tree scan runs in WP1b and CI only.
+- **E6 (§8.2, §11).** Every `INTAKE_*` value is read through `process.env` at call time (as `reports.ts` does), never `import.meta.env`. No `NODE_ENV` rule. Token: `payload = "${ts_ms}.${kind}.${locale}"`, `sig = base64url(HMAC-SHA256(secret, payload))`, `started = base64url(payload + "." + sig)`. The intake page and GhostsNotify embed `data-min-ms` from env and the client waits on it. T11 sends `Origin` on every request.
+- **E7 (§8.1, §8.6).** Server intake modules are loaded with `await import("@lib/intake/process")` inside the POST branch only. No `src/lib/intake/*` module has top-level side effects; the retention sweep starts lazily on the first read or write.
+- **E9 (§8.6).** `ghosts.client.ts` follows the brief's rule: busy state, wait out the remaining `data-min-ms`, fetch a fresh token at submit when the current one is older than 2 h.
+- **QA port (§11).** Port 4321 is production on this server, and 4321 to 4329 and 4360 to 4371 are other live services. Every QA script reads `QA_PORT` (default 4781) and the QA server env uses `PORT=$QA_PORT` and `INTAKE_ALLOWED_ORIGINS=http://127.0.0.1:$QA_PORT`. Packages building in parallel get distinct ports (WP2 4782, WP3 4783, WP4 4784, WP5 4785).
+- **Host speed.** The build server is shared and often heavily loaded; headless Chromium is slow there. Keep browser sweeps targeted (one browser per run, only the routes and viewports the check needs), and wrap long commands in `timeout`.
