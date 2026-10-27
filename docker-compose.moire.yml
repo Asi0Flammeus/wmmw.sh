@@ -17,6 +17,8 @@ services:
       args:
         # QA annotation overlay (Alt+Y) is the point of this preview.
         - ANNOTATION_SYSTEM=true
+    # the host's address pools are exhausted: join the default bridge, create no network
+    network_mode: bridge
     ports:
       - "127.0.0.1:4378:4321"
     environment:

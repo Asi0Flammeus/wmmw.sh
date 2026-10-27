@@ -6,7 +6,8 @@
 import { z } from "zod";
 import { clean, PATH_FIELDS, PATHS, type Brief, type BriefPath } from "./rules";
 
-const text = z.unknown().transform(clean);
+/* optional input: an absent key must parse (zod 4 marks a bare transform non-optional) */
+const text = z.unknown().optional().transform(clean);
 const LOCALES = ["fr", "en", "es"] as const;
 
 /** A same-origin path (no scheme, no protocol-relative), at most 200 chars, else undefined. */
@@ -20,7 +21,10 @@ export const requestSchema = z.object({
     .object({ name: text.optional(), channel: text.optional(), value: text.optional() })
     .catch({})
     .default({}),
-  consent: z.unknown().transform((v) => v === true || v === "on" || v === "true"),
+  consent: z
+    .unknown()
+    .optional()
+    .transform((v) => v === true || v === "on" || v === "true"),
   started: text.optional(),
   page: localPath.optional(),
   from: localPath.optional(),
@@ -31,7 +35,7 @@ export type IntakeRequest = z.infer<typeof requestSchema>;
 
 /** The brief as the rules see it: only the fields of its path, cleaned. */
 export function toBrief(req: IntakeRequest): Brief {
-  const path = req.path;
+  const path = req.path ?? "";
   const fields: Record<string, string> = {};
   if ((PATHS as readonly string[]).includes(path)) {
     for (const f of PATH_FIELDS[path as BriefPath]) fields[f.name] = clean(req.fields[f.name]);

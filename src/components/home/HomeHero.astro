@@ -19,7 +19,7 @@ const source = hero.h1.slice(-1);
 
 <MoireField labelledby="hero-title">
   <h1 class="hero-name" id="hero-title" data-w1-mask>{name}<span class="w1-src">{source}</span></h1>
-  <p class="hero-sub" data-w1-mask>{hero.sub}</p>
+  <h1 class="hero-name" id="hero-title" aria-label={hero.h1} data-w1-mask>{name}<span class="w1-src">{source}</span></h1>
   <p class="hero-aside" data-w1-mask>{hero.aside}</p>
 </MoireField>
 
