@@ -109,16 +109,19 @@ const dict = t(locale);
   }
 
   /* M3: the name underlines, the arrow nudges toward where the row goes */
-  .row-link:is(:hover, :focus-visible) .row-name {
+  .row-link:hover .row-name,
+  .row-link:focus-visible .row-name {
     text-decoration-color: currentColor;
   }
-  .row-link:is(:hover, :focus-visible) .row-arrow {
+  .row-link:hover .row-arrow,
+  .row-link:focus-visible .row-arrow {
     color: var(--ink);
   }
   :global(html.anim) .row-link :global(.arrow) {
     transition: transform 240ms var(--ease-out);
   }
-  :global(html.anim) .row-link:is(:hover, :focus-visible) :global(.arrow) {
+  :global(html.anim) .row-link:hover :global(.arrow),
+  :global(html.anim) .row-link:focus-visible :global(.arrow) {
     transform: translateX(2px);
   }
   :global(html.anim) .row-arrow {
@@ -205,10 +208,12 @@ const dict = t(locale);
       transform: rotate(4deg);
       transform-origin: 6px 50%;
     }
-    .row-link:is(:hover, :focus-visible) .q2 {
+    .row-link:hover .q2,
+    .row-link:focus-visible .q2 {
       opacity: var(--fringe-a);
     }
-    .row-link:is(:hover, :focus-visible) .q2::after {
+    .row-link:hover .q2::after,
+    .row-link:focus-visible .q2::after {
       transform: rotate(1.2deg);
     }
     :global(html.anim) .q2 {

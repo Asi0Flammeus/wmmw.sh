@@ -85,7 +85,8 @@ const named = figure && label;
     :global(html.anim) .strands-figure .strand {
       transition: transform 400ms var(--ease-out);
     }
-    :global(html.anim [data-strands-host]:is(:hover, :focus-visible)) .strands-figure .strand {
+    :global(html.anim [data-strands-host]:hover) .strands-figure .strand,
+    :global(html.anim [data-strands-host]:focus-visible) .strands-figure .strand {
       transform: translateY(var(--spread));
     }
   }
