@@ -56,8 +56,10 @@ const isHome = path === "/";
         {
           navItems.map((item) => {
             const active = isActive(item.href);
+            /* the section root is the page; a page nested under it is only in the section (E29) */
+            const current = active ? (path === item.href ? "page" : "true") : undefined;
             return (
-              <a href={localePath(locale, item.href)} aria-current={active ? "page" : undefined}>
+              <a href={localePath(locale, item.href)} aria-current={current}>
                 {dict.nav[item.key]}
               </a>
             );

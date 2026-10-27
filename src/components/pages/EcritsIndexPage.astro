@@ -1,91 +1,60 @@
 ---
+/**
+ * /ecrits (spec §7.4, decision A19): the list of writings, then the follow
+ * block under it (RSS button and the feed address to copy). Drafts excluded.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import { publishedWritings } from "@lib/writings";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { type Locale, t, localePath, isoDate } from "@i18n/index";
-import { publishedWritings, baseSlug } from "@lib/writings";
+import PageHead from "@components/ui/PageHead.astro";
+import Button from "@components/ui/Button.astro";
+import CopyLine from "@components/outils/CopyLine.astro";
+import WritingRow from "@components/ecrits/WritingRow.astro";
 
 interface Props {
   locale: Locale;
 }
 
 const { locale } = Astro.props;
-const dict = t(locale);
+const e = t(locale).ecrits;
 const entries = await publishedWritings(locale);
+const feedPath = localePath(locale, "/rss.xml");
 ---
 
-<BaseLayout
-  locale={locale}
-  title={dict.ecrits.heading}
-  description={dict.meta.ecrits}
-  path="/ecrits"
->
-  <section class="sec offset-l" data-block>
-    <div class="wrap">
-      <div class="sec-inner">
-        <p class="sec-intro reveal">{dict.ecrits.intro}</p>
-        <div class="rows reveal">
-          {
-            entries.map((entry) => {
-              const slug = baseSlug(entry);
-              return (
-                <a
-                  class="row-item writing"
-                  data-myc-node
-                  href={localePath(locale, `/ecrits/${slug}`)}
-                >
-                  <p class="meta-label">
-                    <time datetime={isoDate(entry.data.publishedAt)}>
-                      {isoDate(entry.data.publishedAt)}
-                    </time>
-                  </p>
-                  <h2 class="writing-title">{entry.data.title}</h2>
-                  <p class="writing-hook">{entry.data.description}</p>
-                </a>
-              );
-            })
-          }
-        </div>
-      </div>
+<BaseLayout locale={locale} title={e.meta.title} description={e.meta.description} path="/ecrits">
+  <div class="wrap">
+    <PageHead title={e.heading} lead={e.intro} />
+    <ul class="writings">
+      {entries.map((entry) => <WritingRow locale={locale} entry={entry} />)}
+    </ul>
+    <div class="follow">
+      <Button variant="secondary" href={feedPath} locale={locale}>{e.follow}</Button>
+      <p class="follow-hint">{e.followHint}</p>
+      <CopyLine code={`wmmw.sh${feedPath}`} locale={locale} copyLabel={e.copy} copiedLabel={e.copied} label={e.feedLabel} />
     </div>
-  </section>
+  </div>
 </BaseLayout>
 
 <style>
-  .rows {
-    margin-top: 2.6rem;
+  .writings {
+    list-style: none;
+    margin: var(--block-gap) 0 0;
+    padding: 0;
+    max-width: var(--measure);
   }
-  .writing {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    padding-block: 1.9rem;
+  .follow {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+    max-width: 30rem;
+    margin-top: var(--section-gap);
   }
-  .writing:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 4px;
-    border-radius: 2px;
+  .follow :global(.copyline) {
+    width: 100%;
   }
-  .writing-title {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: var(--fs-h2);
-    letter-spacing: -0.02em;
-    line-height: 1.12;
-    color: var(--bone);
-    margin-top: 0.5rem;
-    max-width: 26ch;
-    text-wrap: balance;
-  }
-  .writing:hover .writing-title,
-  .writing:focus-visible .writing-title {
-    color: var(--accent);
-  }
-  :global(html.anim) .writing-title {
-    transition: color var(--t-base) ease;
-  }
-  .writing-hook {
-    margin-top: 0.6rem;
+  .follow-hint {
+    margin: 0.5rem 0 0;
+    font-size: var(--fs-small);
     color: var(--ink-2);
-    max-width: 58ch;
-    text-wrap: pretty;
   }
 </style>

@@ -1,0 +1,77 @@
+---
+/**
+ * One /projets article (spec §7.2): from 1100 px an aside (h2 + dimensions
+ * line) beside the body column. The body is the default slot, built from
+ * `Part` blocks. The dimension tags are the visible bridge to the manifesto.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  id: string;
+  title: string;
+  dims?: readonly string[];
+}
+
+const { locale, id, title, dims } = Astro.props;
+const p = t(locale).projets;
+const dimsHref = `${localePath(locale, "/manifeste")}#${p.dimsAnchor}`;
+---
+
+<article class="proj" id={id} aria-labelledby={`${id}-title`}>
+  <div class="proj-aside">
+    <h2 id={`${id}-title`}>{title}</h2>
+    {
+      dims && dims.length > 0 && (
+        <p class="proj-dims">
+          <a href={dimsHref}>{p.labels.dims}</a>
+          <span aria-hidden="true"> · </span>
+          {dims.join(" · ")}
+        </p>
+      )
+    }
+  </div>
+  <div class="proj-body">
+    <slot />
+  </div>
+</article>
+
+<style>
+  .proj {
+    padding-top: var(--section-gap);
+    margin-top: var(--section-gap);
+    border-top: 1px solid var(--line);
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+  .proj:first-of-type {
+    margin-top: var(--block-gap);
+  }
+  .proj-aside h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 0.3em;
+  }
+  .proj-dims {
+    margin: 0 0 var(--block-gap);
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
+  }
+  .proj-body {
+    max-width: var(--measure);
+    display: grid;
+    gap: 1.6rem;
+  }
+  @media (min-width: 1100px) {
+    .proj {
+      display: grid;
+      grid-template-columns: 15rem minmax(0, var(--measure));
+      column-gap: clamp(2.5rem, 5vw, 4.5rem);
+      align-items: start;
+    }
+    .proj-dims {
+      margin-bottom: 0;
+    }
+  }
+</style>

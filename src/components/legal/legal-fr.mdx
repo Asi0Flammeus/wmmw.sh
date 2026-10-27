@@ -1,0 +1,64 @@
+import { SIREN, SIRET, TVA, ADRESSE_SIEGE, SCALEWAY_TEL, MEDIATEUR, POLICES, MAJ } from "@lib/legal";
+
+{/* Copy deck §11.1, binding version. U+202F written as &#8239; before : ; ? ! and inside « ». */}
+
+Qui publie ce site, où il vit, et ce que deviennent tes données. En clair. Ici, «&#8239;je&#8239;», c’est l’éditeur.
+
+## Éditeur
+
+Le site wmmw.sh est édité par **William Lecompte**, entrepreneur individuel (EI), qui publie sous le nom de William Moiré.
+
+- SIREN&#8239;: {SIREN}
+- SIRET&#8239;: {SIRET}
+- TVA intracommunautaire&#8239;: {TVA}
+- Siège&#8239;: {ADRESSE_SIEGE}
+- Directeur de la publication&#8239;: William Lecompte
+- Contact&#8239;: par la page [Travailler ensemble](/contact?chemin=autre), chemin «&#8239;Autre chose&#8239;».
+
+## Hébergement
+
+Le site est auto-hébergé. Il tourne sur un serveur loué à Scaleway, situé en France, et administré directement par l’éditeur.
+
+Scaleway SAS, 8 rue de la Ville l’Évêque, 75008 Paris, France.{SCALEWAY_TEL ? ` ${SCALEWAY_TEL}` : ""}
+
+<h2 id="donnees">Données personnelles</h2>
+
+**Ce que je collecte.** Uniquement ce que tu écris toi-même. Dans Travailler ensemble&#8239;: le chemin choisi, ton brief, ton prénom ou ton pseudo, et le moyen de te répondre (adresse email, pseudo X, Telegram ou Signal, ou autre). Dans «&#8239;Préviens-moi&#8239;»&#8239;: ton email ou ton pseudo.
+
+**Pourquoi.** Pour te répondre et, si on travaille ensemble, préparer un devis. Base légale&#8239;: les démarches précontractuelles que tu demandes (article 6.1.b du RGPD) et, pour les autres messages, mon intérêt légitime à y répondre (article 6.1.f).
+
+**Où.** Dans un fichier sur le serveur du site, en France. Rien n’est envoyé par email, aucun outil tiers ne le lit, rien n’est revendu.
+
+**Combien de temps.** 12 mois après réception, puis effacement automatique. Si un devis ou une facture suit, ces pièces sont conservées à part, pendant la durée imposée par la loi.
+
+**La liste Ghosts.** Si tu laisses ton email ou ton pseudo dans «&#8239;Préviens-moi&#8239;», je l’utilise pour un seul message, à la sortie de Ghosts, puis je l’efface. Base légale&#8239;: ton consentement (article 6.1.a du RGPD), que tu peux retirer à tout moment, par le même chemin que tes autres droits. Si Ghosts n’est pas sorti au bout de 12 mois, il est effacé quand même.
+
+**Ton adresse IP.** Elle sert seulement à limiter les abus, en mémoire et sous forme hachée, pendant 24 heures au plus. Elle n’est jamais enregistrée.
+
+**Si je te réponds par X, Telegram ou Signal,** l’échange passe par ces services, selon leurs propres règles.
+
+**Tes droits.** Accès, rectification, effacement, opposition, limitation et portabilité. Pour les exercer&#8239;: [Travailler ensemble](/contact?chemin=autre), chemin «&#8239;Autre chose&#8239;», sujet «&#8239;Mes données&#8239;». Je réponds sous un mois au plus. Tu peux aussi saisir la CNIL (cnil.fr).
+
+## Cookies et mesure d’audience
+
+Ce site ne dépose aucun cookie. La mesure d’audience passe par Umami, auto-hébergé par l’éditeur, sans cookie et sans profil individuel.
+
+Deux choses restent dans ton navigateur, sans quitter ton appareil&#8239;: ton choix de thème clair ou sombre, et le brouillon du formulaire pendant que tu l’écris. Le brouillon s’efface à l’envoi ou à la fermeture de l’onglet.
+
+## Propriété intellectuelle
+
+Les textes de ce site sont publiés sous licence CC BY-SA 4.0, sauf mention contraire&#8239;: tu peux les reprendre en citant la source et en partageant dans les mêmes conditions. Le code des outils suit la licence indiquée dans chaque dépôt. Le nom William Moiré, le monogramme wmmw et le design du site ne sont pas couverts par cette licence.
+
+## Liens
+
+Ce site renvoie vers d’autres sites, dont alysis.cat et planb.academy. Je n’ai pas la main sur leur contenu.
+
+{MEDIATEUR && <h2>Médiation</h2>}
+
+{MEDIATEUR && <p>Si tu es un particulier et qu’un litige avec moi n’est pas réglé après une réclamation écrite, tu peux saisir gratuitement le médiateur de la consommation&#8239;: {MEDIATEUR}.</p>}
+
+## Crédits
+
+Polices&#8239;: {POLICES}, sous licence SIL Open Font License.
+
+Dernière mise à jour&#8239;: {MAJ.fr}.

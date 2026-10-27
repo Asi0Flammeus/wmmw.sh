@@ -1,6 +1,12 @@
 ---
+/**
+ * /manifeste (spec §7.6): the reading layout. h1 from the frontmatter title,
+ * the prose body, the « Tous les écrits » end link. No CTA, no portrait, no moiré.
+ */
 import { getCollection, render } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHead from "@components/ui/PageHead.astro";
+import Arrow from "@components/ui/Arrow.astro";
 import { type Locale, t, localePath } from "@i18n/index";
 
 interface Props {
@@ -9,115 +15,44 @@ interface Props {
 
 const { locale } = Astro.props;
 const dict = t(locale);
-
-const entries = await getCollection("manifeste");
-const entry = entries.find((e) => e.data.lang === locale);
-if (!entry) {
-  throw new Error(`Missing manifeste entry for locale "${locale}".`);
-}
-
+const entry = (await getCollection("manifeste")).find((e) => e.data.lang === locale);
+if (!entry) throw new Error(`Missing manifeste entry for locale "${locale}".`);
 const { Content } = await render(entry);
-const ecritsHref = localePath(locale, "/ecrits");
 ---
 
 <BaseLayout
   locale={locale}
-  title={entry.data.title}
-  description={entry.data.description}
+  title={dict.manifeste.meta.title}
+  description={dict.manifeste.meta.description}
   path="/manifeste"
 >
-  <section class="sec" data-block>
-    <div class="man-wrap">
-      <div class="manifesto reveal">
+  <article class="wrap">
+    <div class="measure reading">
+      <PageHead title={entry.data.title} />
+      <div class="prose manifesto">
         <Content />
       </div>
-      <p class="man-end reveal">
-        <a class="arrow-link" href={ecritsHref}>{dict.ecrits.all}</a>
+      <p class="reading-end">
+        <a href={localePath(locale, "/ecrits")}>{dict.common.allWritings}<Arrow dir="right" /></a>
       </p>
     </div>
-  </section>
+  </article>
 </BaseLayout>
 
 <style>
-  .man-wrap {
-    max-width: 65ch;
+  .reading {
     margin-inline: auto;
-    padding-inline: var(--pad);
   }
-
-  /* long-form editorial prose */
   .manifesto {
-    display: flex;
-    flex-direction: column;
-    gap: 1.3rem;
+    margin-top: var(--block-gap);
   }
-  .manifesto :global(h2) {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: clamp(1.5rem, 3vw, 1.9rem);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    text-wrap: balance;
-    color: var(--bone);
-    margin-top: 1.6rem;
+  .reading-end {
+    margin: var(--section-gap) 0 0;
   }
-  .manifesto :global(h3) {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: 1.3rem;
-    line-height: 1.25;
-    color: var(--bone);
-    margin-top: 1rem;
-  }
-  .manifesto :global(p) {
-    font-size: 1.0625rem;
-    line-height: 1.72;
-    color: var(--ink-2);
-    text-wrap: pretty;
-  }
-  .manifesto :global(strong) {
-    color: var(--bone);
-    font-weight: 600;
-  }
-  .manifesto :global(blockquote) {
-    margin: 0.4rem 0;
-    border: 0;
-    padding: 0;
-  }
-  .manifesto :global(blockquote p) {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: var(--fs-h3);
-    line-height: 1.35;
-    letter-spacing: -0.015em;
-    color: var(--accent);
-    text-wrap: balance;
-  }
-  .manifesto :global(ul),
-  .manifesto :global(ol) {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    padding-left: 1.3rem;
-    margin: 0;
-  }
-  .manifesto :global(li) {
-    color: var(--ink-2);
-  }
-  .manifesto :global(li::marker) {
-    color: var(--accent);
-  }
-  .manifesto :global(a) {
-    color: var(--accent);
-    text-decoration: none;
-    text-underline-offset: 3px;
-  }
-  .manifesto :global(a:hover),
-  .manifesto :global(a:focus-visible) {
-    text-decoration: underline;
-  }
-
-  .man-end {
-    margin-top: 3rem;
+  .reading-end a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: var(--tap);
   }
 </style>

@@ -1,0 +1,50 @@
+---
+/**
+ * A labelled part of a /projets article: a lowercase JBM micro-label (ink-3)
+ * above Schibsted text. `emphasis` sets the « pour toi » part in ink, larger.
+ */
+interface Props {
+  label: string;
+  emphasis?: boolean;
+}
+
+const { label, emphasis = false } = Astro.props;
+---
+
+<div class:list={["part", { "part-em": emphasis }]}>
+  <p class="part-label">{label}</p>
+  <div class="part-text"><slot /></div>
+</div>
+
+<style>
+  .part-label {
+    margin: 0 0 0.35rem;
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
+  }
+  .part-text {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--ink-2);
+  }
+  .part-text :global(p) {
+    margin: 0;
+  }
+  .part-em .part-text {
+    font-size: 1.1875rem;
+    line-height: var(--lh-small);
+    color: var(--ink);
+  }
+  .part-text :global(ul) {
+    margin: 0;
+    padding-left: 1.25em;
+    display: grid;
+    gap: 0.4rem;
+  }
+  .part-text :global(li::marker) {
+    color: var(--ink-3);
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+/**
+ * Step 1 path cards (copy deck §9.3): radio cards for tool, open and other,
+ * and the site card, a real link to alysis.cat styled the same (selecting it
+ * stores nothing). Each card carries its nature on a tag.
+ */
+import { type Locale, t } from "@i18n/index";
+import { ALYSIS_URL } from "@lib/site";
+import Arrow from "@components/ui/Arrow.astro";
+
+interface Props {
+  locale: Locale;
+  value?: string;
+  error?: string;
+}
+
+const { locale, value, error } = Astro.props;
+const dict = t(locale);
+const p = dict.paths;
+const radios = [
+  { key: "tool", ...p.tool },
+  { key: "open", ...p.open },
+  { key: "other", ...p.other },
+] as const;
+---
+
+<div class="paths" data-field="path">
+  <div class="paths-grid">
+    {
+      radios.slice(0, 1).map((card) => (
+        <label class="path-card" data-qa={`intake-path-${card.key}`}>
+          <input class="sr" type="radio" name="path" value={card.key} id={`path-${card.key}`} checked={value === card.key} aria-describedby="path-err" />
+          <span class="path-title">{card.me}</span>
+          <span class="path-hint">{card.hint}</span>
+          <span class="path-tag">{card.tag}</span>
+        </label>
+      ))
+    }
+    <a class="path-card path-link" href={ALYSIS_URL} rel="noopener" data-qa="intake-path-site">
+      <span class="path-title">{p.site.me}</span>
+      <span class="path-hint">{p.site.hint}</span>
+      <span class="path-tag">{p.site.tag}<Arrow dir="external" /></span>
+      <span class="sr">{dict.a11y.external}</span>
+    </a>
+    {
+      radios.slice(1).map((card) => (
+        <label class="path-card" data-qa={`intake-path-${card.key}`}>
+          <input class="sr" type="radio" name="path" value={card.key} id={`path-${card.key}`} checked={value === card.key} aria-describedby="path-err" />
+          <span class="path-title">{card.me}</span>
+          <span class="path-hint">{card.hint}</span>
+          <span class="path-tag">{card.tag}</span>
+        </label>
+      ))
+    }
+  </div>
+  <p class="field-err" id="path-err" hidden={!error}>
+    <svg class="err-glyph" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6"></circle><path d="M7 3.8v3.9M7 9.9v.3"></path></svg>
+    <span data-err-text>{error}</span>
+  </p>
+</div>

@@ -1,9 +1,11 @@
 # William Moiré redesign preview (branch feat/william-moire).
-# Served at https://moire.wmmw.sh by a hand-managed nginx vhost -> 127.0.0.1:4356.
-# Own compose project name so it never touches the production `wmmw` service
-# that lives in this same checkout.
+# Served at https://moire.wmmw.sh by a hand-managed nginx vhost
+# (/etc/nginx/applications/moire.wmmw.sh.conf) -> 127.0.0.1:4378
+# (`port-claim wmmw-moire`). Own compose project name so it never touches the
+# production `wmmw` service that lives in the same checkout.
 #
-#   docker compose -f docker-compose.moire.yml up -d --build
+#   INTAKE_SECRET and INTAKE_TOKEN come from .env.moire (never committed):
+#   docker compose -f docker-compose.moire.yml --env-file .env.moire up -d --build
 name: wmmw-moire
 
 services:
@@ -16,7 +18,7 @@ services:
         # QA annotation overlay (Alt+Y) is the point of this preview.
         - ANNOTATION_SYSTEM=true
     ports:
-      - "127.0.0.1:4356:4321"
+      - "127.0.0.1:4378:4321"
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
@@ -24,6 +26,9 @@ services:
       - REPORTS_DIR=/data/reports
       - INTAKE_DIR=/data/intake
       - INTAKE_TOKEN=${INTAKE_TOKEN:-}
+      # required (critique E8): a stable key keeps open forms valid across redeploys
+      - INTAKE_SECRET=${INTAKE_SECRET:?set INTAKE_SECRET in .env.moire}
+      - INTAKE_ALLOWED_ORIGINS=https://moire.wmmw.sh
     volumes:
       - moire-reports:/data/reports
       - moire-intake:/data/intake

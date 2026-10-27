@@ -1,0 +1,52 @@
+---
+/**
+ * « Travailler ensemble » (spec §7.1.3): the only action block on home. Four
+ * chips, secondary doors with arrows, labels never shortened. Hosts M4.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import { ALYSIS_URL } from "@lib/site";
+import Chip from "@components/ui/Chip.astro";
+import StepsLine from "@components/visual/StepsLine.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
+const contact = localePath(locale, "/contact");
+---
+
+<section class="work" aria-labelledby="work-title" data-steps-host>
+  <h2 id="work-title">{dict.home.work.heading}</h2>
+  <p class="work-line">{dict.home.work.line}</p>
+  <StepsLine locale={locale} variant="compact" class="work-steps" />
+  <div class="work-chips">
+    <Chip href={`${contact}?chemin=outil`} locale={locale}>{dict.paths.tool.me}</Chip>
+    <Chip href={ALYSIS_URL} locale={locale} external>{dict.paths.site.me}</Chip>
+    <Chip href={`${contact}?chemin=ouvert`} locale={locale}>{dict.paths.open.me}</Chip>
+    <Chip href={`${contact}?chemin=autre`} locale={locale}>{dict.paths.other.me}</Chip>
+  </div>
+</section>
+
+<style>
+  .work h2 {
+    font-size: var(--fs-h2);
+  }
+  .work-line {
+    max-width: 46ch;
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: var(--lh-small);
+    color: var(--ink-2);
+  }
+  .work :global(.work-steps) {
+    margin-top: var(--block-gap);
+  }
+  .work-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: var(--block-gap);
+  }
+</style>

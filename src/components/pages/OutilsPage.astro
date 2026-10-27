@@ -1,7 +1,16 @@
 ---
+/**
+ * /outils (spec §7.3, copy deck §5): free tools, plain blurbs, a real install
+ * line where one exists, the repo link. Closing: a secondary door to the
+ * tool intake. No terminal panels, no typed lines, no counters.
+ */
 import { getCollection } from "astro:content";
+import { type Locale, t, localePath } from "@i18n/index";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { type Locale, t } from "@i18n/index";
+import PageHead from "@components/ui/PageHead.astro";
+import Arrow from "@components/ui/Arrow.astro";
+import Button from "@components/ui/Button.astro";
+import CopyLine from "@components/outils/CopyLine.astro";
 
 interface Props {
   locale: Locale;
@@ -9,123 +18,120 @@ interface Props {
 
 const { locale } = Astro.props;
 const dict = t(locale);
-
-const tools = (await getCollection("tools")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const o = dict.outils;
+const tools = (await getCollection("tools")).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout
-  locale={locale}
-  title={dict.outils.heading}
-  description={dict.meta.outils}
-  path="/outils"
->
-  <section class="sec offset-l" data-block>
-    <div class="wrap">
-      <div class="sec-inner">
-        <p class="sec-intro reveal">{dict.outils.intro}</p>
-        <div class="rows reveal">
-          {
-            tools.map((tool) => {
-              const mainHref = tool.data.repo ?? tool.data.url;
-              return (
-                <article class="row-item tool" data-myc-node>
-                  <div class="tool-head">
-                    <h2 class="tool-name">
-                      {mainHref ? (
-                        <a href={mainHref} rel="noopener">
-                          {tool.data.name}
-                        </a>
-                      ) : (
-                        tool.data.name
-                      )}
-                    </h2>
-                    <span class="badge">{tool.data.status}</span>
-                  </div>
-                  <p class="tool-blurb">{tool.data.blurb[locale]}</p>
-                  {!tool.data.repo && tool.data.url && (
-                    <p class="tool-note">{dict.outils.repoPrivate}</p>
-                  )}
-                  {tool.data.install && (
-                    <p class="tool-install">
-                      <code>{tool.data.install}</code>
-                    </p>
-                  )}
-                </article>
-              );
-            })
-          }
-        </div>
-      </div>
+<BaseLayout locale={locale} title={o.meta.title} description={o.meta.description} path="/outils">
+  <div class="wrap">
+    <PageHead title={o.heading} lead={o.intro} />
+    <ul class="tools">
+      {
+        tools.map(({ data }) => (
+          <li class="tool" id={data.name}>
+            <div class="tool-head">
+              <h2 class="tool-name">{data.name}</h2>
+              <span class="tool-status">{o.status[data.status]}</span>
+            </div>
+            <p class="tool-blurb">{data.blurb[locale]}</p>
+            {data.install && (
+              <div class="tool-install">
+                <p class="tool-micro">{o.install}</p>
+                <CopyLine
+                  code={data.install}
+                  locale={locale}
+                  copyLabel={o.copy}
+                  copiedLabel={o.copied}
+                  label={`${o.install} ${data.name}`}
+                />
+              </div>
+            )}
+            {data.repo ? (
+              <a class="tool-repo" href={data.repo} rel="noopener">
+                {o.repo}
+                <Arrow dir="external" />
+                <span class="sr">{dict.a11y.external}</span>
+              </a>
+            ) : (
+              <p class="tool-private">{o.private}</p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    <div class="tools-cta">
+      <p>{o.cta.line}</p>
+      <Button variant="secondary" arrow="right" href={`${localePath(locale, "/contact")}?chemin=outil`} locale={locale}>
+        {o.cta.link}
+      </Button>
     </div>
-  </section>
+  </div>
 </BaseLayout>
 
 <style>
-  .rows {
-    margin-top: 2.6rem;
+  .tools {
+    list-style: none;
+    margin: var(--block-gap) 0 0;
+    padding: 0;
+    max-width: var(--measure);
   }
   .tool {
-    padding-block: 1.9rem;
+    display: grid;
+    gap: 0.75rem;
+    padding-block: 1.6rem;
+    border-top: 1px solid var(--line);
+  }
+  .tool:last-child {
+    border-bottom: 1px solid var(--line);
   }
   .tool-head {
     display: flex;
-    align-items: baseline;
     flex-wrap: wrap;
-    gap: 1rem;
+    align-items: baseline;
+    gap: 0.4rem 1rem;
   }
   .tool-name {
-    font-family: var(--disp);
-    font-weight: 500;
+    margin: 0;
     font-size: var(--fs-h3);
-    letter-spacing: -0.01em;
-    color: var(--bone);
   }
-  .tool-name a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .tool-name a:hover,
-  .tool-name a:focus-visible {
-    color: var(--accent);
-  }
-  :global(html.anim) .tool-name a {
-    transition: color var(--t-base) ease;
-  }
-  .badge {
-    display: inline-block;
+  .tool-status,
+  .tool-micro {
     font-family: var(--mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.02em;
-    padding: 0.18rem 0.75rem;
-    border-radius: var(--r-pill);
-    background: var(--accent-soft);
-    color: var(--accent);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
+  }
+  .tool-micro {
+    margin: 0 0 0.35rem;
   }
   .tool-blurb {
-    margin-top: 0.6rem;
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
     color: var(--ink-2);
-    max-width: 58ch;
-    text-wrap: pretty;
   }
-  .tool-note {
-    margin-top: 0.5rem;
+  .tool-repo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    justify-self: start;
+    min-height: var(--tap);
+  }
+  .tool-private {
+    margin: 0;
     color: var(--ink-3);
-    font-size: var(--fs-small);
   }
-  .tool-install {
-    margin-top: 0.9rem;
+  .tools-cta {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    margin-top: var(--section-gap);
   }
-  .tool-install code {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--bone);
-    background: var(--surf);
-    border: 1px solid var(--hair-2);
-    border-radius: 6px;
-    padding: 0.4em 0.8em;
-    overflow-wrap: anywhere;
+  .tools-cta p {
+    margin: 0;
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    text-wrap: balance;
   }
 </style>

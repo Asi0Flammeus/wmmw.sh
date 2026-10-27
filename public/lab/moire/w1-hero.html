@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>W1 · é source · labo moiré</title>
+<script>
+/* Lab boot. In production this block is the theme boot of Q1 (see q1-toggle.html):
+   it runs before first paint so the right theme is painted at once. */
+(() => {
+  const d = document.documentElement, q = new URLSearchParams(location.search);
+  const t = q.get("theme"); if (t === "light" || t === "dark") d.dataset.theme = t;
+  if (q.has("bare")) d.classList.add("bare");
+  if (q.has("rm")) d.classList.add("rm");
+  if (q.has("debug")) d.classList.add("debug");
+  d.classList.add("js");
+})();
+</script>
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* ===== W1 hero ===== */
+.w1 {
+  position: relative; isolation: isolate; overflow: clip;   /* clips the 1900 px field, never a Basteleur line */
+  /* the field starts under the header so it fades out at the page top, not at a seam */
+  margin-top: -72px;
+  padding-block: calc(72px + clamp(2.5rem, 12vh, 8rem)) clamp(3.5rem, 10vh, 6.5rem);
+}
+.w1-name {
+  margin: 0; width: fit-content; white-space: nowrap;
+  font: 400 var(--fs-hero)/1.1 var(--disp); font-feature-settings: "ss01"; letter-spacing: -.01em;
+}
+.w1-sub { margin: .5em 0 0; width: fit-content; max-width: 40ch; font-size: var(--fs-lead); line-height: 1.35; letter-spacing: -.005em; text-wrap: balance; }
+.w1-aside { margin: .75rem 0 0; width: fit-content; max-width: 100%; text-wrap: balance; font: 400 var(--fs-mono)/1.4 var(--mono); letter-spacing: .01em; color: var(--ink-2); }
+/* narrow screens: the name takes two lines and keeps its rank over h2 */
+@media (max-width: 560px) { .w1-name { white-space: normal; font-size: 16.5vw; line-height: 1.04; } }
+
+/* The é carries the source. --src-x/--src-y: accent centre in em from the glyph's
+   content box. Basteleur sets USE_TYPO_METRICS, so the box top is the typo ascent,
+   .8em above the baseline. Ink centroid of the acute: x .313em, .743em above the
+   baseline, so y = .8 - .743 = .057em. ss01 leaves the lowercase é alone.
+   JS re-measures from the rendered ink at runtime. */
+.w1-src { position: relative; --src-x: .313em; --src-y: .057em; }
+
+/* Static frame: server-rendered, no JS. Two ring gratings combined by mask (AND), so
+   the fringe exists before any script runs. Same composition as the WebGL rest frame.
+   Desktop: fringe period P = 260 px, so p2 = p1 * P / (P - p1) = 6.142 px and
+   B = A - (C0 - A) * (p2/p1 - 1) with C0 = A + (90, 140). Below 768 px: P = 206 px. */
+.w1-src::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: var(--src-x); top: var(--src-y);
+  width: 1900px; height: 1900px; translate: -50% -50%;
+  --p1: 6px; --p2: 6.1417px; --bx: -2.126px; --by: -3.307px;
+  /* 50 % duty rings with .5 px soft edges, the same profile as the shader */
+  background: repeating-radial-gradient(circle at 50% 50%, var(--fringe) 0 calc(var(--p1) * .25 - .5px), transparent calc(var(--p1) * .25 + .5px) calc(var(--p1) * .75 - .5px), var(--fringe) calc(var(--p1) * .75 + .5px) var(--p1));
+  -webkit-mask-image:
+    repeating-radial-gradient(circle at calc(50% + var(--bx)) calc(50% + var(--by)), #000 0 calc(var(--p2) * .25 - .5px), transparent calc(var(--p2) * .25 + .5px) calc(var(--p2) * .75 - .5px), #000 calc(var(--p2) * .75 + .5px) var(--p2)),
+    radial-gradient(circle at 50% 50%, #000 0, #000 600px, transparent 950px);
+  mask-image:
+    repeating-radial-gradient(circle at calc(50% + var(--bx)) calc(50% + var(--by)), #000 0 calc(var(--p2) * .25 - .5px), transparent calc(var(--p2) * .25 + .5px) calc(var(--p2) * .75 - .5px), #000 calc(var(--p2) * .75 + .5px) var(--p2)),
+    radial-gradient(circle at 50% 50%, #000 0, #000 600px, transparent 950px);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  opacity: var(--fringe-a);
+  transition: opacity .32s ease;
+}
+@media (max-width: 767px) { .w1-src::before { --p2: 6.18px; --bx: -2.7px; --by: -4.2px; } }
+/* In the static frame, text is kept clear by a page-coloured halo: solid to 16 px
+   beyond the text box, then a long Gaussian falloff, close to the shader's 16 + 64 px
+   smooth union. A short falloff draws visible boxes in dark mode, where the halo is
+   darker than the lit field around it.
+   Scoped to the hero and, through :has(), to header items on the home page only. */
+:root:not(.w1-live) .w1 [data-w1-mask],
+:root:not(.w1-live):has(.w1) .head [data-w1-mask] { background: var(--bg); box-shadow: 0 0 56px 30px var(--bg); border-radius: 24px; }
+.w1-field { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+/* page-coloured fade into the next section; it is the page colour, so it is invisible as an object */
+.w1-fade { position: absolute; inset: auto 0 0 0; height: 38%; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, transparent, var(--bg) 92%); }
+.w1-field canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity .32s ease; }
+.w1-live .w1-field canvas { opacity: 1; }
+.w1-live .w1-src::before { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .w1-src::before, .w1-field canvas { transition: none; } }
+
+@media (forced-colors: active) { .w1-src::before, .w1-field { display: none; } [data-w1-mask] { box-shadow: none !important; background: none !important; } }
+@media print { .w1-src::before, .w1-field { display: none; } [data-w1-mask] { box-shadow: none !important; } }
+
+/* Q1 icon, static here (see q1-toggle.html) */
+.tog { position: relative; z-index: 1; width: 32px; height: 32px; border-radius: 50%;   /* above the halos of its neighbours */ box-shadow: inset 0 0 0 1px var(--line); display: grid; place-items: center; color: var(--ink); }
+.tog svg { width: 32px; height: 32px; }
+
+/* Fold context: the next section must show at 932x553 */
+.now .wrap { padding-bottom: 4rem; }
+.row { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr auto; gap: .25rem 1.5rem; align-items: baseline; padding: 1rem 0 1.05rem; }
+@media (max-width: 767px) { .row { grid-template-columns: 1fr auto; } .row .d { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Debug: show the text clear zones (rect + 16 px) */
+.dbg { position: absolute; z-index: 5; pointer-events: none; outline: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent); }
+.dbg.src { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); translate: -50% -50%; outline: none; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<header class="head">
+  <div class="wrap">
+    <a class="wordmark" href="#" aria-label="William Moiré, retour à l'accueil" title="Deux trames, un léger décalage. C'est tout mon nom." data-w1-mask>[w]</a>
+    <nav class="nav" aria-label="Sections">
+      <span class="links" data-w1-mask><a href="#">Projets</a><a href="#">Outils</a><a href="#">Écrits</a><a href="#">Contact</a></span>
+      <span class="tog" aria-hidden="true"><svg viewBox="0 0 32 32"><defs><clipPath id="tc"><circle cx="16" cy="16" r="10"/></clipPath></defs><g clip-path="url(#tc)" fill="none" stroke="currentColor" stroke-width="1"><path d="M0 6.5H32M0 8.5H32M0 10.5H32M0 12.5H32M0 14.5H32M0 16.5H32M0 18.5H32M0 20.5H32M0 22.5H32M0 24.5H32M0 26.5H32"/></g></svg></span>
+      <span class="langs" aria-label="Langues" data-w1-mask><a href="#" aria-current="true" lang="fr" title="Français">FR</a><a href="#" lang="en" title="English">EN</a><a href="#" lang="es" title="Español">ES</a></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="w1" data-w1 data-period="260" data-period-narrow="206">
+    <div class="w1-field" aria-hidden="true"><canvas></canvas></div>
+    <div class="wrap">
+      <h1 class="w1-name" data-w1-mask>William Moir<span class="w1-src">é</span></h1>
+      <p class="w1-sub" data-w1-mask>Faisons circuler le savoir, la pratique et la valeur.</p>
+      <p class="w1-aside" data-w1-mask>Physicien devenu développeur indépendant. Aussi connu comme asi0.</p>
+    </div>
+    <div class="w1-fade" aria-hidden="true"></div>
+  </section>
+
+  <section class="now">
+    <div class="wrap">
+      <h2>En ce moment</h2>
+      <ul class="rows">
+        <li><a class="row" href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-next"/></svg></span></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div class="lab" role="group" aria-label="Labo">
+  <b>W1 é source</b>
+  <button type="button" data-act="theme">thème</button>
+  <label><input type="checkbox" data-act="rm"> mouvement réduit</label>
+  <label><input type="checkbox" data-act="debug"> zones</label>
+</div>
+
+<script>
+/* ===========================================================================
+   W1 · Hero "é source"
+   Two ring gratings. A is anchored on the accent of the é. B is a second ring
+   grating with a slightly larger pitch (p2 = p1 * r) whose centre is driven by
+   the smoothed pointer C through the moiré magnifier: B = A - (C - A) * (r - 1).
+   With that coupling the zero-order fringe is the circle through the é and the
+   pointer, and every fringe keeps a radial period P = p1 * r / (r - 1):
+   260 px on desktop, 206 px below 768 px (dossier: 150 to 400, 250+ desktop).
+   Driving B to the pointer literally gives 2|AB|/p hyperbolae: about 130
+   fringes for a 400 px offset, far past the 5 pair limit. See ?model=literal.
+   Renders on demand only. Stops when settled, hidden, or out of view.
+
+   mountW1(hero, opts) returns { destroy, stats }. Production (Astro):
+     let w1;
+     document.addEventListener("astro:page-load", () => {
+       const el = document.querySelector("[data-w1]"); if (el) w1 = mountW1(el);
+     });
+     document.addEventListener("astro:before-swap", () => { w1?.destroy(); w1 = null; });
+   =========================================================================== */
+function mountW1(hero, opts = {}) {
+  const root = document.documentElement;
+  const ds = hero.dataset;
+  const canvas = hero.querySelector(".w1-field canvas");
+  const srcEl = hero.querySelector(".w1-src");
+  const num = (v, d) => (v === undefined || v === null || v === "" || isNaN(+v) ? d : +v);
+  const CFG = {
+    lerp: num(opts.lerp ?? ds.lerp, 0.16),           // per 60 Hz frame, dt corrected; see README for 0.08
+    period: num(opts.period ?? ds.period, 260),       // fringe period, CSS px, >= 768 px wide
+    periodNarrow: num(opts.periodNarrow ?? ds.periodNarrow, 206),
+    pitch: 6,                                         // ring pitch, CSS px, snapped to device pixels
+    reach: 720,                                       // clamp |C - A|
+    rest: { x: 90, y: 140 },                          // rest offset of C from A (matches the CSS frame)
+    pad: 16, feather: 64,                             // text clear zone: alpha 0 within rect + 16 px
+    vig: [600, 950],                                  // vignette around A: at most 950 / 206 = 4.6 fringe pairs
+    masks: opts.masks || "[data-w1-mask]",
+    literal: !!opts.literal, probe: !!opts.probe,
+  };
+  const ac = new AbortController();
+  const on = (t, ev, fn, o = {}) => t.addEventListener(ev, fn, { ...o, signal: ac.signal });
+  const mqReduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const mqNarrow = matchMedia("(max-width: 767px)");
+  const mqDark = matchMedia("(prefers-color-scheme: dark)");
+  const reduced = () => mqReduce.matches || root.classList.contains("rm");
+  const coarse = matchMedia("(pointer: coarse)").matches;
+
+  const stats = { live: false, frames: 0, drawMs: 0, settles: 0, lastFrameAt: 0, lastSettleAt: 0, startAt: 0 };
+  let gl = null, prog = null, U = {}, raf = 0, inView = true, settled = true, lastT = 0, dead = false, tap = null;
+  let benchFinish = false; const PX = new Uint8Array(4);
+  const S = { A: { x: 0, y: 0 }, C: { x: 0, y: 0 }, T: { x: 0, y: 0 }, rects: [], w: 0, h: 0, dpr: 1, p1: 6, r: 1.0236, ink: [0, 0, 0], alpha: .07, accent: null };
+
+  /* --- geometry --------------------------------------------------------- */
+  // Accent centre of the é from the rendered ink: draw é and e, diff, centroid.
+  function measureAccent() {
+    const cs = getComputedStyle(srcEl), size = 160;
+    const c = document.createElement("canvas"); c.width = c.height = 320;
+    const x = c.getContext("2d", { willReadFrequently: true });
+    x.font = `${cs.fontStyle} ${cs.fontWeight} ${size}px ${cs.fontFamily}`;
+    x.textBaseline = "alphabetic";
+    const ox = 60, base = 240;
+    x.fillText("é", ox, base); const a = x.getImageData(0, 0, 320, 320).data;
+    x.clearRect(0, 0, 320, 320); x.fillText("e", ox, base); const b = x.getImageData(0, 0, 320, 320).data;
+    let sx = 0, sy = 0, n = 0;
+    for (let i = 3; i < a.length; i += 4) { const d = a[i] - b[i]; if (d > 40) { const p = (i - 3) / 4; sx += (p % 320) * d; sy += Math.floor(p / 320) * d; n += d; } }
+    if (!n) return null;
+    const asc = x.measureText("é").fontBoundingBoxAscent;
+    return { x: (sx / n - ox) / size, y: (sy / n - (base - asc)) / size };
+  }
+
+  function layout() {
+    const hr = hero.getBoundingClientRect();
+    S.w = hr.width; S.h = hr.height;
+    S.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    S.p1 = Math.round(CFG.pitch * S.dpr) / S.dpr;
+    const P = mqNarrow.matches ? CFG.periodNarrow : CFG.period;
+    S.r = P / (P - S.p1);                                                  // P = p1 * r / (r - 1)
+    // the source: the é glyph box from a Range, plus the accent's ink centre inside it
+    const fs = parseFloat(getComputedStyle(srcEl).fontSize);
+    const rg = document.createRange(); rg.selectNodeContents(srcEl);
+    const gr = rg.getBoundingClientRect();
+    const acc = S.accent || { x: .313, y: .057 };
+    const prevA = { ...S.A };
+    S.A = { x: gr.left - hr.left + acc.x * fs, y: gr.top - hr.top + acc.y * fs };
+    // keep the visitor-driven offset when the layout moves
+    S.C.x += S.A.x - prevA.x; S.C.y += S.A.y - prevA.y; S.T.x += S.A.x - prevA.x; S.T.y += S.A.y - prevA.y;
+    // text clear zones: one rect per rendered line of every mask element
+    S.rects = [];
+    document.querySelectorAll(CFG.masks).forEach((el) => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const lines = [];
+      for (const b of r.getClientRects()) {
+        if (b.width < 1 || b.height < 1) continue;
+        const l = lines.find((L) => Math.abs(L.t - b.top) < b.height * .5);
+        if (l) { l.l = Math.min(l.l, b.left); l.r = Math.max(l.r, b.right); l.b = Math.max(l.b, b.bottom); }
+        else lines.push({ l: b.left, r: b.right, t: b.top, b: b.bottom });
+      }
+      for (const L of lines) {
+        const R = [L.l - hr.left, L.t - hr.top, L.r - L.l, L.b - L.t];
+        if (R[1] + R[3] + CFG.pad + CFG.feather < 0 || R[1] - CFG.pad - CFG.feather > S.h) continue;
+        S.rects.push(R);
+      }
+    });
+    S.rects = S.rects.slice(0, 12);
+    if (root.classList.contains("debug")) drawDebug();
+  }
+
+  function readTokens() {
+    const cs = getComputedStyle(root);
+    const c = document.createElement("canvas"); c.width = c.height = 1;
+    const x = c.getContext("2d", { willReadFrequently: true });
+    x.fillStyle = cs.getPropertyValue("--fringe").trim() || "#000"; x.fillRect(0, 0, 1, 1);
+    const d = x.getImageData(0, 0, 1, 1).data;
+    S.ink = [d[0] / 255, d[1] / 255, d[2] / 255];
+    const a = parseFloat(cs.getPropertyValue("--fringe-a"));
+    S.alpha = isNaN(a) ? (d[3] / 255) * .9 : a;        // a translucent --fringe without --fringe-a also works
+  }
+
+  /* --- WebGL2 ------------------------------------------------------------ */
+  const VS = `#version 300 es
+  in vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
+  const FS = `#version 300 es
+  precision highp float;
+  uniform vec2 uRes; uniform float uDpr;
+  uniform vec2 uA, uB; uniform float uP1, uP2;
+  uniform vec3 uInk; uniform float uAlpha;
+  uniform vec4 uR[12]; uniform int uN;
+  uniform vec2 uVig; uniform vec2 uClear;
+  out vec4 o;
+  // One ring grating. 50 % duty line with soft edges at least one device px wide,
+  // flattened to its mean before Nyquist: band limited, no aliasing moiré.
+  // The fringe of an AND of two gratings scales with the square of their fundamental:
+  // a soft square (.6) doubles the fringe of a sinusoid (.5) at the same peak alpha,
+  // so the field stays inside the §9 alpha cap and still reads on ordinary screens.
+  // fwidth is analytic (|grad v| = 1 / pitch along the radius), so no derivatives
+  // are needed and masked pixels can return early.
+  float ring(vec2 p, vec2 c, float pitch){
+    vec2 q = p - c; float l = length(q);
+    float v = l / pitch;
+    vec2 n = l > 1e-3 ? abs(q) / l : vec2(.7071);
+    float fw = (n.x + n.y) / (pitch * uDpr);                  // = fwidth(v) in device px
+    float t = abs(fract(v + .5) - .5);                        // 0 on a ring, .5 midway
+    float e = max(fw * .75, .07);
+    float g = 1. - smoothstep(.25 - e, .25 + e, t);
+    return mix(g, .5, smoothstep(.25, .45, fw));
+  }
+  float sdBox(vec2 p, vec4 r){ vec2 h = r.zw * .5; vec2 d = abs(p - r.xy - h) - h; return length(max(d, 0.)) + min(max(d.x, d.y), 0.); }
+  void main(){
+    vec2 p = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uDpr;      // CSS px, y down
+    float a = 1. - smoothstep(uVig.x, uVig.y, length(p - uA));           // vignette around the é
+    if (a <= 0.) { o = vec4(0.); return; }
+    float d = 1e5;                                                       // smooth union of text rects:
+    for (int i = 0; i < 12; i++){                                        // one soft clear zone, never boxes
+      if (i >= uN) break;
+      float b = sdBox(p, uR[i]);
+      float h = max(48. - abs(d - b), 0.) / 48.;
+      d = min(d, b) - h * h * 12.;                                       // smin only grows the clear zone
+    }
+    a *= smoothstep(uClear.x, uClear.y, d);
+    if (a <= 0.) { o = vec4(0.); return; }                               // text zones: no ring math
+    a *= ring(p, uA, uP1) * ring(p, uB, uP2);                            // AND of two gratings
+    a *= uAlpha;                                                          // peak line alpha = --fringe-a
+    o = vec4(uInk * a, a);
+  }`;
+
+  function initGL() {
+    if (gl) return true;
+    gl = canvas.getContext("webgl2", { alpha: true, antialias: false, depth: false, stencil: false, premultipliedAlpha: true, powerPreference: "low-power" });
+    if (!gl) return false;
+    const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; };
+    prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+    gl.bindAttribLocation(prog, 0, "p"); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);   // one oversized triangle covers the quad
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    for (const n of ["uRes", "uDpr", "uA", "uB", "uP1", "uP2", "uInk", "uAlpha", "uR", "uN", "uVig", "uClear"]) U[n] = gl.getUniformLocation(prog, n);
+    return true;
+  }
+
+  function sizeCanvas() {
+    const w = Math.max(1, Math.round(S.w * S.dpr)), h = Math.max(1, Math.round(S.h * S.dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  }
+
+  function sourceB() {
+    if (CFG.literal) return { x: S.C.x, y: S.C.y };
+    return { x: S.A.x - (S.C.x - S.A.x) * (S.r - 1), y: S.A.y - (S.C.y - S.A.y) * (S.r - 1) };
+  }
+
+  const flat = new Float32Array(48);
+  function draw() {
+    if (!gl) return;
+    const t0 = performance.now();
+    sizeCanvas();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    const B = sourceB();
+    gl.uniform2f(U.uRes, canvas.width, canvas.height); gl.uniform1f(U.uDpr, S.dpr);
+    gl.uniform2f(U.uA, S.A.x, S.A.y); gl.uniform2f(U.uB, B.x, B.y);
+    gl.uniform1f(U.uP1, S.p1); gl.uniform1f(U.uP2, CFG.literal ? S.p1 : S.p1 * S.r);
+    gl.uniform3fv(U.uInk, S.ink); gl.uniform1f(U.uAlpha, S.alpha);
+    flat.fill(0); S.rects.forEach((r, i) => flat.set(r, i * 4));
+    gl.uniform4fv(U.uR, flat); gl.uniform1i(U.uN, S.rects.length);
+    gl.uniform2f(U.uVig, CFG.vig[0], CFG.vig[1]); gl.uniform2f(U.uClear, CFG.pad + 1, CFG.pad + CFG.feather);   // +1 px: pixel centres on the 16 px line stay at 0
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (CFG.probe || benchFinish) gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, PX);   // QA only: wait for the GPU
+    stats.frames++; stats.drawMs += performance.now() - t0; stats.lastFrameAt = performance.now();
+  }
+
+  /* --- on-demand loop ---------------------------------------------------- */
+  function frame(now) {
+    raf = 0;
+    const dt = lastT ? Math.min(64, now - lastT) : 16.7; lastT = now;
+    const k = 1 - Math.pow(1 - CFG.lerp, dt / 16.667);
+    S.C.x += (S.T.x - S.C.x) * k; S.C.y += (S.T.y - S.C.y) * k;
+    const rem = Math.hypot(S.T.x - S.C.x, S.T.y - S.C.y);
+    if (rem < .75) { S.C.x = S.T.x; S.C.y = S.T.y; settled = true; }   // .75 px of C moves B by .02 px: invisible
+    draw();
+    if (!settled) schedule();
+    else { lastT = 0; stats.settles++; stats.lastSettleAt = now; }
+  }
+  function schedule() {
+    if (raf || !gl || !inView || document.hidden || dead) return;
+    raf = requestAnimationFrame(frame);
+  }
+  function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; lastT = 0; }
+
+  function setTarget(x, y) {
+    let dx = x - S.A.x, dy = y - S.A.y;
+    const d = Math.hypot(dx, dy);
+    if (d > CFG.reach) { dx *= CFG.reach / d; dy *= CFG.reach / d; }
+    S.T.x = S.A.x + dx; S.T.y = S.A.y + dy;
+    settled = false; schedule();
+  }
+
+  /* --- life cycle -------------------------------------------------------- */
+  function goLive() {
+    if (stats.live || dead || reduced()) return;
+    try { if (!initGL()) return; } catch (e) { console.warn("[w1] static frame kept:", e.message); gl = null; return; }
+    S.accent = measureAccent();
+    readTokens(); layout();
+    S.C = { x: S.A.x + CFG.rest.x, y: S.A.y + CFG.rest.y }; S.T = { ...S.C };
+    draw();                                   // rest frame, identical to the CSS frame, then crossfade
+    root.classList.add("w1-live"); stats.live = true; stats.startAt = performance.now();
+  }
+  function goStatic() { stop(); root.classList.remove("w1-live"); stats.live = false; settled = true; }
+
+  function follow(e) {
+    if (!stats.live) goLive();
+    if (!stats.live) return;
+    const r = hero.getBoundingClientRect(); setTarget(e.clientX - r.left, e.clientY - r.top);
+  }
+  // fine pointers follow; a touch moves the source only on a tap (a scroll fires pointercancel)
+  on(hero, "pointermove", (e) => { if (e.pointerType === "mouse" || e.pointerType === "pen") follow(e); }, { passive: true });
+  on(hero, "pointerdown", (e) => {
+    if (e.pointerType === "mouse" || e.pointerType === "pen") follow(e);
+    else tap = { id: e.pointerId, x: e.clientX, y: e.clientY, t: e.timeStamp };
+  }, { passive: true });
+  on(hero, "pointerup", (e) => {
+    if (!tap || e.pointerId !== tap.id) return;
+    const moved = Math.hypot(e.clientX - tap.x, e.clientY - tap.y), held = e.timeStamp - tap.t; tap = null;
+    if (moved < 10 && held < 600) follow(e);  // jump target to the touch point, then settle
+  }, { passive: true });
+  on(hero, "pointercancel", () => { tap = null; }, { passive: true });
+
+  on(canvas, "webglcontextlost", (e) => { e.preventDefault(); goStatic(); gl = null; prog = null; });
+  on(canvas, "webglcontextrestored", () => goLive());
+  on(document, "visibilitychange", () => { if (document.hidden) stop(); else if (!settled) schedule(); });
+  const io = new IntersectionObserver(([en]) => { inView = en.isIntersecting; if (!inView) stop(); else if (!settled) schedule(); });
+  io.observe(hero);
+  let roT = 0;
+  const ro = new ResizeObserver(() => { cancelAnimationFrame(roT); roT = requestAnimationFrame(() => { if (!stats.live) return; layout(); draw(); }); });
+  ro.observe(hero);
+  // theme change: re-read tokens, one frame
+  const mo = new MutationObserver(() => { if (reduced()) goStatic(); else if (stats.live) { readTokens(); draw(); } });
+  mo.observe(root, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+  on(mqDark, "change", () => { if (stats.live) { readTokens(); draw(); } });
+  on(mqReduce, "change", (m) => { if (m.matches) goStatic(); });
+
+  // lazy init after load and fonts: idle on fine pointers, first tap on coarse pointers
+  const boot = () => { if (!dead && !coarse) (window.requestIdleCallback || setTimeout)(() => goLive(), { timeout: 1500 }); };
+  document.fonts.ready.then(() => (document.readyState === "complete" ? boot() : on(window, "load", boot, { once: true })));
+
+  function destroy() {
+    dead = true; ac.abort(); io.disconnect(); ro.disconnect(); mo.disconnect(); stop(); cancelAnimationFrame(roT);
+    if (gl) {
+      const ext = gl.getExtension("WEBGL_lose_context"); if (ext) ext.loseContext();   // free the GPU now, not at GC
+      canvas.replaceWith(canvas.cloneNode(false));    // a lost context sticks to its canvas: leave a fresh one for a remount
+    }
+    gl = null; prog = null; goStatic();
+    hero.querySelectorAll(".dbg").forEach((n) => n.remove());
+  }
+
+  /* --- QA hooks (lab only) ----------------------------------------------- */
+  // Max alpha drawn inside every text rect grown by 16 px. Must be 0 (P3).
+  stats.checkClearZones = () => {
+    if (!gl) return "static";
+    draw();
+    let max = 0;
+    for (const r of S.rects) {
+      const x0 = Math.max(0, Math.floor((r[0] - CFG.pad) * S.dpr)), x1 = Math.min(canvas.width, Math.ceil((r[0] + r[2] + CFG.pad) * S.dpr));
+      const yTop = Math.max(0, Math.floor((r[1] - CFG.pad) * S.dpr)), yBot = Math.min(canvas.height, Math.ceil((r[1] + r[3] + CFG.pad) * S.dpr));
+      const w = x1 - x0, h = yBot - yTop; if (w <= 0 || h <= 0) continue;
+      const px = new Uint8Array(w * h * 4);
+      gl.readPixels(x0, canvas.height - yBot, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      for (let i = 3; i < px.length; i += 4) if (px[i] > max) max = px[i];
+    }
+    return max / 255;
+  };
+  // Frame cost including GPU (1 px readPixels after each draw forces completion): average ms over n frames.
+  stats.bench = (n = 20) => {
+    if (!gl) return null;
+    benchFinish = true; draw();
+    const t0 = performance.now(); for (let i = 0; i < n; i++) { S.C.x += .5; draw(); } const ms = (performance.now() - t0) / n;
+    benchFinish = false; S.C.x -= n * .5; draw();
+    return { msPerFrame: +ms.toFixed(2), canvas: canvas.width + "x" + canvas.height };
+  };
+  stats.state = () => ({ A: S.A, C: S.C, B: sourceB(), rects: S.rects.length, dpr: S.dpr, p1: S.p1, ratio: S.r, period: S.p1 * S.r / (S.r - 1), accent: S.accent, alpha: S.alpha, lerp: CFG.lerp });
+  stats.goLive = goLive; stats.goStatic = goStatic; stats.layout = layout;
+  function drawDebug() {
+    hero.querySelectorAll(".dbg").forEach((n) => n.remove());
+    for (const r of S.rects) { const d = document.createElement("div"); d.className = "dbg"; Object.assign(d.style, { left: r[0] - CFG.pad + "px", top: r[1] - CFG.pad + "px", width: r[2] + 2 * CFG.pad + "px", height: r[3] + 2 * CFG.pad + "px" }); hero.append(d); }
+    const s = document.createElement("div"); s.className = "dbg src"; Object.assign(s.style, { left: S.A.x + "px", top: S.A.y + "px" }); hero.append(s);
+  }
+  stats.drawDebug = () => { layout(); drawDebug(); };
+
+  return { destroy, stats };
+}
+
+/* --- lab boot ----------------------------------------------------------- */
+(() => {
+  const root = document.documentElement, q = new URLSearchParams(location.search);
+  const hero = document.querySelector("[data-w1]");
+  const opts = { literal: q.get("model") === "literal", probe: q.has("probe") };
+  if (q.get("lerp")) opts.lerp = Number(q.get("lerp"));
+  let w1 = mountW1(hero, opts);
+  window.__w1 = w1.stats;
+  window.__w1remount = () => { w1.destroy(); w1 = mountW1(hero, opts); window.__w1 = w1.stats; return w1.stats; };
+
+  document.querySelector(".lab").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    const act = b.dataset.act;
+    if (act === "theme") { const dark = getComputedStyle(root).colorScheme === "dark"; root.dataset.theme = dark ? "light" : "dark"; }
+    if (act === "rm") { root.classList.toggle("rm", b.checked); if (!b.checked) w1.stats.goLive(); }
+    if (act === "debug") { root.classList.toggle("debug", b.checked); if (b.checked) w1.stats.drawDebug(); else hero.querySelectorAll(".dbg").forEach((n) => n.remove()); }
+  });
+  if (root.classList.contains("rm")) document.querySelector('[data-act="rm"]').checked = true;
+  if (root.classList.contains("debug")) { document.querySelector('[data-act="debug"]').checked = true; document.fonts.ready.then(() => w1.stats.drawDebug()); }
+})();
+</script>
+</body>
+</html>

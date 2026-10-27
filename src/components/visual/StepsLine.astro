@@ -1,9 +1,13 @@
 ---
 /**
  * V1 « Comment on travaille » (copy deck §3.5): four beats on one line, a real
- * ordered list whose labels stay live text. Stub by WP1a with the final props;
- * WP2 owns the drawing (double segment 2 to 3, dashed optional beat 4) and M4,
- * the travelling dot played by the nearest [data-steps-host] ancestor.
+ * ordered list whose labels stay live text. Segment 1 to 2 is one hairline,
+ * 2 to 3 two parallel hairlines 3 px apart (your context and my craft, side by
+ * side), 3 to 4 dashed with a hollow dashed node: optional.
+ * M4: on hover or focus-within of the nearest [data-steps-host], a 4 px ruby
+ * dot travels from node 1 to node 3 and rests (the ol's ::after, a grid item
+ * spanning beats 1 and 2, so no script measures anything). M6: done=1 fills
+ * node 1 in ruby with a 200 ms scale, replayed whenever the list is un-hidden.
  */
 import { type Locale, t } from "@i18n/index";
 
@@ -48,45 +52,27 @@ const beats = [
 
 <style>
   .steps-line {
+    --node: 9px;
+    position: relative;
     list-style: none;
-    display: grid;
-    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
     font-family: var(--mono);
     font-size: 0.75rem;
     line-height: var(--lh-mono);
     letter-spacing: var(--ls-mono);
     color: var(--ink-2);
   }
-  .steps-compact {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-width: 420px;
-  }
   .beat {
     position: relative;
-    display: grid;
-    gap: 0.5rem;
-    align-content: start;
-  }
-  /* the line: a hairline from this node to the next */
-  .steps-compact .beat:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    right: 0;
-    height: 1px;
-    background: var(--ink-3);
-  }
-  .steps-compact .beat-build::after {
-    background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
-  }
-  .steps-compact .beat:last-child {
-    justify-items: end;
-    text-align: right;
+    min-width: 0;
   }
   .node {
-    width: 9px;
-    height: 9px;
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: var(--node);
+    height: var(--node);
     border: 1px solid var(--ink-2);
     border-radius: 50%;
     background: var(--bg);
@@ -97,18 +83,66 @@ const beats = [
   .beat-care .label {
     color: var(--ink-3);
   }
-  [data-done="1"] .beat-tell .node {
-    border-color: var(--accent);
-    background: var(--accent);
+
+  /* ---- compact: one row, nodes at the start of beats 1 to 3, node 4 at the end */
+  .steps-compact {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 5.75rem;
+    max-width: 420px;
+    min-height: 44px;
+  }
+  .steps-compact .label {
+    display: block;
+    margin-top: 0.55rem;
+    padding-right: 0.5rem;
+  }
+  .steps-compact .beat-care {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+  }
+  .steps-compact .beat-care .label {
+    padding-right: 0;
+  }
+  /* segments run from a node to the next one, behind the nodes */
+  .steps-compact .beat::after {
+    content: "";
+    position: absolute;
+    top: calc(var(--node) / 2 - 0.5px);
+    left: var(--node);
+    right: 0;
+    height: 1px;
+    background: var(--ink-3);
+  }
+  .steps-compact .beat-scope::after {
+    top: calc(var(--node) / 2 - 2px);
+    height: 4px;
+    background: linear-gradient(var(--ink-3) 0 1px, transparent 1px 3px, var(--ink-3) 3px 4px);
+  }
+  .steps-compact .beat-build::after {
+    background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
+  }
+  .steps-compact .beat-care::after {
+    left: 0;
+    right: var(--node);
+    background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 8px);
   }
 
+  /* ---- detailed: a vertical list, the line runs down the left */
   .steps-detailed {
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    column-gap: 0.85rem;
   }
   .steps-detailed .beat {
-    grid-template-columns: 9px minmax(0, 1fr);
-    column-gap: 0.85rem;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
     row-gap: 0.15rem;
+    padding-bottom: 1.1rem;
+  }
+  .steps-detailed .beat:last-child {
+    padding-bottom: 0;
   }
   .steps-detailed .node {
     grid-row: span 2;
@@ -117,6 +151,9 @@ const beats = [
   .steps-detailed .label {
     color: var(--ink);
   }
+  .steps-detailed .beat-care .label {
+    color: var(--ink-3);
+  }
   .sub {
     font-family: var(--text);
     font-size: var(--fs-small);
@@ -124,17 +161,117 @@ const beats = [
     letter-spacing: normal;
     color: var(--ink-2);
   }
+  /* from below a node to the top of the next one (the next node sits .3em into its beat) */
+  .steps-detailed .beat:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: calc(0.3em + var(--node));
+    bottom: -0.3em;
+    left: calc(var(--node) / 2 - 0.5px);
+    width: 1px;
+    background: var(--ink-3);
+  }
+  .steps-detailed .beat-scope:not(:last-child)::after {
+    left: calc(var(--node) / 2 - 2px);
+    width: 4px;
+    background: linear-gradient(90deg, var(--ink-3) 0 1px, transparent 1px 3px, var(--ink-3) 3px 4px);
+  }
+  .steps-detailed .beat-build:not(:last-child)::after {
+    background: repeating-linear-gradient(180deg, var(--ink-3) 0 4px, transparent 4px 8px);
+  }
+
+  /* ---- M4, the travelling dot: hover devices with motion only */
+  .steps-line::after {
+    content: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.anim) .steps-line::after {
+      content: "";
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      background: radial-gradient(circle, var(--accent) 1.6px, transparent 2.2px) no-repeat;
+      background-size: 4px 4px;
+      transition:
+        opacity 160ms ease,
+        background-position 0s linear 160ms;
+    }
+    :global(html.anim) .steps-compact::after {
+      grid-row: 1;
+      grid-column: 1 / 3;
+      align-self: start;
+      height: 4px;
+      margin: calc(var(--node) / 2 - 2px) -6.5px 0 2.5px;
+      background-position: 0 50%;
+    }
+    :global(html.anim) .steps-detailed::after {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      justify-self: start;
+      width: 4px;
+      margin: calc(0.3em + 2.5px) 0 calc(-0.3em - 6.5px) 2.5px;
+      background-position: 50% 0;
+    }
+    :global(html.anim [data-steps-host]:is(:hover, :focus-within)) .steps-line::after {
+      opacity: 1;
+      transition:
+        opacity 0s,
+        background-position 600ms var(--ease-out);
+    }
+    :global(html.anim [data-steps-host]:is(:hover, :focus-within)) .steps-compact::after {
+      background-position: 100% 50%;
+    }
+    :global(html.anim [data-steps-host]:is(:hover, :focus-within)) .steps-detailed::after {
+      background-position: 50% 100%;
+    }
+  }
+
+  /* ---- M6: confirmation node */
+  [data-done="1"] .beat-tell .node {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+  :global(html.anim) [data-done="1"] .beat-tell .node {
+    animation: node-fill 200ms var(--ease-out) both;
+  }
+  @keyframes node-fill {
+    from {
+      transform: scale(0.6);
+      background: var(--bg);
+    }
+  }
 
   @media (max-width: 339px) {
     .steps-compact {
-      grid-template-columns: 1fr;
+      grid-template-columns: var(--node) minmax(0, 1fr);
+      column-gap: 0.85rem;
+      row-gap: 0.6rem;
+    }
+    .steps-compact .beat {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: subgrid;
+      align-items: center;
+    }
+    .steps-compact .beat-care {
+      justify-items: start;
+      text-align: left;
+    }
+    .steps-compact .label {
+      margin: 0;
     }
     .steps-compact .beat::after {
       display: none;
     }
-    .steps-compact .beat:last-child {
-      justify-items: start;
-      text-align: left;
+  }
+  @media (forced-colors: active) {
+    .node {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    [data-done="1"] .beat-tell .node {
+      background: CanvasText;
     }
   }
 </style>

@@ -1,14 +1,16 @@
 ---
 /**
- * Ghosts « Préviens-moi » (copy deck §9.10). Stub by WP1a with the final
- * props: a plain form, no enhancement. WP3 owns it from here: JS upgrade of
- * the disclosure, token fetch, JSON post, the POST handling of the open
- * instance on /projets, and the move of these strings to `intake.ghosts.*`.
+ * Ghosts « Préviens-moi » (copy deck §9.10, spec §8.6, critique E9 and E19).
+ * Closed: a <details> under the home Ghosts line; JS upgrades it to a button
+ * with a 200 ms reveal. Open: always shown (/projets#ghosts). Never embeds a
+ * token: the client fetches one on first open or focus.
  *
- * Without JS the form posts to /projets#ghosts (the open instance there
- * handles it). Field names follow the deck §9.8 payload, flattened.
+ * Without JS the form posts to /projets#ghosts, where the open instance (and
+ * only it) handles the POST and renders its done or error state.
  */
-import { type Locale, localePath } from "@i18n/index";
+import { type Locale, t, localePath } from "@i18n/index";
+import { MAX_BODY_BYTES } from "@lib/intake/rules";
+import { minMs } from "@lib/intake/token";
 import Button from "@components/ui/Button.astro";
 
 interface Props {
@@ -21,95 +23,143 @@ interface Props {
 }
 
 const { locale, open = false, page, class: className } = Astro.props;
+const copy = t(locale).intake.ghosts;
+const honeypot = t(locale).intake.honeypot;
 
-/* Deck §9.10 strings, local until WP3 adds them to ns/intake.ts. */
-const COPY = {
-  fr: {
-    open: "Préviens-moi",
-    label: "Ton email ou ton pseudo",
-    ph: "toi@exemple.fr",
-    hint: "Un pseudo ? Précise le réseau : @camille sur X.",
-    submit: "Me prévenir",
-    fine: "Un seul message, à la sortie de Ghosts. Ensuite, ton contact est effacé.",
-    legal: "Détails",
-    honeypot: "Si tu es humain, laisse cette case vide.",
-  },
-  en: {
-    open: "Tell me when",
-    label: "Your email or handle",
-    ph: "you@example.com",
-    hint: "A handle? Add the network: @sam on X.",
-    submit: "Notify me",
-    fine: "One message, when Ghosts ships. Then your contact is deleted.",
-    legal: "Details",
-    honeypot: "If you’re human, leave this box empty.",
-  },
-  es: {
-    open: "Avísame",
-    label: "Tu email o tu usuario",
-    ph: "tu@ejemplo.es",
-    hint: "¿Un usuario? Indica la red: @lucia en X.",
-    submit: "Avisarme",
-    fine: "Un solo mensaje, cuando salga Ghosts. Después, tu contacto se borra.",
-    legal: "Detalles",
-    honeypot: "Si eres humano, deja esta casilla vacía.",
-  },
-} as const;
-const copy = COPY[locale];
+/* no-JS POST, handled by the open instance on an on-demand page only */
+let done = false;
+let error: "empty" | "format" | "net" | null = null;
+let value = "";
+const request = Astro.request;
+if (open && request.method === "POST") {
+  const type = request.headers.get("content-type") ?? "";
+  const size = Number(request.headers.get("content-length") ?? 0);
+  if (size <= MAX_BODY_BYTES && /form/.test(type)) {
+    const form = await request.formData();
+    if (form.get("path") === "ghosts") {
+      // dynamic on purpose (errata E7): prerendered pages never evaluate the intake modules
+      const { processIntake, parseForm } = await import("@lib/intake/process");
+      const result = await processIntake(parseForm(form), {
+        request,
+        clientAddress: Astro.clientAddress,
+        js: false,
+        kind: "ghosts",
+      });
+      value = String(form.get("contact.value") ?? "");
+      if (result.status === 201) done = true;
+      else if (result.status === 400) error = result.errors?.["contact.value"] === "required" ? "empty" : "format";
+      else error = "net";
+    }
+  }
+}
 
-const uid = `ghosts-${crypto.randomUUID().slice(0, 6)}`;
+const uid = `gn-${open ? "open" : "home"}`;
 const action = `${localePath(locale, "/projets")}#ghosts`;
-/* closed: a <details> disclosure (works without JS); open: always shown */
+/* closed: a <details> disclosure (works without JS); open: a plain block */
 const Wrap = open ? "div" : "details";
+const i18n = JSON.stringify({
+  sending: copy.sending,
+  submit: copy.submit,
+  err: copy.err,
+}).replace(/</g, "\\u003c");
 ---
 
 <div
   class:list={["ghosts-notify", className]}
   data-ghosts-notify
   data-open={open ? "true" : "false"}
+  data-locale={locale}
+  data-page={page}
+  data-min-ms={minMs("ghosts")}
   data-qa="ghosts"
 >
-  <Wrap class="gn-wrap">
-    {
-      !open && (
-        <summary class="gn-open" data-qa="ghosts-open">
-          {copy.open}
-        </summary>
-      )
-    }
-    <form class="gn-form" method="post" action={action} data-astro-reload>
-      <div class="gn-field">
-        <label class="gn-label" for={`${uid}-value`}>{copy.label}</label>
-        <input
-          id={`${uid}-value`}
-          class="gn-input"
-          type="text"
-          name="contact.value"
-          inputmode="email"
-          autocomplete="email"
-          placeholder={copy.ph}
-          aria-describedby={`${uid}-hint`}
-          data-qa="ghosts-input"
-        />
-        <p class="gn-hint" id={`${uid}-hint`}>{copy.hint}</p>
-      </div>
-      <Button variant="secondary" type="submit" locale={locale} data-qa="ghosts-submit">
-        {copy.submit}
-      </Button>
-      <p class="gn-fine">
-        {copy.fine}{" "}
-        <a href={`${localePath(locale, "/mentions-legales")}#donnees`}>{copy.legal}</a>
+  <script type="application/json" data-i18n set:html={i18n} />
+  {
+    done ? (
+      <p class="gn-done" role="status" data-qa="ghosts-done">
+        <svg class="gn-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" /></svg>
+        {copy.done}
       </p>
-      <input type="hidden" name="path" value="ghosts" />
-      <input type="hidden" name="locale" value={locale} />
-      <input type="hidden" name="page" value={page} />
-      <div class="gn-trap" aria-hidden="true">
-        <label for={`${uid}-trap`}>{copy.honeypot}</label>
-        <input id={`${uid}-trap`} type="text" name="site_web" tabindex="-1" autocomplete="off" />
-      </div>
-    </form>
-  </Wrap>
+    ) : (
+      <Fragment>
+        {!open && (
+          <button type="button" class="gn-open gn-toggle" aria-expanded="false" aria-controls={`${uid}-region`} data-js-only data-qa="ghosts-open">
+            {copy.open}
+          </button>
+        )}
+        <Wrap class="gn-details" open={!open && error ? true : undefined} data-mode={open ? "open" : "closed"}>
+          {!open && (
+            <summary class="gn-open" data-nojs-only>
+              {copy.open}
+            </summary>
+          )}
+          <div class="gn-region" id={`${uid}-region`}>
+            <div class="gn-inner">
+              <form class="gn-form" method="post" action={action} novalidate data-astro-reload>
+                <div class="gn-field">
+                  <label class="gn-label" for={`${uid}-value`}>{copy.label}</label>
+                  <input
+                    id={`${uid}-value`}
+                    class="gn-input"
+                    type="text"
+                    name="contact.value"
+                    inputmode="email"
+                    autocomplete="email"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    placeholder={copy.ph}
+                    value={value || undefined}
+                    aria-describedby={`${uid}-hint${error ? ` ${uid}-err` : ""}`}
+                    aria-invalid={error && error !== "net" ? "true" : undefined}
+                    data-qa="ghosts-input"
+                  />
+                  <p class="gn-hint" id={`${uid}-hint`}>{copy.hint}</p>
+                  <p class="gn-error" id={`${uid}-err`} role="alert" hidden={!error}>
+                    <svg class="gn-glyph" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" /><path d="M7 3.8v3.9M7 9.9v.3" /></svg>
+                    <span data-err-text>{error ? copy.err[error] : ""}</span>
+                  </p>
+                </div>
+                <Button variant="secondary" type="submit" locale={locale} data-qa="ghosts-submit">
+                  {copy.submit}
+                </Button>
+                <p class="gn-fine">
+                  {copy.fine}{" "}
+                  <a href={`${localePath(locale, "/mentions-legales")}#donnees`}>{copy.legal}</a>
+                </p>
+                <input type="hidden" name="path" value="ghosts" />
+                <input type="hidden" name="locale" value={locale} />
+                <input type="hidden" name="page" value={page} />
+                <input type="hidden" name="started" value="" />
+                <div class="gn-trap" aria-hidden="true">
+                  <label for={`${uid}-trap`}>{honeypot}</label>
+                  <input id={`${uid}-trap`} type="text" name="site_web" tabindex="-1" autocomplete="off" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </Wrap>
+        <p class="gn-done" aria-live="polite" hidden data-done data-qa="ghosts-done">
+          <svg class="gn-check" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.4l2.6 2.6L10 3.4" /></svg>
+          <span>{copy.done}</span>
+        </p>
+      </Fragment>
+    )
+  }
 </div>
+
+<script>
+  import { initGhosts } from "./ghosts.client";
+
+  let ac: AbortController | undefined;
+  document.addEventListener("astro:page-load", () => {
+    ac?.abort();
+    ac = new AbortController();
+    for (const root of document.querySelectorAll<HTMLElement>("[data-ghosts-notify]")) {
+      initGhosts(root, ac.signal);
+    }
+  });
+  document.addEventListener("astro:before-swap", () => ac?.abort());
+</script>
 
 <style>
   .ghosts-notify {
@@ -121,6 +171,9 @@ const Wrap = open ? "div" : "details";
     display: inline-flex;
     align-items: center;
     min-height: var(--tap);
+    padding: 0;
+    border: 0;
+    background: none;
     font-family: var(--mono);
     font-size: var(--fs-mono);
     letter-spacing: var(--ls-mono);
@@ -137,13 +190,40 @@ const Wrap = open ? "div" : "details";
   }
   .gn-open:hover {
     color: var(--ink);
+    text-decoration-color: var(--ink);
+  }
+  .gn-open[aria-expanded="true"] {
+    color: var(--ink);
+  }
+  /* enhanced closed variant: the details stays open, the region carries hidden */
+  .gn-details[data-enhanced] > summary {
+    display: none;
+  }
+  .gn-region {
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+  .gn-region[hidden] {
+    display: none;
+  }
+  .gn-region[data-closing],
+  .gn-region[data-opening] {
+    grid-template-rows: 0fr;
+  }
+  :global(html.anim) .gn-region {
+    transition: grid-template-rows var(--t-2) var(--ease-out);
+  }
+  .gn-inner {
+    min-height: 0;
+    overflow: hidden;
   }
   .gn-form {
+    position: relative;
     display: grid;
     gap: 0.75rem;
     justify-items: start;
     max-width: 30rem;
-    padding-top: 0.5rem;
+    padding: 0.5rem 2px 2px;
   }
   .gn-field {
     display: grid;
@@ -158,18 +238,66 @@ const Wrap = open ? "div" : "details";
     width: 100%;
     min-height: var(--tap);
     padding: 0 0.85rem;
-    font-size: 1.0625rem;
+    font: 400 1.0625rem/1.3 var(--text);
     color: var(--ink);
     background: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: var(--r-2);
   }
+  .gn-input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .gn-input[aria-invalid="true"] {
+    box-shadow: inset 3px 0 0 var(--error);
+  }
   .gn-hint,
   .gn-fine {
+    margin: 0;
     color: var(--ink-2);
   }
   .gn-fine {
     font-size: var(--fs-meta);
+  }
+  .gn-error {
+    display: flex;
+    gap: 0.4rem;
+    align-items: baseline;
+    margin: 0;
+    color: var(--error);
+  }
+  .gn-error[hidden] {
+    display: none;
+  }
+  .gn-glyph {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    align-self: center;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+  }
+  .gn-done {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 0.5rem 0 0;
+    color: var(--ink);
+  }
+  .gn-done[hidden] {
+    display: none;
+  }
+  .gn-check {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--success);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   .gn-trap {
     position: absolute;
@@ -177,5 +305,10 @@ const Wrap = open ? "div" : "details";
     width: 1px;
     height: 1px;
     overflow: hidden;
+  }
+  @media (forced-colors: active) {
+    .gn-input[aria-invalid="true"] {
+      border-left: 3px solid CanvasText;
+    }
   }
 </style>

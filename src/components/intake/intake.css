@@ -1,0 +1,510 @@
+/* Intake card, fields and confirmation (spec §7.7, §8.4, copy deck §9).
+   No fill on the card (R4), no moiré, no glass inside it: the primary loupe on
+   the send button is the only ruby fill. Errors are ink + glyph + sentence. */
+
+.intake-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-3);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+.intake {
+  display: grid;
+  gap: 1.5rem;
+}
+.intake .q {
+  margin: 0 0 0.25rem;
+  font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+}
+.intake .q:focus {
+  outline: none;
+}
+.intake .q:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+.step,
+.group {
+  display: grid;
+  gap: 1.35rem;
+  min-width: 0;
+}
+.step-set {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.step-set > legend {
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+/* ---- head: back + progress ---------------------------------------------- */
+.intake-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--tap);
+  gap: 1rem;
+}
+.intake-progress {
+  margin: 0 0 0 auto;
+  font-family: var(--mono);
+  font-size: var(--fs-meta);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-3);
+}
+.intake-back,
+.text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 500 var(--fs-small) / 1.2 var(--text);
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.intake-back {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.intake-back:hover,
+.text-btn:hover {
+  color: var(--ink);
+  text-decoration-thickness: 2px;
+}
+.intake-back[hidden],
+.text-btn[hidden] {
+  display: none;
+}
+
+/* ---- recap of answered steps ------------------------------------------- */
+.recap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+.recap strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+.recap[hidden] {
+  display: none;
+}
+
+/* ---- error summary ------------------------------------------------------ */
+.err-summary {
+  padding: 0.9rem 1rem;
+  border-left: 2px solid var(--error);
+  background: var(--surface);
+  border-radius: 0 var(--r-2) var(--r-2) 0;
+  color: var(--ink);
+}
+.err-summary[hidden] {
+  display: none;
+}
+.err-summary p {
+  margin: 0;
+  font-weight: 600;
+}
+.err-summary ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+.err-summary a {
+  color: var(--ink);
+}
+
+/* ---- step 1: path cards ------------------------------------------------- */
+.paths-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 560px) {
+  .paths-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.path-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: 1rem 2.25rem 1rem 1rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-3);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.path-title {
+  font: 600 1.0625rem / 1.3 var(--text);
+}
+.path-hint {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+}
+.path-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin-top: auto;
+  padding-top: 0.25rem;
+  font-family: var(--mono);
+  font-size: var(--fs-meta);
+  letter-spacing: var(--ls-mono);
+  color: var(--ink-3);
+}
+.path-card:has(input:checked) {
+  border: 2px solid var(--ink);
+  padding: calc(1rem - 1px) calc(2.25rem - 1px) calc(1rem - 1px) calc(1rem - 1px);
+  background: var(--surface);
+}
+.path-card:has(input:checked)::after {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  mask: no-repeat center / contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 6.4l2.6 2.6L10 3.4' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.path-card:has(input:focus-visible),
+.path-link:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .path-card:hover {
+    border-color: var(--ink);
+  }
+}
+html.anim .path-card {
+  transition: border-color var(--t-2) ease, background-color var(--t-2) ease;
+}
+.learn {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+}
+
+/* ---- alysis panel (?chemin=site) ---------------------------------------- */
+.site-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+.site-panel p {
+  margin: 0;
+  color: var(--ink-2);
+}
+.site-panel .site-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+}
+
+/* ---- fields --------------------------------------------------------------- */
+.field,
+.chips {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.field-label {
+  padding: 0;
+  font: 500 var(--fs-small) / 1.4 var(--text);
+  color: var(--ink);
+}
+.field-hint {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+}
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0.6rem 0.85rem;
+  font: 400 1.0625rem / 1.45 var(--text);
+  color: var(--ink);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--r-2);
+}
+.field textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+  field-sizing: content;
+}
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.field [aria-invalid="true"] {
+  box-shadow: inset 3px 0 0 var(--error);
+}
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+.field-err {
+  display: flex;
+  gap: 0.4rem;
+  align-items: baseline;
+  margin: 0.1rem 0 0;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--error);
+}
+.field-err[hidden] {
+  display: none;
+}
+.err-glyph {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  align-self: center;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.field-count {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+  text-align: right;
+}
+.field-count[hidden] {
+  display: none;
+}
+.safe,
+.no-list {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+/* channel values: only the chosen channel's input */
+.channel-values {
+  display: grid;
+}
+.intake:has(input[name="contact.channel"]:checked) .channel-value {
+  display: none;
+}
+.intake:has(#channel-email:checked) [data-channel="email"],
+.intake:has(#channel-x:checked) [data-channel="x"],
+.intake:has(#channel-telegram:checked) [data-channel="telegram"],
+.intake:has(#channel-signal:checked) [data-channel="signal"],
+.intake:has(#channel-other:checked) [data-channel="other"] {
+  display: block;
+}
+.intake[data-enhanced]:not(:has(input[name="contact.channel"]:checked)) .channel-value {
+  display: none;
+}
+
+.consent {
+  display: grid;
+  gap: 0.3rem;
+}
+.consent-box {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink);
+  cursor: pointer;
+}
+.consent-box input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0.1rem 0 0;
+}
+.consent-link {
+  justify-self: start;
+  margin-left: calc(20px + 0.7rem);
+  font-size: var(--fs-small);
+}
+
+.send {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+.status {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+.status:empty {
+  display: none;
+}
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.step-foot {
+  display: flex;
+}
+
+/* ---- no JS: one long form; the step 2 groups follow the chosen path ------ */
+@supports selector(:has(*)) {
+  html:not(.js) .intake [data-path-group] {
+    display: none;
+  }
+  html:not(.js) .intake:has(input[name="path"][value="tool"]:checked) [data-path-group="tool"],
+  html:not(.js) .intake:has(input[name="path"][value="open"]:checked) [data-path-group="open"],
+  html:not(.js) .intake:has(input[name="path"][value="other"]:checked) [data-path-group="other"] {
+    display: grid;
+  }
+}
+
+/* ---- JS: one step at a time ------------------------------------------------ */
+.intake[data-enhanced] .step:not([data-active]),
+.intake[data-enhanced] .site-panel:not([data-active]) {
+  display: none;
+}
+.intake[data-enhanced] [data-path-group] {
+  display: none;
+}
+.intake[data-enhanced][data-path="tool"] [data-path-group="tool"],
+.intake[data-enhanced][data-path="open"] [data-path-group="open"],
+.intake[data-enhanced][data-path="other"] [data-path-group="other"] {
+  display: grid;
+}
+html.anim .intake[data-enhanced] .step[data-active],
+html.anim .intake[data-enhanced] .site-panel[data-active] {
+  animation: step-in 240ms var(--ease-out);
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- step 4: the confirmation -------------------------------------------- */
+.intake-done {
+  display: grid;
+  gap: 1rem;
+}
+.intake-done[hidden] {
+  display: none;
+}
+.done-title {
+  margin: 0;
+  font-size: var(--fs-h3);
+}
+.done-title:focus {
+  outline: none;
+}
+.intake-done p {
+  margin: 0;
+}
+.done-nojs {
+  font-weight: 600;
+  color: var(--success);
+}
+.done-lede {
+  color: var(--ink-2);
+}
+.done-summary {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+}
+.sum-quote,
+.sum-value {
+  color: var(--ink);
+}
+.q-more {
+  margin-left: 0.35em;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--fs-small);
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+html:not(.js) .q-rest[hidden] {
+  display: inline;
+}
+html:not(.js) .q-ell {
+  display: none;
+}
+.done-rule {
+  width: 100%;
+  margin: 0.25rem 0;
+}
+.done-fit {
+  color: var(--ink);
+}
+.done-next,
+.done-ref,
+.done-read {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--ink-2);
+}
+.done-read[hidden] {
+  display: none;
+}
+.done-ref [data-slot="ref"] {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+.done-steps {
+  margin-top: 0.5rem;
+}
+
+@media (forced-colors: active) {
+  .chip-radio > input:checked + span {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+  [aria-invalid="true"] {
+    border-left: 3px solid CanvasText;
+  }
+  .path-card:has(input:checked) {
+    border-color: Highlight;
+  }
+}

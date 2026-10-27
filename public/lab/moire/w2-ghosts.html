@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W2 · Loupe Ghosts · labo moiré</title>
+<script>
+(() => {
+  const d = document.documentElement, q = new URLSearchParams(location.search);
+  const t = q.get("theme"); if (t === "light" || t === "dark") d.dataset.theme = t;
+  if (q.has("bare")) d.classList.add("bare");
+  if (q.has("rm")) d.classList.add("rm");
+  const g = q.get("ghost"); if (g === "accent" || g === "ink") d.dataset.ghost = g;
+})();
+</script>
+<link rel="stylesheet" href="tokens.css">
+<style>
+.now { padding-block: clamp(4rem, 14vh, 9rem) 6rem; }
+.row > a, .row > .in { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr auto; gap: .25rem 1.5rem; align-items: baseline; padding: 1rem 0 1.05rem; }
+
+/* « Préviens-moi »: a quiet text button that opens one field in place (copy deck §9.10).
+   Lab context only: it shows that the field lives in the text column, clear of the lens. */
+.notify { margin-top: .35rem; }
+.notify summary { display: inline-flex; align-items: center; gap: .35em; list-style: none; cursor: pointer; font: 500 var(--fs-small)/1.45 var(--text); color: var(--accent-text); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.notify summary::-webkit-details-marker { display: none; }
+.notify form { display: grid; gap: .4rem; max-width: 26rem; margin-top: .75rem; }
+.notify label { font-size: var(--fs-small); }
+.notify .field { display: flex; gap: .5rem; }
+.notify input { flex: 1; min-width: 0; font: inherit; font-size: var(--fs-small); color: var(--ink); background: var(--bg); border: 1px solid color-mix(in oklch, var(--ink) 35%, transparent); border-radius: 8px; padding: .55rem .7rem; }
+.notify button { font: 500 var(--fs-small)/1 var(--text); color: var(--ink); background: transparent; border: 1px solid color-mix(in oklch, var(--ink) 35%, transparent); border-radius: 8px; padding: .55rem .8rem; cursor: pointer; }
+.notify small { font-size: var(--fs-meta); line-height: 1.45; color: var(--ink-2); }
+
+/* ===== W2 · Ghosts lens =====
+   Shape moiré, 1D. Base: the ghost squeezed into every 4 px band (p_b = 4).
+   Lens: slits at p_r = 4.25 px. Magnification p_r/(p_r - p_b) = 17, so one
+   ghost period reads 68 px wide; the ghosts travel 16x faster than the lens,
+   the other way. The lens paints the exact composite (magnified shape masked
+   by its slits) from the lens position, instead of rasterising two 4 px
+   gratings on top of each other, which aliases at DPR 1. */
+.ghosts .in { grid-template-columns: minmax(10rem, 16rem) 1fr clamp(220px, 24vw, 340px); }
+.ghosts .gl { align-self: start; }            /* top anchored: opening « Préviens-moi » never moves the lens */
+.gl {
+  --pb: 4px; --period: 68px; --gh: 78px; --lens-w: 136px;
+  --L: 56px;                    /* lens position; a multiple of --pb puts both ghosts whole and centred (rest frame) */
+  --gx: 0px;                    /* ghost phase inside the lens: -(L / pb) * period mod period; 0 for the rest frame */
+  position: relative; height: 88px; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+}
+.gl-base {
+  position: absolute; inset: 0; pointer-events: none;
+  background: var(--fringe); opacity: var(--fringe-a);          /* a line layer: §9 alpha cap */
+  -webkit-mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
+  mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
+}
+.gl-fade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--bg), transparent 18%, transparent 82%, var(--bg)); }
+.gl-lens {
+  position: absolute; top: 0; left: 0; width: var(--lens-w); height: 100%;
+  transform: translateX(var(--L));
+  border-radius: 12px; background: var(--bg);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 24%, transparent);
+  cursor: grab; touch-action: pan-y; outline-offset: 4px;
+}
+.gl-lens:active { cursor: grabbing; }
+.gl-lens:hover { box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 42%, transparent); }
+.gl-lens::before {               /* the lens grating itself, faint, so the lens reads as a second layer */
+  content: ""; position: absolute; inset: 1px; border-radius: 11px; pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--fringe) 0 1.7px, transparent 1.7px 4.25px);
+  opacity: var(--fringe-a);
+}
+.gl-ghosts {
+  position: absolute; inset: 1px; border-radius: 11px; pointer-events: none;
+  background: var(--w2-ghost);
+  -webkit-mask: var(--ghost) calc(var(--gx) - 1px) center / var(--period) var(--gh) repeat-x, repeating-linear-gradient(90deg, #000 0 1.7px, transparent 1.7px 4.25px);
+  mask: var(--ghost) calc(var(--gx) - 1px) center / var(--period) var(--gh) repeat-x, repeating-linear-gradient(90deg, #000 0 1.7px, transparent 1.7px 4.25px);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+  opacity: var(--reveal, 1);
+}
+/* Ghost colour: the fringe's own ink by default (a physical moiré shows the base layer
+   through the slits, and the accent stays reserved for the one action). ?ghost=accent
+   shows the accent variant. */
+.gl { --w2-ghost: var(--fringe); }
+:root[data-ghost="accent"] .gl { --w2-ghost: var(--accent); }
+/* the ghost: dome, scalloped hem, two eyes. One shape for both layers (squeezed in the base). */
+.gl { --ghost: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 78' preserveAspectRatio='none'%3E%3Cpath fill-rule='evenodd' d='M12 32a22 22 0 0 1 44 0v38l-7.33-6-7.34 6-7.33-6-7.33 6-7.34-6L12 70zM22 26.5a4.5 6 0 1 0 9 0a4.5 6 0 1 0-9 0zM37 26.5a4.5 6 0 1 0 9 0a4.5 6 0 1 0-9 0z'/%3E%3C/svg%3E"); }
+
+@media (forced-colors: active) { .gl { display: none; } }
+@media print { .gl { display: none; } }
+@media (max-width: 767px) {
+  .row > a { grid-template-columns: 1fr auto; } .row > a .d { grid-column: 1 / -1; grid-row: 2; }
+  .ghosts .in { grid-template-columns: 1fr; gap: .35rem; }
+  .gl { margin-top: .6rem; }
+}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<main>
+  <section class="now">
+    <div class="wrap">
+      <h2>En ce moment</h2>
+      <ul class="rows">
+        <li class="row"><a href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li class="row"><a href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li class="row"><a href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-next"/></svg></span></a></li>
+        <li class="row ghosts">
+          <div class="in">
+            <h3 class="t">Ghosts</h3>
+            <div>
+              <p class="d">Des agents au très long cours. J'en dis plus bientôt.</p>
+              <details class="notify">
+                <summary>Préviens-moi</summary>
+                <form onsubmit="return false">
+                  <label for="gn">Ton email ou ton pseudo</label>
+                  <span class="field"><input id="gn" name="contact" autocomplete="email" placeholder="toi@exemple.fr" aria-describedby="gn-h"><button type="submit">Me prévenir</button></span>
+                  <small id="gn-h">Un pseudo ? Précise le réseau : @camille sur X.</small>
+                </form>
+              </details>
+            </div>
+            <div class="gl" data-w2 data-label="Loupe à fantômes : fais-la glisser">
+              <div class="gl-base" aria-hidden="true"></div>
+              <div class="gl-fade" aria-hidden="true"></div>
+              <div class="gl-lens"><div class="gl-ghosts" aria-hidden="true"></div></div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div class="lab" role="group" aria-label="Labo">
+  <b>W2 Ghosts</b>
+  <button type="button" data-act="theme">thème</button>
+  <button type="button" data-act="ghost">fantôme</button>
+  <label><input type="checkbox" data-act="rm"> mouvement réduit</label>
+</div>
+
+<script>
+/* ===========================================================================
+   W2 · Ghosts lens. Pointer drag, touch drag, arrow keys. Renders on demand:
+   three custom properties per frame (--L, --gx, --reveal), nothing else, all
+   inside one 88 px strip. Stops when settled.
+
+   mountW2(box) returns { destroy, stats }. Production (Astro):
+     let w2;
+     document.addEventListener("astro:page-load", () => {
+       const el = document.querySelector("[data-w2]"); if (el) w2 = mountW2(el);
+     });
+     document.addEventListener("astro:before-swap", () => { w2?.destroy(); w2 = null; });
+   =========================================================================== */
+function mountW2(box) {
+  const root = document.documentElement;
+  const lens = box.querySelector(".gl-lens");
+  const PB = 4, PR = 4.25, MAG = PR / (PR - PB), PERIOD = PB * MAG;       // 17, 68 px
+  const LENS_W = 136;                                                     // two ghost periods
+  const REST = 56;                                                        // same as the CSS rest frame
+  const mqReduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = () => mqReduce.matches || root.classList.contains("rm");
+  const ac = new AbortController();
+  const on = (t, ev, fn, o = {}) => t.addEventListener(ev, fn, { ...o, signal: ac.signal });
+  const stats = { frames: 0, settles: 0 };
+
+  let W = 0, L = 0, T = 0, raf = 0, last = 0, drag = null, speed = 0;
+
+  // phase of the magnified ghost row inside the lens for a lens position
+  const phase = (l) => { let g = -(l / PB) * PERIOD; g = ((g % PERIOD) + PERIOD) % PERIOD; return g - PERIOD; };
+  // nearest lens position (to l) where ghosts sit centred in the lens (edges fall in the gaps)
+  const snap = (l) => Math.round(l / PB) * PB;
+  const clamp = (l) => Math.max(0, Math.min(W - LENS_W, l));
+
+  function paint() {
+    box.style.setProperty("--L", L.toFixed(3) + "px");
+    box.style.setProperty("--gx", phase(L).toFixed(3) + "px");
+    // ghosts blur out when they would race past (honest motion blur, no strobing)
+    const g = speed * MAG;                                                // ghost speed, px/s
+    const fade = 1 - .75 * Math.min(1, Math.max(0, (g - 900) / 1500));
+    box.style.setProperty("--reveal", fade.toFixed(3));
+    const pct = Math.round((L / Math.max(1, W - LENS_W)) * 100);
+    lens.setAttribute("aria-valuenow", pct);
+    stats.frames++;
+  }
+  function frame(now) {
+    raf = 0;
+    const dt = last ? Math.min(64, now - last) : 16.7; last = now;
+    const prev = L;
+    const k = drag ? 1 - Math.pow(1 - .35, dt / 16.667) : 1 - Math.pow(1 - .2, dt / 16.667);
+    L += (T - L) * k;
+    if (Math.abs(T - L) < .02) L = T;                                    // .02 px of lens = .3 px of ghost
+    speed = speed * .7 + (Math.abs(L - prev) / (dt / 1000)) * .3;
+    paint();
+    if (L !== T || drag || speed > 1) schedule(); else { last = 0; speed = 0; paint(); stats.settles++; }
+  }
+  function schedule() { if (!raf && !document.hidden) raf = requestAnimationFrame(frame); }
+  function go(t, { snapTo = true, instant = false } = {}) {
+    T = clamp(snapTo ? clamp(snap(t)) : t);
+    if (instant || reduced()) { L = T; speed = 0; paint(); return; }
+    schedule();
+  }
+
+  function measure() {
+    W = box.clientWidth;
+    if (!L) { L = T = clamp(REST); } else { L = T = clamp(L); }
+    paint();
+  }
+
+  // pointer and touch: drag inside the strip, horizontal only (touch-action: pan-y keeps page scroll)
+  on(box, "pointerdown", (e) => {
+    if (e.button > 0) return;
+    const r = box.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const onLens = x >= L && x <= L + LENS_W;
+    drag = { id: e.pointerId, dx: onLens ? x - L : LENS_W / 2 };
+    box.setPointerCapture(e.pointerId);
+    go(x - drag.dx, { snapTo: false });
+  });
+  on(box, "pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const r = box.getBoundingClientRect();
+    go(e.clientX - r.left - drag.dx, { snapTo: false, instant: reduced() });
+  });
+  const end = (e) => { if (!drag || (e && e.pointerId !== drag.id)) return; drag = null; go(T); };
+  on(box, "pointerup", end); on(box, "pointercancel", end); on(box, "lostpointercapture", end);
+
+  // keyboard: the lens is a slider (a toy: it carries no information)
+  lens.setAttribute("role", "slider"); lens.tabIndex = 0;
+  if (!lens.hasAttribute("aria-label")) lens.setAttribute("aria-label", box.dataset.label || "Ghosts");
+  lens.setAttribute("aria-valuemin", "0"); lens.setAttribute("aria-valuemax", "100");
+  lens.setAttribute("aria-orientation", "horizontal");
+  on(lens, "keydown", (e) => {
+    const step = e.shiftKey ? 10 * PB : 1.5 * PB;
+    let t = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") t = T + step;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") t = T - step;
+    if (e.key === "PageUp") t = T + 10 * PB; if (e.key === "PageDown") t = T - 10 * PB;
+    if (e.key === "Home") t = 0; if (e.key === "End") t = W;
+    if (t === null) return;
+    e.preventDefault(); go(t);
+  });
+
+  const ro = new ResizeObserver(measure); ro.observe(box);
+  on(mqReduce, "change", () => go(T, { instant: true }));
+  on(document, "visibilitychange", () => { if (document.hidden && raf) { cancelAnimationFrame(raf); raf = 0; last = 0; L = T; speed = 0; paint(); } });
+
+  function destroy() {
+    ac.abort(); ro.disconnect(); if (raf) cancelAnimationFrame(raf); raf = 0; drag = null;
+    for (const p of ["--L", "--gx", "--reveal"]) box.style.removeProperty(p);
+    for (const a of ["role", "tabindex", "aria-label", "aria-valuemin", "aria-valuemax", "aria-valuenow", "aria-orientation"]) lens.removeAttribute(a);
+  }
+  return { destroy, stats };
+}
+
+/* --- lab boot ----------------------------------------------------------- */
+(() => {
+  const root = document.documentElement;
+  const w2 = mountW2(document.querySelector("[data-w2]"));
+  window.__w2 = w2.stats;
+  document.querySelector(".lab").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (b.dataset.act === "theme") { const dark = getComputedStyle(root).colorScheme === "dark"; root.dataset.theme = dark ? "light" : "dark"; }
+    if (b.dataset.act === "ghost") { root.dataset.ghost = root.dataset.ghost === "accent" ? "ink" : "accent"; }
+    if (b.dataset.act === "rm") root.classList.toggle("rm", b.checked);
+  });
+  if (root.classList.contains("rm")) document.querySelector('[data-act="rm"]').checked = true;
+})();
+</script>
+</body>
+</html>

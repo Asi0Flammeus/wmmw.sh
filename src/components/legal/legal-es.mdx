@@ -1,0 +1,64 @@
+import { SIREN, SIRET, TVA, ADRESSE_SIEGE, SCALEWAY_TEL, MEDIATEUR, POLICES, MAJ } from "@lib/legal";
+
+{/* Copy deck §11.3. The French version is binding (legal.binding, shown under the h1). */}
+
+Quién publica este sitio, dónde vive y qué pasa con tus datos. Con claridad. Aquí, «yo» es el editor.
+
+## Editor
+
+wmmw.sh lo edita **William Lecompte**, empresario individual (entrepreneur individuel, EI), que publica con el nombre de William Moiré.
+
+- SIREN: {SIREN}
+- SIRET: {SIRET}
+- IVA intracomunitario: {TVA}
+- Domicilio social: {ADRESSE_SIEGE}
+- Director de la publicación: William Lecompte
+- Contacto: en [Trabajar juntos](/es/contact?chemin=autre), camino «Otra cosa».
+
+## Alojamiento
+
+El sitio está autoalojado. Funciona en un servidor alquilado a Scaleway, situado en Francia, y administrado directamente por el editor.
+
+Scaleway SAS, 8 rue de la Ville l’Évêque, 75008 París, Francia.{SCALEWAY_TEL ? ` ${SCALEWAY_TEL}` : ""}
+
+<h2 id="donnees">Datos personales</h2>
+
+**Qué recojo.** Solo lo que escribes tú. En Trabajar juntos: el camino elegido, tu brief, tu nombre o seudónimo, y cómo responderte (email, usuario de X, Telegram o Signal, u otro). En «Avísame»: tu email o tu usuario.
+
+**Para qué.** Para responderte y, si trabajamos juntos, preparar un presupuesto. Base legal: las gestiones precontractuales que pides (artículo 6.1.b del RGPD) y, para los demás mensajes, mi interés legítimo en responderlos (artículo 6.1.f).
+
+**Dónde.** En un archivo en el servidor del sitio, en Francia. Nada se envía por email, ninguna herramienta de terceros lo lee, nada se vende.
+
+**Cuánto tiempo.** 12 meses desde su recepción, y luego se borra automáticamente. Si sigue un presupuesto o una factura, esos documentos se guardan aparte durante el plazo que exige la ley.
+
+**La lista Ghosts.** Si dejas tu email o tu usuario en «Avísame», lo uso para un solo mensaje cuando salga Ghosts, y luego lo borro. Base legal: tu consentimiento (artículo 6.1.a del RGPD), que puedes retirar en cualquier momento, por la misma vía que tus otros derechos. Si Ghosts no ha salido en 12 meses, se borra igualmente.
+
+**Tu dirección IP.** Solo sirve para limitar abusos, en memoria y en forma de hash, durante 24 horas como máximo. Nunca se guarda.
+
+**Si te respondo por X, Telegram o Signal,** el intercambio pasa por esos servicios, con sus propias reglas.
+
+**Tus derechos.** Acceso, rectificación, supresión, oposición, limitación y portabilidad. Para ejercerlos: [Trabajar juntos](/es/contact?chemin=autre), camino «Otra cosa», tema «Mis datos». Respondo en un mes como máximo. También puedes acudir a la CNIL, la autoridad francesa de protección de datos (cnil.fr).
+
+## Cookies y medición de audiencia
+
+Este sitio no instala ninguna cookie. La medición de audiencia usa Umami, autoalojado por el editor, sin cookies y sin perfiles individuales.
+
+Dos cosas se quedan en tu navegador y nunca salen de tu dispositivo: tu elección de tema claro u oscuro, y el borrador del formulario mientras lo escribes. El borrador se borra al enviarlo o al cerrar la pestaña.
+
+## Propiedad intelectual
+
+Los textos de este sitio se publican con licencia CC BY-SA 4.0, salvo indicación contraria: puedes reutilizarlos citando la fuente y compartiendo igual. El código de las herramientas sigue la licencia indicada en cada repositorio. El nombre William Moiré, el monograma wmmw y el diseño del sitio no están cubiertos por esta licencia.
+
+## Enlaces
+
+Este sitio enlaza a otros, como alysis.cat y planb.academy. No controlo su contenido.
+
+{MEDIATEUR && <h2>Mediación</h2>}
+
+{MEDIATEUR && <p>Si eres consumidor y un litigio conmigo no se resuelve tras una reclamación por escrito, puedes acudir gratuitamente al mediador de consumo: {MEDIATEUR}.</p>}
+
+## Créditos
+
+Tipografías: {POLICES}, con licencia SIL Open Font License.
+
+Última actualización: {MAJ.es}.

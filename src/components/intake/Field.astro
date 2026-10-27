@@ -1,0 +1,62 @@
+---
+/**
+ * One labelled intake control (copy deck §9.4 to §9.6): label, optional hint,
+ * a text input or a textarea (field-sizing: content, rows=4 fallback), the
+ * error line and, for limited text, the 80 % character counter.
+ */
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  hint?: string;
+  ph?: string;
+  multiline?: boolean;
+  type?: "text" | "email" | "url";
+  inputmode?: "text" | "email" | "url";
+  autocomplete?: string;
+  value?: string;
+  error?: string;
+  /** character limit: enables the counter */
+  max?: number;
+  optional?: boolean;
+}
+
+const { id, name, label, hint, ph, multiline = false, type = "text", inputmode, autocomplete, value, error, max } = Astro.props;
+const describedBy = [hint && `${id}-hint`, `${id}-err`].filter(Boolean).join(" ");
+---
+
+<div class="field" data-field={name}>
+  <label class="field-label" for={id}>{label}</label>
+  {hint && <p class="field-hint" id={`${id}-hint`}>{hint}</p>}
+  {
+    multiline ? (
+      <textarea
+        id={id}
+        name={name}
+        rows="4"
+        placeholder={ph}
+        aria-describedby={describedBy}
+        aria-invalid={error ? "true" : undefined}
+        data-max={max}>{value ?? ""}</textarea>
+
+    ) : (
+      <input
+        id={id}
+        name={name}
+        type={type}
+        inputmode={inputmode}
+        autocomplete={autocomplete ?? "off"}
+        placeholder={ph}
+        value={value || undefined}
+        aria-describedby={describedBy}
+        aria-invalid={error ? "true" : undefined}
+        data-max={max}
+      />
+    )
+  }
+  <p class="field-err" id={`${id}-err`} hidden={!error}>
+    <svg class="err-glyph" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6"></circle><path d="M7 3.8v3.9M7 9.9v.3"></path></svg>
+    <span data-err-text>{error}</span>
+  </p>
+  {max && <p class="field-count" aria-hidden="true" hidden data-count></p>}
+</div>

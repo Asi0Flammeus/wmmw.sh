@@ -2,11 +2,14 @@
 import ContactPage from "@components/pages/ContactPage.astro";
 import type { Locale } from "@i18n/index";
 
-export function getStaticPaths() {
-  return ["en", "es"].map((lang) => ({ params: { lang } }));
-}
+/* on demand: embeds a signed start token, handles the no-JS brief (spec §7.7) */
+export const prerender = false;
 
-const locale = Astro.params.lang as Locale;
+const lang = Astro.params.lang;
+/* never Astro.rewrite("/404") from an on-demand route (errata E1): the adapter serves 404.html */
+if (lang !== "en" && lang !== "es") return new Response(null, { status: 404 });
+const locale: Locale = lang;
+Astro.response.headers.set("Cache-Control", "no-store");
 ---
 
 <ContactPage locale={locale} />

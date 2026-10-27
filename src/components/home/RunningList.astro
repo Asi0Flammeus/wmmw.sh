@@ -1,0 +1,49 @@
+---
+/**
+ * « En ce moment » (spec §7.1.2): what is running, four rows. Plan ₿ Academy
+ * and alysis leave the site; the tools row opens the intake on the tool path;
+ * Ghosts is not a link: a quiet « Préviens-moi » and the W2 lens.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import { ALYSIS_URL, PLANB_URL } from "@lib/site";
+import RunningRow from "./RunningRow.astro";
+import GhostsLens from "@components/moire/GhostsLens.astro";
+import GhostsNotify from "@components/intake/GhostsNotify.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const now = t(locale).home.now;
+---
+
+<section class="now wrap" aria-labelledby="now">
+  <h2 id="now" data-qa="now-heading">{now.heading}</h2>
+  <ul class="rows-now">
+    <RunningRow locale={locale} name={now.planb.name} line={now.planb.line} href={PLANB_URL} external />
+    <RunningRow locale={locale} name={now.alysis.name} line={now.alysis.line} href={ALYSIS_URL} external />
+    <RunningRow
+      locale={locale}
+      name={now.tools.name}
+      line={now.tools.line}
+      href={`${localePath(locale, "/contact")}?chemin=outil`}
+    />
+    <RunningRow locale={locale} name={now.ghosts.name} line={now.ghosts.line} variant="ghosts">
+      <GhostsNotify locale={locale} page="/" />
+      <GhostsLens locale={locale} slot="lens" />
+    </RunningRow>
+  </ul>
+</section>
+
+<style>
+  .now h2 {
+    font-size: var(--fs-h2);
+    margin-bottom: 0.4em;
+  }
+  .rows-now {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

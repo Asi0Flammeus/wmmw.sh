@@ -1,5 +1,9 @@
 ---
 import ContactPage from "@components/pages/ContactPage.astro";
+
+/* on demand: embeds a signed start token, handles the no-JS brief (spec §7.7) */
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "no-store");
 ---
 
 <ContactPage locale="fr" />

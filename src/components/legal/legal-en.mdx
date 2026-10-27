@@ -1,0 +1,64 @@
+import { SIREN, SIRET, TVA, ADRESSE_SIEGE, SCALEWAY_TEL, MEDIATEUR, POLICES, MAJ } from "@lib/legal";
+
+{/* Copy deck §11.2. The French version is binding (legal.binding, shown under the h1). */}
+
+Who publishes this site, where it lives, and what happens to your data. In plain words. Here, “I” means the publisher.
+
+## Publisher
+
+wmmw.sh is published by **William Lecompte**, sole trader (entrepreneur individuel, EI), who publishes as William Moiré.
+
+- SIREN: {SIREN}
+- SIRET: {SIRET}
+- EU VAT: {TVA}
+- Registered address: {ADRESSE_SIEGE}
+- Publication director: William Lecompte
+- Contact: through [Work together](/en/contact?chemin=autre), path “Something else”.
+
+## Hosting
+
+The site is self-hosted. It runs on a server rented from Scaleway, located in France, and administered directly by the publisher.
+
+Scaleway SAS, 8 rue de la Ville l’Évêque, 75008 Paris, France.{SCALEWAY_TEL ? ` ${SCALEWAY_TEL}` : ""}
+
+<h2 id="donnees">Personal data</h2>
+
+**What I collect.** Only what you write yourself. In Work together: the path you chose, your brief, your first name or handle, and how to reply (email address, X, Telegram or Signal handle, or other). In “Tell me when”: your email or handle.
+
+**Why.** To reply and, if we work together, to prepare a quote. Legal basis: the pre-contract steps you ask for (GDPR article 6.1.b) and, for other messages, my legitimate interest in answering them (article 6.1.f).
+
+**Where.** In a file on the site’s server, in France. Nothing is sent by email, no third-party tool reads it, nothing is sold.
+
+**How long.** 12 months after receipt, then automatic deletion. If a quote or invoice follows, those documents are kept separately for as long as the law requires.
+
+**The Ghosts list.** If you leave your email or handle in “Tell me when”, I use it for a single message when Ghosts ships, then delete it. Legal basis: your consent (GDPR article 6.1.a), which you can withdraw at any time, the same way as your other rights. If Ghosts has not shipped after 12 months, it is deleted anyway.
+
+**Your IP address.** It is used only to limit abuse, in memory and hashed, for 24 hours at most. It is never stored.
+
+**If I reply via X, Telegram or Signal,** the exchange runs through those services, under their own rules.
+
+**Your rights.** Access, correction, deletion, objection, restriction and portability. To use them: [Work together](/en/contact?chemin=autre), path “Something else”, topic “My data”. I reply within one month at most. You can also contact the CNIL, the French data protection authority (cnil.fr).
+
+## Cookies and analytics
+
+This site sets no cookies. Analytics run on Umami, self-hosted by the publisher, without cookies and without individual profiles.
+
+Two things stay in your browser and never leave your device: your light or dark theme choice, and the form draft while you write it. The draft is erased when you send it or close the tab.
+
+## Intellectual property
+
+Texts on this site are published under CC BY-SA 4.0 unless stated otherwise: you may reuse them with credit, sharing alike. Tool code follows the licence stated in each repository. The name William Moiré, the wmmw monogram and the site design are not covered by this licence.
+
+## Links
+
+This site links to other sites, including alysis.cat and planb.academy. I have no control over their content.
+
+{MEDIATEUR && <h2>Mediation</h2>}
+
+{MEDIATEUR && <p>If you are a consumer and a dispute with me is not settled after a written complaint, you can refer it free of charge to the consumer mediator: {MEDIATEUR}.</p>}
+
+## Credits
+
+Typefaces: {POLICES}, under the SIL Open Font License.
+
+Last updated: {MAJ.en}.

@@ -1,0 +1,349 @@
+---
+/**
+ * /lab (spec §7.10): how the direction was chosen. FR only, noindex, never
+ * linked. Images are the committed copies in public/lab (scripts/lab-assets.mjs);
+ * the token swatches are live, in two themed islands.
+ */
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHead from "@components/ui/PageHead.astro";
+import Arrow from "@components/ui/Arrow.astro";
+import lab from "@lib/lab-data.json";
+import tokensCss from "@styles/tokens.css?raw";
+
+type Size = { width: number; height: number };
+const sizes = lab.sizes as Record<string, Size>;
+const size = (key: string): Size => sizes[key] ?? { width: 1200, height: 675 };
+
+const TAGS: Record<string, string> = { G1: "centre évident", G2: "centre évident", OPTICS5: "retenue" };
+const JUDGES: Record<string, string> = { distinct: "Singularité", brand: "Marque", comfort: "Confort" };
+
+const PAIRINGS = [
+  { id: "a", label: "a" },
+  { id: "a2", label: "a2" },
+  { id: "a3", label: "a3", tag: "retenue" },
+  { id: "b", label: "b" },
+  { id: "c", label: "c" },
+  { id: "d", label: "d" },
+  { id: "e", label: "e" },
+  { id: "f", label: "f" },
+  { id: "g", label: "g" },
+];
+const RECS = [
+  { id: "rec-1440-light", label: "1440 · clair" },
+  { id: "rec-932-dark", label: "932 · sombre" },
+  { id: "rec-390-light", label: "390 · clair" },
+  { id: "rec-390-dark", label: "390 · sombre" },
+];
+const PROTOS = [
+  { file: "w1-hero.html", label: "W1 · la source é" },
+  { file: "w2-ghosts.html", label: "W2 · la loupe Ghosts" },
+  { file: "q1-toggle.html", label: "Q1 · la bascule Lycurgus" },
+  { file: "q2-row.html", label: "Q2 · la bande des lignes" },
+  { file: "q3-monogram.html", label: "Q3 · le monogramme" },
+];
+
+/* colour tokens, read from the shipped tokens.css so the table can never drift */
+const ROLES: Record<string, string> = {
+  bg: "page",
+  surface: "survol de puce, carte cochée",
+  "surface-2": "code, kbd, info-bulle",
+  ink: "titres, texte",
+  "ink-2": "texte secondaire, nav",
+  "ink-3": "méta seulement",
+  accent: "rubis\u202F: agir ici",
+  "accent-hover": "rubis au survol",
+  "accent-text": "liens, focus",
+  "on-accent": "texte sur rubis",
+  line: "filets décoratifs",
+  "line-strong": "bords de contrôles",
+  focus: "anneau de focus",
+  success: "jade\u202F: c’est fait",
+  "selection-bg": "sélection (la coupe)",
+  "input-bg": "puits des champs",
+  fringe: "lignes du moiré",
+};
+function themeTokens(selector: string): Map<string, { value: string; hex: string }> {
+  const start = tokensCss.indexOf(selector);
+  const block = tokensCss.slice(start, tokensCss.indexOf("}", start));
+  const out = new Map<string, { value: string; hex: string }>();
+  for (const m of block.matchAll(/--([a-z0-9-]+):\s*([^;]+);[ \t]*(?:\/\*\s*(#[0-9a-f]{6})?)?/gi)) {
+    const [, name = "", value = "", hex = ""] = m;
+    if (name in ROLES) out.set(name, { value: value.trim(), hex });
+  }
+  return out;
+}
+const light = themeTokens('[data-theme="light"] {');
+const dark = themeTokens('[data-theme="dark"] {');
+const islands = [
+  { theme: "light", label: "Clair\u202F: la coupe en lumière de face", tokens: light },
+  { theme: "dark", label: "Sombre\u202F: la coupe à contre-jour", tokens: dark },
+];
+---
+
+<BaseLayout
+  locale="fr"
+  title="Le labo"
+  description={"Comment la direction William Moiré a été choisie\u202F: palettes, juges, typographies, prototypes moiré, jetons."}
+  path="/lab"
+  alternatesFor={["fr"]}
+  noindex
+>
+  <div class="wrap lab">
+    <PageHead title="Le labo" lead="Comment la direction a été choisie, pièce par pièce." />
+
+    <section aria-labelledby="lab-palette">
+      <h2 id="lab-palette">Palette</h2>
+      <ul class="cards">
+        {
+          lab.palettes.map((p) => (
+            <li class:list={["card", { kept: p.id === "OPTICS5" }]}>
+              <img src={`/lab/palettes/${p.id}.webp`} alt={`Rendu de la palette ${p.id}`} loading="lazy" decoding="async" {...size(`palettes/${p.id}`)} />
+              <p class="card-id">
+                {p.id}
+                {TAGS[p.id] && <span class="tag">{TAGS[p.id]}</span>}
+              </p>
+              <p class="card-name">{p.name}</p>
+              <p class="card-story">{p.story}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="lab-judges">
+      <h2 id="lab-judges">Ce que les juges ont dit</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th scope="col">Juge</th><th scope="col">Top 3</th><th scope="col">OPTICS5</th></tr>
+          </thead>
+          <tbody>
+            {
+              lab.judges.map((j) => (
+                <tr>
+                  <th scope="row">{JUDGES[j.judge] ?? j.judge}</th>
+                  <td>{j.top3.join(" · ")}</td>
+                  <td class="num">{j.optics5 ?? "n/a"}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="lab-type">
+      <h2 id="lab-type">Typographie</h2>
+      <ul class="cards">
+        {
+          PAIRINGS.map((p) => (
+            <li class:list={["card", { kept: p.tag }]}>
+              <img src={`/lab/type/${p.id}.webp`} alt={`Accord typographique ${p.label}`} loading="lazy" decoding="async" {...size(`type/${p.id}`)} />
+              <p class="card-id">
+                Accord {p.label}
+                {p.tag && <span class="tag">{p.tag}</span>}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <h3>L’accord a3 en situation</h3>
+      <ul class="cards">
+        {
+          RECS.map((r) => (
+            <li class="card">
+              <img src={`/lab/type/${r.id}.webp`} alt={`Recommandation typographique, ${r.label}`} loading="lazy" decoding="async" {...size(`type/${r.id}`)} />
+              <p class="card-id">{r.label}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="lab-moire">
+      <h2 id="lab-moire">Moiré</h2>
+      <ul class="protos">
+        {
+          PROTOS.map((p) => (
+            <li>
+              <a href={`/lab/moire/${p.file}`} data-astro-reload>
+                {p.label}
+                <Arrow dir="right" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="lab-tokens">
+      <h2 id="lab-tokens">Jetons</h2>
+      <div class="islands">
+        {
+          islands.map((island) => (
+            <div class="island" data-theme={island.theme}>
+              <p class="island-label">{island.label}</p>
+              <ul class="swatches">
+                {[...island.tokens].map(([name, t]) => (
+                  <li class="swatch">
+                    <span class="chip" style={`background: var(--${name})`} />
+                    <span class="sw-name">--{name}</span>
+                    <span class="sw-hex">{t.hex || "n/a"}</span>
+                    <span class="sw-value">{t.value}</span>
+                    <span class="sw-role">{ROLES[name]}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .lab section {
+    margin-top: var(--section-gap);
+  }
+  .lab h2 {
+    font-size: var(--fs-h2);
+  }
+  .lab h3 {
+    margin-top: var(--block-gap);
+    font-size: var(--fs-h3);
+  }
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  }
+  .card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--r-2);
+    border: 1px solid var(--line);
+  }
+  .card.kept img {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .card p {
+    margin: 0.4rem 0 0;
+  }
+  .card-id,
+  .tag,
+  .island-label,
+  .sw-name,
+  .sw-hex,
+  .sw-value {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    letter-spacing: var(--ls-mono);
+  }
+  .card-id {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    color: var(--ink);
+  }
+  .tag {
+    color: var(--ink-3);
+  }
+  .card-name {
+    font-weight: 500;
+  }
+  .card-story {
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    color: var(--ink-2);
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    min-width: 28rem;
+  }
+  th,
+  td {
+    padding: 0.6rem 1.25rem 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-weight: 400;
+  }
+  thead th {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    color: var(--ink-3);
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  .protos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .protos a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: var(--tap);
+  }
+  .islands {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 900px) {
+    .islands {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .island {
+    padding: 1.25rem;
+    border-radius: var(--r-3);
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .island-label {
+    margin: 0 0 0.75rem;
+    color: var(--ink-2);
+  }
+  .swatches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .swatch {
+    display: grid;
+    grid-template-columns: 2rem 9rem 5rem minmax(0, 1fr);
+    gap: 0.15rem 0.75rem;
+    align-items: center;
+  }
+  .chip {
+    grid-row: span 2;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--r-1);
+    border: 1px solid var(--line);
+  }
+  .sw-value {
+    color: var(--ink-3);
+    overflow-wrap: anywhere;
+  }
+  .sw-role {
+    grid-column: 2 / -1;
+    font-size: var(--fs-meta);
+    color: var(--ink-2);
+  }
+</style>

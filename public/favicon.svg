@@ -1,8 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="wmmw.sh">
-  <rect width="32" height="32" rx="7" fill="#12100d"/>
-  <text x="16" y="16" text-anchor="middle" dominant-baseline="central"
-        font-family="'JetBrains Mono', ui-monospace, 'DejaVu Sans Mono', monospace"
-        font-size="16" font-weight="700" letter-spacing="-0.5">
-    <tspan fill="#d9a24a">[</tspan><tspan fill="#ede6d8">w</tspan><tspan fill="#d9a24a">]</tspan>
-  </text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><style>.bg{fill:#ecf2f0}.a{fill:#1c2c29}.s{fill:#ad335b}@media (prefers-color-scheme:dark){.bg{fill:#17201d}.a{fill:#d5dbd9}.s{fill:#de7f96}}</style><rect class="bg" width="512" height="512" rx="112"/><path class="a" d="M7.00 116H73.00L134.71 396H68.71Z"/><path class="a" d="M130.43 116H196.43L134.71 396H68.71Z"/><path class="a" d="M130.43 116H196.43L258.14 396H192.14Z"/><path class="s" d="M253.86 116H319.86L258.14 396H192.14Z"/><path class="a" d="M253.86 116H319.86L381.57 396H315.57Z"/><path class="a" d="M377.29 116H443.29L381.57 396H315.57Z"/><path class="a" d="M377.29 116H443.29L505.00 396H439.00Z"/></svg>

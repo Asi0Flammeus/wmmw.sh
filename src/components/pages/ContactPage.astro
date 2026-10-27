@@ -1,9 +1,19 @@
 ---
-import { Image } from "astro:assets";
+/**
+ * /contact « Travailler ensemble » (spec §7.7, §8.5): proves before it asks.
+ * Renders on demand: GET embeds a fresh start token; a no-JS POST is handled
+ * here and answered with the confirmation or the form with its errors.
+ * From 1100 px: copy and V1 on the left, the sticky intake card on the right.
+ */
+import { type Locale, t, splitLink, localePath } from "@i18n/index";
+import { MAX_BODY_BYTES, type Brief, type Errors } from "@lib/intake/rules";
+import { minMs, mintToken } from "@lib/intake/token";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { type Locale, t } from "@i18n/index";
-import { CONTACT_EMAIL, GITHUB_URL, X_URL, PLANB_URL } from "@lib/site";
-import portrait from "@assets/william.jpg";
+import PageHead from "@components/ui/PageHead.astro";
+import StepsLine from "@components/visual/StepsLine.astro";
+import IntakeForm from "@components/intake/IntakeForm.astro";
+import Gets from "@components/contact/Gets.astro";
+import Elsewhere from "@components/contact/Elsewhere.astro";
 
 interface Props {
   locale: Locale;
@@ -11,285 +21,155 @@ interface Props {
 
 const { locale } = Astro.props;
 const dict = t(locale);
-const directHref = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}` : X_URL;
-const directText = CONTACT_EMAIL
-  ? dict.contact.directEmailText
-  : dict.contact.directText;
-const directCta = CONTACT_EMAIL
-  ? dict.contact.directEmailCta
-  : dict.contact.directCta;
+const c = dict.contact;
+const s = dict.intake;
 
-const links = [
-  {
-    label: "GitHub",
-    handle: "@Asi0Flammeus",
-    description: dict.contact.links.github,
-    href: GITHUB_URL,
-  },
-  {
-    label: "X",
-    handle: "@asi0_flammeus",
-    description: dict.contact.links.x,
-    href: X_URL,
-  },
-  {
-    label: "Plan ₿ Academy",
-    handle: "asi0",
-    description: dict.contact.links.planb,
-    href: PLANB_URL,
-  },
-];
+const CHEMIN: Record<string, string> = { outil: "tool", ouvert: "open", autre: "other", site: "site" };
+const cheminParam = Astro.url.searchParams.get("chemin") ?? "";
+const chemin = CHEMIN[cheminParam];
+const page = `/contact${chemin ? `?chemin=${cheminParam}` : ""}`;
+
+let started = mintToken("brief", locale);
+let values: Brief | undefined;
+let errors: Errors | undefined;
+let invalidToken = false;
+let netMessage: string | undefined;
+let accepted: { ref: string; fit: string } | undefined;
+
+const request = Astro.request;
+if (request.method === "POST") {
+  const size = Number(request.headers.get("content-length") ?? 0);
+  if (size > MAX_BODY_BYTES) {
+    netMessage = s.net.tooLarge;
+  } else {
+    const form = await request.formData();
+    // dynamic on purpose (errata E7): keep the intake modules out of prerendered pages
+    const { processIntake, parseForm } = await import("@lib/intake/process");
+    const result = await processIntake(parseForm(form), {
+      request,
+      clientAddress: Astro.clientAddress,
+      js: false,
+      kind: "brief",
+    });
+    values = result.brief;
+    const posted = form.get("started");
+    if (typeof posted === "string" && posted) started = posted;
+    if (result.status === 201 && result.accepted) {
+      accepted = { ref: result.accepted.ref, fit: result.accepted.fit };
+    } else if (result.errors) {
+      errors = result.errors;
+    } else if (result.fresh) {
+      invalidToken = true;
+      started = result.fresh;
+    } else if (result.status === 429) {
+      const minutes = Math.max(1, Math.ceil(Number(result.body.retry_after ?? 600) / 60));
+      netMessage = s.net.rate.replace("{minutes}", String(minutes));
+    } else {
+      netMessage = s.net.server;
+    }
+  }
+}
+
+const legalData = splitLink(s.legal.data, s.legal.dataLink);
 ---
 
-<BaseLayout
-  locale={locale}
-  title={dict.contact.heading}
-  description={dict.meta.contact}
-  path="/contact"
-  ogImage={portrait.src}
->
-  <section class="sec contact-sec" data-block>
-    <div class="wrap contact-layout">
-      <figure class="portrait reveal" data-myc-node>
-        <Image
-          class="portrait-image"
-          src={portrait}
-          alt={dict.contact.portraitAlt}
-          widths={[420, 640, 895]}
-          sizes="(max-width: 760px) 82vw, 38vw"
-          loading="lazy"
-        />
-      </figure>
-
-      <div class="contact-copy">
-        <p class="contact-intro reveal">{dict.contact.intro}</p>
-
-        <section class="direct reveal" aria-labelledby="direct-heading">
-          <h2 id="direct-heading">{dict.contact.direct}</h2>
-          <p>{directText}</p>
-          <a class="direct-link" href={directHref} rel="me noopener">
-            {directCta}
-            <span aria-hidden="true">↗</span>
-          </a>
-        </section>
-      </div>
-
-      <section class="network reveal" aria-labelledby="network-heading">
-        <h2 id="network-heading">{dict.contact.elsewhere}</h2>
-        <div class="link-list">
-          {
-            links.map((link) => (
-              <a class="network-link" href={link.href} rel="me noopener">
-                <span class="link-identity">
-                  <strong>{link.label}</strong>
-                  <span class="handle">{link.handle}</span>
-                </span>
-                <span class="link-description">{link.description}</span>
-                <span class="external" aria-hidden="true">↗</span>
-              </a>
-            ))
-          }
-        </div>
-      </section>
+<BaseLayout locale={locale} title={c.meta.title} description={c.meta.description} path="/contact">
+  <div class="wrap contact">
+    <div class="contact-head">
+      <PageHead title={c.heading} lead={c.lede} />
+      <p class="contact-split">{c.split}</p>
     </div>
-  </section>
+
+    <div class="contact-card">
+      {netMessage && <p class="contact-net" role="alert">{netMessage}</p>}
+      <IntakeForm
+        locale={locale}
+        started={started}
+        minMs={minMs("brief")}
+        page={page}
+        chemin={chemin}
+        values={values}
+        errors={errors}
+        invalidToken={invalidToken}
+        accepted={accepted}
+      />
+      <p class="contact-legal">
+        {s.legal.who}{" "}
+        {legalData[0]}<a href={`${localePath(locale, "/mentions-legales")}#donnees`}>{legalData[1]}</a>{legalData[2]}
+      </p>
+    </div>
+
+    <section class="contact-steps" aria-labelledby="steps-title" data-steps-host>
+      <h2 id="steps-title">{c.steps.heading}</h2>
+      <StepsLine locale={locale} variant="detailed" />
+    </section>
+  </div>
+
+  <div class="wrap contact-more">
+    <Gets locale={locale} />
+    <Elsewhere locale={locale} />
+  </div>
 </BaseLayout>
 
 <style>
-  .contact-sec {
-    padding-top: clamp(4rem, 8vw, 7rem);
-  }
-
-  .contact-layout {
+  .contact {
     display: grid;
-    grid-template-columns: minmax(17rem, 0.76fr) minmax(20rem, 1.24fr);
-    grid-template-areas:
-      "portrait copy"
-      ". network";
-    column-gap: clamp(3rem, 8vw, 8rem);
-    row-gap: clamp(3.5rem, 8vw, 6rem);
-    align-items: stretch;
+    grid-template-areas: "head" "card" "steps";
+    row-gap: var(--block-gap);
   }
-
-  .portrait {
-    grid-area: portrait;
-    position: relative;
-    min-height: 0;
-    margin: 0;
-    overflow: hidden;
-    border-radius: var(--r-tile);
+  .contact-head {
+    grid-area: head;
   }
-
-  .portrait-image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 25%;
-    filter: saturate(0.78) contrast(1.04);
+  .contact-card {
+    grid-area: card;
+    align-self: start;
   }
-
-  .contact-copy {
-    grid-area: copy;
-    padding-top: clamp(0rem, 4vw, 3.5rem);
+  .contact-steps {
+    grid-area: steps;
   }
-
-  .contact-intro {
-    max-width: 42ch;
-    font-family: var(--disp);
-    font-size: clamp(1.65rem, 3.3vw, 2.55rem);
-    font-weight: 500;
-    line-height: 1.24;
-    letter-spacing: -0.025em;
+  .contact-split {
+    max-width: var(--measure-lead);
+    margin: 1.25rem 0 0;
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    letter-spacing: var(--ls-lead);
+    color: var(--ink);
     text-wrap: balance;
   }
-
-  .direct {
-    margin-top: clamp(3rem, 7vw, 5.5rem);
-    max-width: 58ch;
-  }
-
-  .direct h2,
-  .network h2 {
-    font-family: var(--disp);
+  .contact-steps h2 {
+    margin-bottom: 1rem;
     font-size: var(--fs-h3);
-    font-weight: 500;
-    line-height: 1.25;
-    text-wrap: balance;
   }
-
-  .direct p {
-    margin-top: 0.8rem;
-    color: var(--ink-2);
-    text-wrap: pretty;
-  }
-
-  .direct-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-top: 1.35rem;
-    padding: 0.62em 1.15em;
-    border: 1px solid rgba(217, 162, 74, 0.5);
-    border-radius: var(--r-pill);
-    background: var(--accent-soft);
-    color: var(--accent);
-    font-family: var(--disp);
-    font-weight: 500;
-    text-decoration: none;
-  }
-
-  .direct-link:hover,
-  .direct-link:focus-visible {
-    background: var(--accent);
-    color: var(--bg);
-  }
-
-  .network {
-    grid-area: network;
-  }
-
-  .link-list {
-    margin-top: 1.2rem;
-    border-bottom: 1px solid var(--hair-2);
-  }
-
-  .network-link {
-    display: grid;
-    grid-template-columns: minmax(9.5rem, 0.8fr) minmax(12rem, 1.2fr) auto;
-    gap: 1rem 1.5rem;
-    align-items: center;
-    padding-block: 1.3rem;
-    border-top: 1px solid var(--hair-2);
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .link-identity {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .link-identity strong {
-    font-family: var(--disp);
-    font-size: 1.05rem;
-    font-weight: 500;
-  }
-
-  .handle {
-    color: var(--ink-3);
-    font-family: var(--mono);
-    font-size: 0.74rem;
-  }
-
-  .link-description {
-    color: var(--ink-2);
+  .contact-legal {
+    max-width: 60ch;
+    margin: 0.9rem 0 0;
     font-size: var(--fs-small);
-    text-wrap: pretty;
+    line-height: var(--lh-small);
+    color: var(--ink-2);
   }
-
-  .external {
-    color: var(--accent);
-    font-size: 1.15rem;
+  .contact-net {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    border-left: 2px solid var(--error);
+    color: var(--ink);
   }
-
-  :global(html.anim) .direct-link,
-  :global(html.anim) .network-link {
-    transition:
-      color var(--t-base) var(--ease-out),
-      background-color var(--t-base) var(--ease-out),
-      border-color var(--t-base) var(--ease-out);
+  .contact-more {
+    display: grid;
+    gap: var(--section-gap);
+    margin-top: var(--section-gap);
   }
-
-  :global(html.anim) .direct-link span,
-  :global(html.anim) .network-link .external {
-    transition: transform var(--t-base) var(--ease-swift);
-  }
-
-  .direct-link:hover span,
-  .direct-link:focus-visible span,
-  .network-link:hover .external,
-  .network-link:focus-visible .external {
-    transform: translate(2px, -2px);
-  }
-
-  .network-link:hover,
-  .network-link:focus-visible {
-    color: var(--accent);
-  }
-
-  @media (max-width: 760px) {
-    .contact-layout {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "portrait"
-        "copy"
-        "network";
-      gap: 2.8rem;
+  @media (min-width: 1100px) {
+    .contact {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      grid-template-areas: "head card" "steps card";
+      grid-template-rows: auto 1fr;
+      column-gap: clamp(2.5rem, 5vw, 4.5rem);
     }
-
-    .portrait {
-      width: min(82vw, 25rem);
-      aspect-ratio: 4 / 5;
-    }
-
-    .contact-copy {
-      padding-top: 0;
-    }
-
-    .network-link {
-      grid-template-columns: 1fr auto;
-    }
-
-    .link-description {
-      grid-column: 1;
-    }
-
-    .external {
-      grid-column: 2;
-      grid-row: 1 / span 2;
+  }
+  @media (min-width: 1100px) and (min-height: 760px) {
+    .contact-card {
+      position: sticky;
+      top: calc(var(--header-h) + 1rem);
     }
   }
 </style>

@@ -1,0 +1,48 @@
+---
+/**
+ * A band of radio chips in a fieldset (copy deck §9.4): real radios, the
+ * legend is the question, the value keys are the deck §9.8 enums. Ids are
+ * namespaced by group (critique E16.2): `${idPrefix}-${value}`.
+ */
+interface Props {
+  legend: string;
+  name: string;
+  idPrefix: string;
+  options: Readonly<Record<string, string>>;
+  /** long labels for screen readers (budget bands: « k€ » reads badly) */
+  aria?: Readonly<Record<string, string>>;
+  value?: string;
+  hint?: string;
+  error?: string;
+}
+
+const { legend, name, idPrefix, options, aria, value, hint, error } = Astro.props;
+---
+
+<fieldset class="chips" data-field={name} aria-describedby={`${idPrefix}-err${hint ? ` ${idPrefix}-hint` : ""}`}>
+  <legend class="field-label">{legend}</legend>
+  {hint && <p class="field-hint" id={`${idPrefix}-hint`}>{hint}</p>}
+  <div class="chips-row">
+    {
+      Object.entries(options).map(([key, label]) => (
+        <label class="chip-radio">
+          <input
+            class="sr"
+            type="radio"
+            name={name}
+            value={key}
+            id={`${idPrefix}-${key}`}
+            checked={value === key}
+            aria-label={aria?.[key]}
+            aria-invalid={error ? "true" : undefined}
+          />
+          <span>{label}</span>
+        </label>
+      ))
+    }
+  </div>
+  <p class="field-err" id={`${idPrefix}-err`} hidden={!error}>
+    <svg class="err-glyph" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6"></circle><path d="M7 3.8v3.9M7 9.9v.3"></path></svg>
+    <span data-err-text>{error}</span>
+  </p>
+</fieldset>

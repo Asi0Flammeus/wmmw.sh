@@ -1,0 +1,89 @@
+---
+/**
+ * The Mycelic line (spec §7.1.5): one link to the manifesto, an unruled coda
+ * between two hairlines. V2 left of the line from 768 px, above it below.
+ * Hosts M5 (the strands spread on hover or focus).
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import Arrow from "@components/ui/Arrow.astro";
+import FiveStrands from "@components/visual/FiveStrands.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const wealth = t(locale).home.wealth;
+---
+
+<a
+  class="wealth wrap"
+  href={localePath(locale, "/manifeste")}
+  aria-label={wealth.aria}
+  data-strands-host
+>
+  <span class="wealth-in">
+    <FiveStrands variant="figure" label={wealth.figureAlt} />
+    <span class="wealth-line">{wealth.line}</span>
+    <span class="wealth-more">{wealth.more}<Arrow dir="right" /></span>
+  </span>
+</a>
+
+<style>
+  .wealth {
+    display: block;
+    margin-top: var(--section-gap);
+    color: inherit;
+    text-decoration: none;
+  }
+  .wealth-in {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+    padding-block: 1.5rem;
+    border-block: 1px solid var(--line);
+  }
+  .wealth:focus-visible {
+    outline: none;
+  }
+  .wealth:focus-visible .wealth-in {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+    border-radius: var(--r-1);
+  }
+  .wealth-line {
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    letter-spacing: var(--ls-lead);
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .wealth-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: var(--fs-small);
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+  .wealth:hover .wealth-more {
+    text-decoration-thickness: 2px;
+  }
+  :global(html.anim) .wealth :global(.arrow) {
+    transition: transform 240ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.anim) .wealth:hover :global(.arrow) {
+      transform: translateX(2px);
+    }
+  }
+  @media (min-width: 768px) {
+    .wealth-in {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: 2rem;
+    }
+  }
+</style>

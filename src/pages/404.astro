@@ -1,54 +1,82 @@
 ---
+/**
+ * 404 (spec §7.9, copy deck §12): a single FR route that speaks all three
+ * languages, FR first; an inline script moves EN or ES first when the
+ * requested path starts with /en/ or /es/. The path is shown with textContent.
+ */
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { t } from "@i18n/index";
+import Arrow from "@components/ui/Arrow.astro";
+import { LOCALES, t, localePath } from "@i18n/index";
 
-/* Astro emits a single /404.html; chrome is FR only, no [lang] variants. */
-const locale = "fr" as const;
-const dict = t(locale);
+const fr = t("fr").notFound;
+const blocks = LOCALES.map((l) => ({ locale: l, ...t(l).notFound, href: localePath(l, "/") }));
 ---
 
-<BaseLayout
-  locale={locale}
-  title="404"
-  description={dict.meta.notFound}
-  path="/404"
->
-  <section class="sec offset-l" data-block>
-    <div class="wrap">
-      <div class="sec-inner">
-        <p class="nf-path meta-label reveal"><span id="nf-path">404</span></p>
-        <p class="nf-out reveal">{dict.notFound.output}</p>
-        <p class="nf-hint reveal">
-          <a class="arrow-link" href="/">{dict.notFound.hint}</a>
-        </p>
-      </div>
+<BaseLayout locale="fr" title={fr.meta.title} rawTitle description={fr.line} path="/404" alternatesFor={["fr"]} noindex>
+  <div class="wrap nf">
+    <h1 class="sr">{fr.title}</h1>
+    <p class="nf-path"><span id="nf-path">404</span></p>
+    <div class="nf-blocks" id="nf-blocks">
+      {
+        blocks.map((b) => (
+          <div class="nf-block" lang={b.locale} data-locale={b.locale}>
+            <p class="nf-line">{b.line}</p>
+            <a class="nf-home" href={b.href}>
+              {b.home}
+              <Arrow dir="right" />
+            </a>
+          </div>
+        ))
+      }
     </div>
-  </section>
+  </div>
 </BaseLayout>
 
 <script is:inline>
-  /* Fill the requested path client-side. textContent only: the pathname is
-     attacker-influenced, so never assign it via innerHTML. */
+  /* The pathname is attacker-influenced: textContent only, never innerHTML. */
   (function () {
+    var p = window.location.pathname;
     var el = document.getElementById("nf-path");
-    if (el) el.textContent = window.location.pathname;
+    if (el) el.textContent = p;
+    var m = /^\/(en|es)(\/|$)/.exec(p);
+    var box = document.getElementById("nf-blocks");
+    var first = m && box && box.querySelector('[data-locale="' + m[1] + '"]');
+    if (first && box) box.insertBefore(first, box.firstChild);
   })();
 </script>
 
 <style>
+  .nf {
+    padding-top: clamp(2rem, 8svh, 5rem);
+  }
   .nf-path {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: var(--fs-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
     overflow-wrap: anywhere;
   }
-  .nf-out {
-    margin-top: 1rem;
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: var(--fs-h3);
-    color: var(--bone);
+  .nf-blocks {
+    display: grid;
+    gap: var(--block-gap);
+    margin-top: var(--block-gap);
+  }
+  .nf-line {
+    margin: 0;
     max-width: 30ch;
+    font-family: var(--disp);
+    font-feature-settings: "ss01";
+    font-size: var(--fs-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-disp);
+    color: var(--ink);
     text-wrap: balance;
   }
-  .nf-hint {
-    margin-top: 2rem;
+  .nf-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: var(--tap);
   }
 </style>

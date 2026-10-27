@@ -100,73 +100,8 @@ const fr = {
     tabs: { livres: "Livres", films: "Films", videos: "Vidéos" },
     empty: "Rien ici pour le moment. Bientôt.",
   },
-
-  /* ---- Legacy (old shape, untouched) ---------------------------------------
-     Read by pages not yet rewritten. A namespace with the same name
-     deep-merges over its object (see LEGACY_KEYS in index.ts). WP1b deletes
-     this block, except meta.nourritures. */
-  manifeste: {
-    heading: "La forêt n'a pas besoin d'un arbre de plus.",
-    headingGold: "Elle a besoin de mycélium.",
-    readMore: "Lire le manifeste en entier",
-    title: "Manifeste",
-  },
-  projets: {
-    heading: "Mes projets",
-    intro: "Les arbres que le réseau nourrit.",
-    all: "Tous les projets",
-  },
-  outils: {
-    heading: "Outils & repos",
-    intro: "Des outils libres, comme des spores : prenez, semez.",
-    all: "Tous les outils",
-    repoPrivate: "repo privé, ouverture prochaine",
-    install: "installation",
-  },
-  ecrits: {
-    heading: "Écrits",
-    intro: "Des signaux envoyés dans le réseau.",
-    all: "Tous les écrits",
-    published: "publié le",
-    updated: "mis à jour le",
-    back: "Tous les écrits",
-    translations: "aussi disponible en",
-  },
-  contact: {
-    heading: "Contact",
-    intro:
-      "Une idée à relier, une question ou simplement l'envie d'échanger ? Écris-moi là où tu te sens chez toi.",
-    direct: "Le chemin le plus direct",
-    directText:
-      "Pour le moment, le plus simple est de m'envoyer un message sur X. Une adresse wmmw.sh viendra compléter ce chemin.",
-    directCta: "M'écrire sur X",
-    directEmailText:
-      "Le courriel est le chemin le plus simple pour me joindre. Je te répondrai dès que possible.",
-    directEmailCta: "M'écrire par courriel",
-    elsewhere: "Ailleurs dans le réseau",
-    portraitAlt:
-      "William, alias asi0, de profil dans la lumière basse d'un intérieur.",
-    portraitCaption: "William · asi0",
-    links: {
-      github: "Code, outils et contributions ouvertes.",
-      x: "Notes courtes et conversations.",
-      planb: "Éducation Bitcoin et travail collectif.",
-    },
-  },
-  notFound: {
-    output: "Cette page n'existe pas, ou pas encore.",
-    hint: "Retour à l'accueil",
-  },
   meta: {
-    home: "William, alias asi0. Projets, outils, écrits et nourritures, portés par la richesse mycélique : la richesse s'échange, elle ne s'empile pas.",
-    manifeste: "La richesse mycélique : apporter des ressources aux autres sans exiger de retour. Le manifeste au long format.",
-    projets: "Les arbres que le réseau nourrit : recherche ouverte, éducation Bitcoin, sites artisanaux, art émergent.",
-    outils: "Des outils libres, comme des spores : TUI pour agents, dictée vocale, extensions, CLI cloud.",
-    ecrits: "Des signaux envoyés dans le réseau : essais sur la technique, la physique et ce qui circule entre les deux.",
-    nourritures: "Ce qui me nourrit : livres, films et vidéos. Le sol d'où tout pousse.",
-    contact:
-      "Contacter William, alias asi0, et retrouver ses présences sur GitHub, X et Plan ₿ Academy.",
-    notFound: "Page introuvable.",
+    nourritures: "Ce qui me nourrit\u202F: livres, films et vidéos. Le sol d’où tout pousse.",
   },
 } as const;
 
@@ -260,69 +195,8 @@ const en: UIDict = {
     tabs: { livres: "Books", films: "Films", videos: "Videos" },
     empty: "Nothing here yet. Soon.",
   },
-
-  manifeste: {
-    heading: "The forest does not need one more tree.",
-    headingGold: "It needs mycelium.",
-    readMore: "Read the full manifesto",
-    title: "Manifesto",
-  },
-  projets: {
-    heading: "My projects",
-    intro: "The trees the network feeds.",
-    all: "All projects",
-  },
-  outils: {
-    heading: "Tools & repos",
-    intro: "Free tools, like spores: take them, sow them.",
-    all: "All tools",
-    repoPrivate: "private repo, opening soon",
-    install: "install",
-  },
-  ecrits: {
-    heading: "Writings",
-    intro: "Signals sent into the network.",
-    all: "All writings",
-    published: "published",
-    updated: "updated",
-    back: "All writings",
-    translations: "also available in",
-  },
-  contact: {
-    heading: "Contact",
-    intro:
-      "An idea to connect, a question, or simply a wish to talk? Write to me wherever feels natural.",
-    direct: "The most direct path",
-    directText:
-      "For now, the simplest way is to message me on X. A wmmw.sh email address will complete this path later.",
-    directCta: "Write to me on X",
-    directEmailText:
-      "Email is the simplest way to reach me. I will reply as soon as I can.",
-    directEmailCta: "Write to me by email",
-    elsewhere: "Elsewhere in the network",
-    portraitAlt:
-      "William, aka asi0, in profile in the low light of an interior.",
-    portraitCaption: "William · asi0",
-    links: {
-      github: "Code, tools and open contributions.",
-      x: "Short notes and conversations.",
-      planb: "Bitcoin education and collective work.",
-    },
-  },
-  notFound: {
-    output: "This page does not exist, or not yet.",
-    hint: "Back to home",
-  },
   meta: {
-    home: "William, aka asi0. Projects, tools, writings and nourishment, carried by mycelic wealth: wealth is exchanged, it does not stack.",
-    manifeste: "Mycelic wealth: bringing resources to others without demanding a return. The long-form manifesto.",
-    projets: "The trees the network feeds: open research, Bitcoin education, handcrafted websites, emerging art.",
-    outils: "Free tools, like spores: agent TUI, voice dictation, browser extensions, cloud CLI.",
-    ecrits: "Signals sent into the network: essays on technology, physics and what flows between the two.",
     nourritures: "What feeds me: books, films and videos. The soil everything grows from.",
-    contact:
-      "Contact William, aka asi0, and find him on GitHub, X and Plan ₿ Academy.",
-    notFound: "Page not found.",
   },
 };
 
@@ -414,69 +288,8 @@ const es: UIDict = {
     tabs: { livres: "Libros", films: "Películas", videos: "Vídeos" },
     empty: "Nada por ahora. Pronto.",
   },
-
-  manifeste: {
-    heading: "El bosque no necesita un árbol más.",
-    headingGold: "Necesita micelio.",
-    readMore: "Leer el manifiesto completo",
-    title: "Manifiesto",
-  },
-  projets: {
-    heading: "Mis proyectos",
-    intro: "Los árboles que la red alimenta.",
-    all: "Todos los proyectos",
-  },
-  outils: {
-    heading: "Herramientas y repos",
-    intro: "Herramientas libres, como esporas: toma, siembra.",
-    all: "Todas las herramientas",
-    repoPrivate: "repo privado, se abrirá pronto",
-    install: "instalación",
-  },
-  ecrits: {
-    heading: "Escritos",
-    intro: "Señales enviadas a la red.",
-    all: "Todos los escritos",
-    published: "publicado el",
-    updated: "actualizado el",
-    back: "Todos los escritos",
-    translations: "también disponible en",
-  },
-  contact: {
-    heading: "Contacto",
-    intro:
-      "¿Una idea que conectar, una pregunta o simplemente ganas de conversar? Escríbeme donde te resulte más natural.",
-    direct: "El camino más directo",
-    directText:
-      "Por ahora, lo más sencillo es enviarme un mensaje en X. Más adelante, una dirección wmmw.sh completará este camino.",
-    directCta: "Escribirme en X",
-    directEmailText:
-      "El correo es la forma más sencilla de contactarme. Te responderé en cuanto pueda.",
-    directEmailCta: "Escribirme por correo",
-    elsewhere: "En otros rincones de la red",
-    portraitAlt:
-      "William, alias asi0, de perfil en la luz tenue de un interior.",
-    portraitCaption: "William · asi0",
-    links: {
-      github: "Código, herramientas y contribuciones abiertas.",
-      x: "Notas breves y conversaciones.",
-      planb: "Educación sobre Bitcoin y trabajo colectivo.",
-    },
-  },
-  notFound: {
-    output: "Esta página no existe, o todavía no.",
-    hint: "Volver al inicio",
-  },
   meta: {
-    home: "William, alias asi0. Proyectos, herramientas, escritos y alimentos, guiados por la riqueza micélica: la riqueza se intercambia, no se apila.",
-    manifeste: "La riqueza micélica: aportar recursos a los demás sin exigir retorno. El manifiesto en formato largo.",
-    projets: "Los árboles que la red alimenta: investigación abierta, educación Bitcoin, webs artesanales, arte emergente.",
-    outils: "Herramientas libres, como esporas: TUI para agentes, dictado por voz, extensiones, CLI cloud.",
-    ecrits: "Señales enviadas a la red: ensayos sobre la técnica, la física y lo que circula entre ambas.",
     nourritures: "Lo que me nutre: libros, películas y vídeos. El suelo del que todo crece.",
-    contact:
-      "Contactar con William, alias asi0, y encontrarlo en GitHub, X y Plan ₿ Academy.",
-    notFound: "Página no encontrada.",
   },
 };
 

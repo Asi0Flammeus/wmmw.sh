@@ -1,0 +1,101 @@
+---
+/**
+ * « Écrits » on home (spec §7.1.4): the three latest, each row a link (ISO
+ * date in JBM tabular, title in Basteleur), then « Tous les écrits ».
+ * Two rows when FR home copy would exceed its 140-word budget (deck §3.2).
+ */
+import { type Locale, t, localePath, isoDate } from "@i18n/index";
+import { publishedWritings, baseSlug } from "@lib/writings";
+import Arrow from "@components/ui/Arrow.astro";
+
+interface Props {
+  locale: Locale;
+  /** rows to show (3, or 2 when the home word budget is short) */
+  limit?: 2 | 3;
+}
+
+const { locale, limit = 3 } = Astro.props;
+const dict = t(locale);
+const writings = (await publishedWritings(locale)).slice(0, limit);
+---
+
+<section class="latest" aria-labelledby="latest-title">
+  <h2 id="latest-title">{dict.home.ecrits.heading}</h2>
+  <ul class="latest-list">
+    {
+      writings.map((w) => (
+        <li>
+          <a class="latest-row" href={localePath(locale, `/ecrits/${baseSlug(w)}`)}>
+            <time class="latest-date" datetime={isoDate(w.data.publishedAt)}>
+              {isoDate(w.data.publishedAt)}
+            </time>
+            <span class="latest-title">{w.data.title}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <a class="latest-all" href={localePath(locale, "/ecrits")}>
+    {dict.common.allWritings}
+    <Arrow dir="right" />
+  </a>
+</section>
+
+<style>
+  .latest h2 {
+    font-size: var(--fs-h2);
+  }
+  .latest-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .latest-list li {
+    border-top: 1px solid var(--line);
+  }
+  .latest-list li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .latest-row {
+    display: grid;
+    gap: 0.2rem;
+    padding-block: 0.85rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .latest-row:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+    border-radius: var(--r-1);
+  }
+  .latest-date {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+  }
+  .latest-title {
+    font-family: var(--disp);
+    font-feature-settings: "ss01";
+    font-size: var(--fs-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-disp);
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .latest-row:is(:hover, :focus-visible) .latest-title {
+    text-decoration-color: currentColor;
+  }
+  .latest-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: var(--tap);
+    margin-top: 0.75rem;
+  }
+</style>

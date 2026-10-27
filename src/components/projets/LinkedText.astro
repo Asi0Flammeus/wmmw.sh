@@ -1,0 +1,30 @@
+---
+/**
+ * A verbatim dictionary sentence with one substring linked (splitLink keeps
+ * the copy whole). Site paths are localised; anchors and URLs pass through.
+ */
+import { type Locale, localePath, splitLink } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  text: string;
+  href?: string;
+  linkText?: string;
+}
+
+const { locale, text, href, linkText } = Astro.props;
+const parts = href && linkText ? splitLink(text, linkText) : null;
+const target = href?.startsWith("/") ? localePath(locale, href) : href;
+---
+
+{
+  parts ? (
+    <Fragment>
+      {parts[0]}
+      <a href={target}>{parts[1]}</a>
+      {parts[2]}
+    </Fragment>
+  ) : (
+    text
+  )
+}

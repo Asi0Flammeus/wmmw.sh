@@ -14,19 +14,11 @@ export const DEFAULT_LOCALE: Locale = "fr";
 export interface Namespaces {}
 
 /**
- * Legacy page keys of `ui.ts` that a namespace of the same name may shadow
- * while the old pages still read them. The namespace deep-merges over the
- * legacy object (namespace wins), so neither side breaks the other's build.
- * WP1b empties this list together with the legacy block of `ui.ts`.
+ * Legacy page keys of `ui.ts` that a namespace of the same name may shadow.
+ * Empty since every page reads its own namespace (WP1b); kept as the
+ * extension point the shadowing check reads.
  */
-export const LEGACY_KEYS = [
-  "projets",
-  "outils",
-  "ecrits",
-  "contact",
-  "manifeste",
-  "notFound",
-] as const;
+export const LEGACY_KEYS = [] as const;
 
 type Merged<K extends keyof Namespaces> = K extends keyof UIDict
   ? UIDict[K] & Namespaces[K]

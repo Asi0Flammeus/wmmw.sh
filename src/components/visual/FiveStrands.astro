@@ -1,10 +1,10 @@
 ---
 /**
  * V2 « Cinq fils » (copy deck §3.5): five woven strands, the fourth (money)
- * drawn bolder in ink, by contrast and weight, never by hue. Stub by WP1a
- * with the final props; WP2 owns the drawing and M5, the weave played by the
- * nearest [data-strands-host] ancestor. Path data is computed here at build:
- * no client JS.
+ * drawn bolder in ink, by contrast and weight, never by hue. Path data is
+ * computed here at build: no client JS. M5: on hover or focus of the nearest
+ * [data-strands-host], the strands spread from 6 to 9 px apart (400 ms) and
+ * weave back on leave. Static with reduced motion and on touch.
  */
 interface Props {
   /** figure: 120 x 40 (home); stub: 16 x 8 bullet (/contact). */
@@ -19,7 +19,7 @@ interface Props {
 const { variant = "figure", strand = 0, label, class: className } = Astro.props;
 const MONEY = 3;
 
-/** One strand as a sampled sine, `periods` across `w`, centred on y0. */
+/** One strand as a smooth sampled sine, `periods` across `w`, centred on y0. */
 const wave = (w: number, y0: number, amp: number, phase: number, periods: number): string => {
   const steps = Math.max(8, Math.round(w / 2));
   let d = "";
@@ -34,12 +34,10 @@ const wave = (w: number, y0: number, amp: number, phase: number, periods: number
 const figure = variant === "figure";
 const width = figure ? 120 : 16;
 const height = figure ? 40 : 8;
+/* neighbours run in opposite phase, so each pair meets twice across the figure: a loose weave */
 const strands = figure
-  ? [0, 1, 2, 3, 4].map((i) => ({
-      i,
-      d: wave(120, 8 + i * 6, 3, (i * 2 * Math.PI) / 5, 1.5),
-    }))
-  : [{ i: strand, d: wave(16, 4, 2, (strand * 2 * Math.PI) / 5, 1) }];
+  ? [0, 1, 2, 3, 4].map((i) => ({ i, d: wave(120, 8 + i * 6, 3, (i % 2) * Math.PI + i * 0.35, 1.5) }))
+  : [{ i: strand, d: wave(16, 4, 2, (strand % 2) * Math.PI, 1) }];
 const named = figure && label;
 ---
 
@@ -59,7 +57,12 @@ const named = figure && label;
 >
   {
     strands.map((s) => (
-      <path class:list={["strand", { money: s.i === MONEY }]} data-strand={s.i} d={s.d} />
+      <path
+        class:list={["strand", { money: s.i === MONEY }]}
+        data-strand={s.i}
+        style={figure ? `--spread:${(s.i - 2) * 3}px` : undefined}
+        d={s.d}
+      />
     ))
   }
 </svg>
@@ -77,5 +80,18 @@ const named = figure && label;
   .strand.money {
     stroke: var(--ink);
     stroke-width: 1.75;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    :global(html.anim) .strands-figure .strand {
+      transition: transform 400ms var(--ease-out);
+    }
+    :global(html.anim [data-strands-host]:is(:hover, :focus-visible)) .strands-figure .strand {
+      transform: translateY(var(--spread));
+    }
+  }
+  @media (forced-colors: active) {
+    .strand {
+      stroke: CanvasText;
+    }
   }
 </style>

@@ -1,0 +1,78 @@
+---
+/**
+ * Step 4, the honest confirmation (copy deck §9.7, critique E13). Rendered in
+ * full by the server: filled for the no-JS confirmation, empty and hidden as
+ * the JS template, whose [data-slot] parts the client fills with textContent.
+ * Un-hiding the section replays the M6 node animation of its StepsLine.
+ */
+import { type Locale, t, localePath, fmt } from "@i18n/index";
+import type { Brief } from "@lib/intake/rules";
+import { composeSummary, QUOTE_CLIP } from "@lib/intake/summary";
+import StepsLine from "@components/visual/StepsLine.astro";
+import Button from "@components/ui/Button.astro";
+
+interface Props {
+  locale: Locale;
+  /** filled confirmation (no-JS POST accepted) */
+  brief?: Brief;
+  accepted?: { ref: string; fit: string };
+}
+
+const { locale, brief, accepted } = Astro.props;
+const s = t(locale).intake;
+const done = s.done;
+const filled = Boolean(brief && accepted);
+const parts = brief ? composeSummary(brief, s) : [];
+const fitLabel = (accepted?.fit ?? "") as keyof typeof s.fit;
+const name = brief?.contact.name ?? "";
+---
+
+<section
+  class="intake-done"
+  data-step="4"
+  hidden={!filled}
+  data-qa={filled ? "intake-done" : "intake-step-4"}
+  aria-labelledby="done-title"
+>
+  <h2 id="done-title" class="done-title" tabindex="-1" data-slot="title">{filled ? fmt(done.title, { name }) : ""}</h2>
+  {filled && <p class="done-nojs">{done.nojs}</p>}
+  <p class="done-lede">{done.lede}</p>
+  <p class="done-summary" data-slot="summary" data-clip={QUOTE_CLIP}>
+    {
+      parts.map((part) =>
+        part.kind === "frag" ? (
+          <span class="sum-frag">{part.text}</span>
+        ) : part.kind === "value" ? (
+          <span class="sum-value">{part.text}</span>
+        ) : part.text.length > QUOTE_CLIP ? (
+          <Fragment>
+            <span class="sum-quote">{s.sum.quote.open}{part.text.slice(0, QUOTE_CLIP)}<span class="q-ell" aria-hidden="true">…</span><span class="q-rest" hidden>{part.text.slice(QUOTE_CLIP)}</span>{s.sum.quote.close}</span>
+            <button type="button" class="q-more" data-js-only>{s.sum.more}</button>
+          </Fragment>
+        ) : (
+          <span class="sum-quote">{`${s.sum.quote.open}${part.text}${s.sum.quote.close}`}</span>
+        ),
+      )
+    }
+  </p>
+  <hr class="done-rule" />
+  <p class="done-fit" data-slot="fit" data-qa="intake-fit" data-fit={filled ? fitLabel : undefined}>
+    {filled ? s.fit[fitLabel] : ""}
+  </p>
+  <p class="done-next" data-slot="next">{filled ? (fitLabel === "data" ? done.nextData : done.next) : ""}</p>
+  <p class="done-ref">
+    <span data-qa="intake-ref" data-slot="ref">{filled && accepted ? fmt(done.ref, { ref: accepted.ref }) : ""}</span>
+    <span aria-hidden="true"> · </span>
+    {done.again}
+  </p>
+  <p class="done-read" data-read="tool" hidden={!(filled && brief?.path === "tool")}>
+    {done.read.tool.lead} <a href={localePath(locale, "/ecrits/workflow-a-en-perdre-la-tete")}>{done.read.tool.link}</a>
+  </p>
+  <p class="done-read" data-read="open" hidden={!(filled && brief?.path === "open")}>
+    {done.read.open.lead} <a href={localePath(locale, "/manifeste")}>{done.read.open.link}</a>
+  </p>
+  <StepsLine locale={locale} variant="compact" done={1} class="done-steps" />
+  <p class="done-home">
+    <Button variant="secondary" href={localePath(locale, "/")} locale={locale}>{done.home}</Button>
+  </p>
+</section>

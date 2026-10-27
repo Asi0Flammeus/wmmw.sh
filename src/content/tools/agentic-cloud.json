@@ -1,9 +1,9 @@
 {
   "name": "agentic-cloud",
   "blurb": {
-    "fr": "CLI multi-Nextcloud au-dessus de rclone. Montages VFS, partages publics.",
-    "en": "Multi-Nextcloud CLI on top of rclone. VFS mounts, public shares.",
-    "es": "CLI multi-Nextcloud sobre rclone. Montajes VFS, enlaces públicos."
+    "fr": "Un outil en ligne de commande pour gérer plusieurs Nextcloud au même endroit.",
+    "en": "A command-line tool to manage several Nextcloud accounts in one place.",
+    "es": "Una herramienta de línea de comandos para gestionar varios Nextcloud en un solo lugar."
   },
   "repo": "https://github.com/Asi0Flammeus/agentic-cloud",
   "status": "stable",

@@ -1,0 +1,56 @@
+---
+/**
+ * Step 3 reply channel (copy deck §9.5): channel chips, then one value input
+ * per channel. All five wrappers are in the DOM; the checked channel's one
+ * shows through :has() (and JS). Names: contact.value.<channel>.
+ */
+import { type Locale, t } from "@i18n/index";
+import { CHANNELS } from "@lib/intake/rules";
+import ChipGroup from "./ChipGroup.astro";
+import Field from "./Field.astro";
+
+interface Props {
+  locale: Locale;
+  channel?: string;
+  value?: string;
+  channelError?: string;
+  valueError?: string;
+}
+
+const { locale, channel, value, channelError, valueError } = Astro.props;
+const s3 = t(locale).intake.s3;
+const INPUT: Record<(typeof CHANNELS)[number], { type: "text" | "email"; inputmode?: "email"; autocomplete?: string }> = {
+  email: { type: "email", inputmode: "email", autocomplete: "email" },
+  x: { type: "text", autocomplete: "off" },
+  telegram: { type: "text", autocomplete: "off" },
+  signal: { type: "text", autocomplete: "off" },
+  other: { type: "text", autocomplete: "off" },
+};
+---
+
+<ChipGroup
+  legend={s3.channel.legend}
+  name="contact.channel"
+  idPrefix="channel"
+  options={s3.channel.options}
+  value={channel}
+  error={channelError}
+/>
+<div class="channel-values">
+  {
+    CHANNELS.map((c) => (
+      <div class="channel-value" data-channel={c}>
+        <Field
+          id={`contact-value-${c}`}
+          name={`contact.value.${c}`}
+          label={s3[c].label}
+          hint={s3[c].hint}
+          ph={s3[c].ph}
+          {...INPUT[c]}
+          value={channel === c ? value : undefined}
+          error={channel === c ? valueError : undefined}
+        />
+      </div>
+    ))
+  }
+</div>

@@ -1,8 +1,15 @@
 ---
+/**
+ * A writing (spec §7.5): back link, title with byline, dates, tags and
+ * translations, cover, the prose, the end back link. No moiré, no glass,
+ * no sidebars, no share buttons.
+ */
 import { Image } from "astro:assets";
 import { render } from "astro:content";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { type Locale, t, localePath, formatDate } from "@i18n/index";
+import PageHead from "@components/ui/PageHead.astro";
+import Arrow from "@components/ui/Arrow.astro";
+import { type Locale, t, localePath, formatDate, isoDate } from "@i18n/index";
 import { baseSlug, translationsOf, type Writing } from "@lib/writings";
 import "@styles/crqpt-compat.css";
 
@@ -13,10 +20,13 @@ interface Props {
 
 const { locale, entry } = Astro.props;
 const dict = t(locale);
+const e = dict.ecrits;
 const { data } = entry;
 const slug = baseSlug(entry);
 const translations = await translationsOf(entry);
 const { Content } = await render(entry);
+const byline = data.author === "asi0" ? e.byLegacy : e.by;
+const back = localePath(locale, "/ecrits");
 ---
 
 <BaseLayout
@@ -24,298 +34,143 @@ const { Content } = await render(entry);
   title={data.title}
   description={data.description}
   path={`/ecrits/${slug}`}
+  ogType="article"
   ogImage={data.image ? data.image.src : undefined}
+  ogImageAlt={data.imageAlt}
+  alternatesFor={[locale, ...translations.map((tr) => tr.data.lang)]}
+  langFallbackPath="/ecrits"
 >
-  <article class="post">
-    <p class="post-back">
-      <a href={localePath(locale, "/ecrits")}>{dict.ecrits.back}</a>
-    </p>
-
-    <header class="post-head">
-      <p class="post-meta">
-        <span>{dict.ecrits.published} {formatDate(data.publishedAt, locale)}</span>
-        {
-          data.updatedAt && (
-            <span class="post-meta-sep">
-              {dict.ecrits.updated} {formatDate(data.updatedAt, locale)}
-            </span>
-          )
-        }
-      </p>
-      {
-        data.tags.length > 0 && (
-          <ul class="post-tags">
-            {data.tags.map((tag) => (
-              <li>#{tag}</li>
-            ))}
-          </ul>
-        )
-      }
-      {
-        translations.length > 0 && (
-          <p class="post-translations">
-            {dict.ecrits.translations}{" "}
-            {translations.map((tr, i) => (
-              <Fragment>
-                {i > 0 && <span class="sep">, </span>}
-                <a href={localePath(tr.data.lang, `/ecrits/${baseSlug(tr)}`)}>
-                  {dict.lang.switchTo[tr.data.lang]}
-                </a>
-              </Fragment>
-            ))}
+  <article class="wrap post">
+    <div class="measure post-col">
+      <a class="post-back" href={back}><Arrow dir="left" />{e.back}</a>
+      <PageHead title={data.title} size="post">
+        <div slot="meta" class="post-meta">
+          <p class="post-by">{byline}</p>
+          <p class="post-dates">
+            {e.published} <time datetime={isoDate(data.publishedAt)}>{formatDate(data.publishedAt, locale)}</time>
+            {
+              data.updatedAt && (
+                <Fragment>
+                  <span aria-hidden="true"> · </span>
+                  {e.updated} <time datetime={isoDate(data.updatedAt)}>{formatDate(data.updatedAt, locale)}</time>
+                </Fragment>
+              )
+            }
           </p>
-        )
-      }
-    </header>
+          {
+            data.tags.length > 0 && (
+              <ul class="post-tags">
+                {data.tags.map((tag) => (
+                  <li>#{tag}</li>
+                ))}
+              </ul>
+            )
+          }
+          {
+            translations.length > 0 && (
+              <p class="post-translations">
+                {e.translations}{" "}
+                {translations.map((tr, i) => (
+                  <Fragment>
+                    {i > 0 && ", "}
+                    <a href={localePath(tr.data.lang, `/ecrits/${baseSlug(tr)}`)} hreflang={tr.data.lang} lang={tr.data.lang}>
+                      {dict.lang.switchTo[tr.data.lang]}
+                    </a>
+                  </Fragment>
+                ))}
+              </p>
+            )
+          }
+        </div>
+      </PageHead>
+    </div>
 
     {
       data.image && (
-        <figure class="post-cover">
-          <Image
-            src={data.image}
-            alt={data.imageAlt ?? ""}
-            widths={[480, 800, 1200]}
-            sizes="(max-width: 768px) 100vw, 65ch"
-          />
+        <figure class="measure post-cover">
+          <Image src={data.image} alt={data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(max-width: 768px) 100vw, 64ch" />
         </figure>
       )
     }
 
-    <div class="prose crqpt-compat">
+    <div class="measure prose crqpt-compat">
       <Content />
     </div>
 
-    <p class="post-back post-back-end">
-      <a href={localePath(locale, "/ecrits")}>{dict.ecrits.back}</a>
+    <p class="measure post-end">
+      <a class="post-back" href={back}><Arrow dir="left" />{e.back}</a>
     </p>
   </article>
 </BaseLayout>
 
 <style>
-  /* ---------- post shell (readable measure) ---------- */
-  .post {
-    max-width: 65ch;
+  .post-col,
+  .post-cover,
+  .prose,
+  .post-end {
     margin-inline: auto;
-    padding: clamp(2.5rem, 6vw, 4.5rem) var(--pad) 5rem;
   }
-
-  /* ---------- quiet back nav ---------- */
   .post-back {
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-  }
-  .post-back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: var(--tap);
+    margin-top: clamp(1rem, 3svh, 2rem);
+    font-size: var(--fs-small);
     color: var(--ink-3);
     text-decoration: none;
   }
-  .post-back a::before {
-    content: "\2190\00a0";
+  .post-back:hover,
+  .post-back:focus-visible {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
-  .post-back a:hover,
-  .post-back a:focus-visible {
-    color: var(--accent);
-  }
-  .post-back-end {
-    margin-top: 3rem;
-    margin-bottom: 0;
-  }
-
-  /* ---------- mono metadata header ---------- */
-  .post-head {
-    margin-bottom: 2.4rem;
+  .post :global(.page-head) {
+    padding-top: 0.5rem;
   }
   .post-meta {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--ink-3);
-    margin-bottom: 1rem;
+    display: grid;
+    gap: 0.35rem;
   }
-  .post-meta-sep::before {
-    content: " · ";
+  .post-meta p {
+    margin: 0;
+  }
+  .post-by {
+    color: var(--ink-2);
+  }
+  .post-dates,
+  .post-tags,
+  .post-translations {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
   }
   .post-tags {
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.25rem 0.75rem;
+    margin: 0;
     padding: 0;
-    margin: 0 0 1rem;
   }
-  .post-tags li {
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--ink-3);
-    border: 1px solid var(--hair);
-    border-radius: var(--r-pill);
-    padding: 0.2rem 0.65rem;
-  }
-  .post-translations {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--ink-3);
-  }
-  .post-translations a {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease;
-  }
-  .post-translations a:hover,
-  .post-translations a:focus-visible {
-    border-bottom-color: var(--accent);
-  }
-
-  /* ---------- cover ---------- */
   .post-cover {
-    margin: 0 0 2.6rem;
+    margin-top: var(--block-gap);
+    margin-bottom: 0;
   }
   .post-cover :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    border-radius: var(--r-tile);
+    border-radius: var(--r-3);
   }
-
-  /* ---------- article body (MDX renders here; needs :global) ---------- */
   .prose {
-    color: var(--bone);
-    font-family: var(--body);
-    font-size: 1.0625rem;
-    line-height: 1.7;
+    margin-top: var(--block-gap);
   }
-  .prose :global(h2) {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: clamp(1.5rem, 3vw, 1.9rem);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-    text-wrap: balance;
-    color: var(--bone);
-    margin: 2.6rem 0 1rem;
-  }
-  .prose :global(h3) {
-    font-family: var(--disp);
-    font-weight: 500;
-    font-size: 1.3rem;
-    line-height: 1.25;
-    color: var(--bone);
-    margin: 2rem 0 0.8rem;
-  }
-  .prose :global(h4) {
-    font-family: var(--disp);
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--bone);
-    margin: 1.6rem 0 0.6rem;
-  }
-  .prose :global(p) {
-    margin: 0 0 1.2rem;
-  }
-  .prose :global(a) {
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease;
-  }
-  .prose :global(a:hover),
-  .prose :global(a:focus-visible) {
-    border-bottom-color: var(--accent);
-  }
-  .prose :global(strong) {
-    color: var(--bone);
-    font-weight: 700;
-  }
-  .prose :global(em) {
-    font-style: italic;
-  }
-  .prose :global(ul),
-  .prose :global(ol) {
-    margin: 0 0 1.2rem;
-    padding-left: 1.4rem;
-  }
-  .prose :global(li) {
-    margin: 0 0 0.4rem;
-  }
-  .prose :global(li::marker) {
-    color: var(--ink-3);
-  }
-  .prose :global(blockquote) {
-    margin: 1.6rem 0;
-    padding: 0.2rem 0 0.2rem 1.2rem;
-    border-left: 2px solid var(--hair);
-    color: var(--ink-2);
-    font-style: italic;
-  }
-  .prose :global(blockquote p:last-child) {
+  .post-end {
+    margin-top: var(--section-gap);
     margin-bottom: 0;
-  }
-  .prose :global(code) {
-    font-family: var(--mono);
-    font-size: 0.9em;
-    background: var(--surf);
-    border: 1px solid var(--hair);
-    border-radius: 4px;
-    padding: 0.1em 0.35em;
-  }
-  .prose :global(pre) {
-    font-family: var(--mono);
-    font-size: 0.875rem;
-    line-height: 1.6;
-    background: var(--surf);
-    border: 1px solid var(--hair);
-    border-radius: var(--r-tile);
-    padding: 1rem 1.2rem;
-    overflow-x: auto;
-    margin: 0 0 1.4rem;
-  }
-  .prose :global(pre code) {
-    background: none;
-    border: 0;
-    padding: 0;
-    font-size: inherit;
-  }
-  .prose :global(hr) {
-    border: 0;
-    border-top: 1px solid var(--hair);
-    margin: 2.4rem 0;
-  }
-  .prose :global(img) {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    border-radius: var(--r-tile);
-    margin: 1.6rem auto;
-  }
-  .prose :global(figure) {
-    margin: 1.6rem 0;
-  }
-  .prose :global(figcaption) {
-    color: var(--ink-3);
-    font-size: 0.85rem;
-    text-align: center;
-    margin-top: 0.5rem;
-  }
-  .prose :global(table) {
-    display: block;
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    overflow-x: auto;
-    margin: 0 0 1.4rem;
-  }
-  .prose :global(th),
-  .prose :global(td) {
-    border: 1px solid var(--hair);
-    padding: 0.5rem 0.7rem;
-    text-align: left;
-  }
-  .prose :global(th) {
-    color: var(--bone);
-    font-weight: 600;
-    background: var(--surf);
-  }
-  .prose :global(td) {
-    color: var(--ink-2);
   }
 </style>

@@ -1,0 +1,87 @@
+---
+/**
+ * « Ce que tu emportes » (copy deck §8.4): five concrete gains, one per
+ * dimension, each led by its V2 strand stub (the financial one bold ink).
+ * The theory stays in the manifesto, one link away.
+ */
+import { type Locale, t, localePath } from "@i18n/index";
+import FiveStrands from "@components/visual/FiveStrands.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const gets = t(locale).contact.gets;
+const rows = [
+  { key: "fin", strand: 3 },
+  { key: "rel", strand: 0 },
+  { key: "int", strand: 1 },
+  { key: "exp", strand: 2 },
+  { key: "emo", strand: 4 },
+] as const;
+---
+
+<section class="gets" aria-labelledby="gets-title">
+  <h2 id="gets-title">{gets.heading}</h2>
+  <ul class="gets-list">
+    {
+      rows.map(({ key, strand }) => (
+        <li class="gets-row">
+          <FiveStrands variant="stub" strand={strand} />
+          <span class="gets-dim">{gets.items[key].dim}</span>
+          <span class="gets-text">{gets.items[key].text}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="gets-why"><a href={localePath(locale, "/manifeste")}>{gets.why}</a></p>
+</section>
+
+<style>
+  .gets h2 {
+    font-size: var(--fs-h2);
+  }
+  .gets-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 52rem;
+  }
+  .gets-row {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr);
+    column-gap: 0.85rem;
+    row-gap: 0.15rem;
+    align-items: center;
+    padding-block: 0.9rem;
+    border-top: 1px solid var(--line);
+  }
+  .gets-row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .gets-dim {
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-3);
+  }
+  .gets-text {
+    grid-column: 2;
+    font-size: var(--fs-body);
+    line-height: var(--lh-small);
+    color: var(--ink);
+  }
+  @media (min-width: 768px) {
+    .gets-row {
+      grid-template-columns: 16px 10rem minmax(0, 1fr);
+    }
+    .gets-text {
+      grid-column: 3;
+    }
+  }
+  .gets-why {
+    margin: 1rem 0 0;
+  }
+</style>

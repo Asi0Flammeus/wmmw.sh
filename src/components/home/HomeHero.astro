@@ -1,0 +1,61 @@
+---
+/**
+ * Home hero (spec §7.1.1): the name, the owner's line, the aside. No CTA, no
+ * photo. The final é carries the W1 source; every text line is a W1 clear zone.
+ */
+import { type Locale, t } from "@i18n/index";
+import MoireField from "@components/moire/MoireField.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const hero = t(locale).home.hero;
+/* the source sits on the last letter, the é of Moiré */
+const name = hero.h1.slice(0, -1);
+const source = hero.h1.slice(-1);
+---
+
+<MoireField labelledby="hero-title">
+  <h1 class="hero-name" id="hero-title" data-w1-mask>{name}<span class="w1-src">{source}</span></h1>
+  <p class="hero-sub" data-w1-mask>{hero.sub}</p>
+  <p class="hero-aside" data-w1-mask>{hero.aside}</p>
+</MoireField>
+
+<style>
+  .hero-name {
+    margin: 0;
+    font-size: var(--fs-hero);
+    line-height: var(--lh-hero);
+    white-space: nowrap;
+    text-wrap: nowrap;
+  }
+  @media (max-width: 560px) {
+    .hero-name {
+      font-size: var(--fs-hero-narrow);
+      line-height: var(--lh-hero-narrow);
+      white-space: normal;
+      text-wrap: balance;
+    }
+  }
+  .hero-sub {
+    margin: 0.5em 0 0;
+    max-width: 40ch;
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    letter-spacing: var(--ls-lead);
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .hero-aside {
+    margin: 0.75rem 0 0;
+    max-width: 64ch;
+    font-family: var(--mono);
+    font-size: var(--fs-mono);
+    line-height: var(--lh-mono);
+    letter-spacing: var(--ls-mono);
+    color: var(--ink-2);
+    text-wrap: balance;
+  }
+</style>

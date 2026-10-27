@@ -1,0 +1,325 @@
+{
+  "palettes": [
+    {
+      "id": "G1",
+      "name": "First guess: humus + gold / paper + ochre (current site + mockup A)",
+      "story": "The center of the first guess: warm earth dark with bone text and a gold accent, and its paper twin with ink and ochre.",
+      "scores": {
+        "distinct": null,
+        "brand": null,
+        "comfort": null
+      }
+    },
+    {
+      "id": "G2",
+      "name": "Second guess: ink navy + cream + cobalt / op-art black-white + signal",
+      "story": "The center of the second guess: deep ink blue with cream text and an electric cobalt accent, the default 'serious creative technologist' look.",
+      "scores": {
+        "distinct": null,
+        "brand": null,
+        "comfort": null
+      }
+    },
+    {
+      "id": "OPTICS1",
+      "name": "Teinte sensible",
+      "story": "Under a polarising microscope, the first-order red near 550 nm is the most sensitive tint of the whole interference scale: a few nanometres of shift flip it to blue or to yellow.",
+      "scores": {
+        "distinct": 6,
+        "brand": 4,
+        "comfort": 6.5
+      }
+    },
+    {
+      "id": "PRINT1",
+      "name": "Teinte sensible",
+      "story": "Pencil graphite on neutral paper, plus one ink: first-order red, the magenta a physicist sees through a gypsum plate under crossed polarisers.",
+      "scores": {
+        "distinct": 5,
+        "brand": 5,
+        "comfort": 6
+      }
+    },
+    {
+      "id": "SPORE1",
+      "name": "Strophaire vert-de-gris",
+      "story": "One mushroom holds the whole palette: the verdigris agaric (Stropharia aeruginosa) has a blue-green cap, purple-grey gills and a purple-brown spore print.",
+      "scores": {
+        "distinct": 5.5,
+        "brand": 6.5,
+        "comfort": 7.5
+      }
+    },
+    {
+      "id": "OPTICS2",
+      "name": "Labradorite",
+      "story": "Labradorite is a plain grey stone that flashes peacock blue-green when light meets its lamellae, layers thinner than 200 nm interfering inside the crystal.",
+      "scores": {
+        "distinct": 4,
+        "brand": 5,
+        "comfort": 7
+      }
+    },
+    {
+      "id": "PRINT2",
+      "name": "Encre violette",
+      "story": "The French school notebook: Seyès paper with its violet lines and blue interlines, written on in the methyl violet ink French classrooms used for a century; the dark side is the carbon sheet underneath.",
+      "scores": {
+        "distinct": 2.5,
+        "brand": 2.5,
+        "comfort": 5.5
+      }
+    },
+    {
+      "id": "SPORE2",
+      "name": "Rhodochrosite",
+      "story": "Sliced rhodochrosite stalactites show concentric rose bands laid down by rhythmic precipitation: a natural ring grating, close kin to the hero field radiating from the accent of the é.",
+      "scores": {
+        "distinct": 4.5,
+        "brand": 4.5,
+        "comfort": 7
+      }
+    },
+    {
+      "id": "OPTICS3",
+      "name": "Antireflet",
+      "story": "An anti-reflection coating is interference used for comfort: a quarter-wave layer cancels the glare, and all that is left is a faint sea-green sheen with a magenta edge.",
+      "scores": {
+        "distinct": 4.5,
+        "brand": 6.5,
+        "comfort": 8.5
+      }
+    },
+    {
+      "id": "PRINT3",
+      "name": "Vert-de-gris",
+      "story": "Copper is what carries the current; left in the air it grows verdigris, the blue-green salt of old domes, roofs and lab fittings.",
+      "scores": {
+        "distinct": 3.5,
+        "brand": 5,
+        "comfort": 8
+      }
+    },
+    {
+      "id": "SPORE3",
+      "name": "Lichen géographique",
+      "story": "The map lichen (Rhizocarpon geographicum) tiles Alpine schist in yellow-green, each colony fenced by a black line of fungal threads, and geologists date moraines by measuring it.",
+      "scores": {
+        "distinct": 5.5,
+        "brand": 5.5,
+        "comfort": 6.5
+      }
+    },
+    {
+      "id": "OPTICS4",
+      "name": "555 nm",
+      "story": "The human eye is most sensitive at 555 nm, a yellow-green: the colour that needs the least light to be seen.",
+      "scores": {
+        "distinct": 5,
+        "brand": 5.5,
+        "comfort": 6
+      }
+    },
+    {
+      "id": "PRINT4",
+      "name": "Tableau noir",
+      "story": "The physicist's oldest instrument: the green slate board, chalk dust, one stick of lemon chalk for what matters.",
+      "scores": {
+        "distinct": 6,
+        "brand": 6,
+        "comfort": 6.5
+      }
+    },
+    {
+      "id": "SPORE4",
+      "name": "Érythrite",
+      "story": "Erythrite (cobalt bloom, crimson) and annabergite (nickel bloom, pale green) are the two ends of one continuous mineral series: swap cobalt for nickel atom by atom and the colour slides from one to the other.",
+      "scores": {
+        "distinct": 7,
+        "brand": 8,
+        "comfort": 7
+      }
+    },
+    {
+      "id": "OPTICS5",
+      "name": "Lycurgus",
+      "story": "The Lycurgus cup, Roman glass from the 4th century, holds gold and silver nanoparticles: lit from the front it looks jade, lit from behind it glows ruby.",
+      "scores": {
+        "distinct": 8.5,
+        "brand": 9,
+        "comfort": 7
+      }
+    },
+    {
+      "id": "PRINT5",
+      "name": "Deux encres",
+      "story": "A risograph prints one drum per ink, and two slightly misregistered screens make the moiré printers fight.",
+      "scores": {
+        "distinct": 7.5,
+        "brand": 6.5,
+        "comfort": 5.5
+      }
+    },
+    {
+      "id": "SPORE5",
+      "name": "Améthyste dans la mousse",
+      "story": "The amethyst deceiver (Laccaria amethystina) trades with beech and oak through its roots, and its violet only shows while water moves through it: dry, it fades to buff.",
+      "scores": {
+        "distinct": 6,
+        "brand": 3.5,
+        "comfort": 6
+      }
+    }
+  ],
+  "judges": [
+    {
+      "judge": "distinct",
+      "top3": [
+        "OPTICS5",
+        "PRINT5",
+        "SPORE4"
+      ],
+      "optics5": 8.5
+    },
+    {
+      "judge": "brand",
+      "top3": [
+        "OPTICS5",
+        "SPORE4",
+        "PRINT5"
+      ],
+      "optics5": 9
+    },
+    {
+      "judge": "comfort",
+      "top3": [
+        "OPTICS3",
+        "PRINT3",
+        "SPORE1"
+      ],
+      "optics5": 7
+    }
+  ],
+  "sizes": {
+    "palettes/G1": {
+      "width": 1200,
+      "height": 533
+    },
+    "palettes/G2": {
+      "width": 1200,
+      "height": 534
+    },
+    "palettes/OPTICS1": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/PRINT1": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/SPORE1": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/OPTICS2": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/PRINT2": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/SPORE2": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/OPTICS3": {
+      "width": 1200,
+      "height": 549
+    },
+    "palettes/PRINT3": {
+      "width": 1200,
+      "height": 549
+    },
+    "palettes/SPORE3": {
+      "width": 1200,
+      "height": 564
+    },
+    "palettes/OPTICS4": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/PRINT4": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/SPORE4": {
+      "width": 1200,
+      "height": 548
+    },
+    "palettes/OPTICS5": {
+      "width": 1200,
+      "height": 549
+    },
+    "palettes/PRINT5": {
+      "width": 1200,
+      "height": 549
+    },
+    "palettes/SPORE5": {
+      "width": 1200,
+      "height": 549
+    },
+    "type/a": {
+      "width": 1200,
+      "height": 1086
+    },
+    "type/a2": {
+      "width": 1200,
+      "height": 1087
+    },
+    "type/a3": {
+      "width": 1200,
+      "height": 1087
+    },
+    "type/b": {
+      "width": 1200,
+      "height": 1193
+    },
+    "type/c": {
+      "width": 1200,
+      "height": 1078
+    },
+    "type/d": {
+      "width": 1200,
+      "height": 1088
+    },
+    "type/e": {
+      "width": 1200,
+      "height": 1078
+    },
+    "type/f": {
+      "width": 1200,
+      "height": 1094
+    },
+    "type/g": {
+      "width": 1200,
+      "height": 1077
+    },
+    "type/rec-1440-light": {
+      "width": 1200,
+      "height": 750
+    },
+    "type/rec-932-dark": {
+      "width": 932,
+      "height": 553
+    },
+    "type/rec-390-light": {
+      "width": 390,
+      "height": 844
+    },
+    "type/rec-390-dark": {
+      "width": 390,
+      "height": 844
+    }
+  }
+}

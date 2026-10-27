@@ -1,0 +1,138 @@
+---
+/**
+ * « Ailleurs » (copy deck §8.5): the only portrait on the site, small, beside
+ * three plain row links (GitHub, X, Plan ₿ Academy professor page).
+ */
+import { Image } from "astro:assets";
+import { type Locale, t } from "@i18n/index";
+import { GITHUB_URL, GITHUB_HANDLE, X_URL, X_HANDLE, PLANB_PROFESSOR_URL, HANDLE } from "@lib/site";
+import Arrow from "@components/ui/Arrow.astro";
+import portrait from "@assets/william.jpg";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
+const c = dict.contact;
+const links = [
+  { name: "GitHub", handle: GITHUB_HANDLE, href: GITHUB_URL, line: c.links.github, rel: "me noopener" },
+  { name: "X", handle: X_HANDLE, href: X_URL, line: c.links.x, rel: "me noopener" },
+  { name: "Plan ₿ Academy", handle: HANDLE, href: PLANB_PROFESSOR_URL, line: c.links.planb, rel: "noopener" },
+];
+---
+
+<section class="elsewhere" aria-labelledby="elsewhere-title">
+  <h2 id="elsewhere-title">{c.elsewhere}</h2>
+  <div class="elsewhere-grid">
+    <figure class="portrait">
+      <Image src={portrait} alt={c.portraitAlt} widths={[240, 360, 480]} sizes="200px" />
+      <figcaption>{c.portraitCaption}</figcaption>
+    </figure>
+    <ul class="elsewhere-links">
+      {
+        links.map((l) => (
+          <li>
+            <a class="elsewhere-row" href={l.href} rel={l.rel}>
+              <span class="elsewhere-name">
+                {l.name} <span class="elsewhere-handle">{l.handle}</span>
+              </span>
+              <span class="elsewhere-line">{l.line}</span>
+              <span class="elsewhere-arrow">
+                <Arrow dir="external" size="1rem" />
+                <span class="sr">{dict.a11y.external}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .elsewhere h2 {
+    font-size: var(--fs-h2);
+  }
+  .elsewhere-grid {
+    display: grid;
+    gap: var(--block-gap);
+    align-items: start;
+  }
+  @media (min-width: 768px) {
+    .elsewhere-grid {
+      grid-template-columns: 200px minmax(0, 1fr);
+    }
+  }
+  .portrait {
+    width: 200px;
+    margin: 0;
+  }
+  .portrait :global(img) {
+    display: block;
+    width: 200px;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--r-3);
+  }
+  .portrait figcaption {
+    margin-top: 0.5rem;
+    font-family: var(--mono);
+    font-size: var(--fs-meta);
+    color: var(--ink-3);
+  }
+  .elsewhere-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .elsewhere-links li {
+    border-top: 1px solid var(--line);
+  }
+  .elsewhere-links li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .elsewhere-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.2rem 1rem;
+    padding-block: 0.9rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .elsewhere-row:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+    border-radius: var(--r-1);
+  }
+  .elsewhere-name {
+    font: 600 1.0625rem/1.3 var(--text);
+    color: var(--ink);
+  }
+  .elsewhere-handle {
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: var(--fs-mono);
+    color: var(--ink-3);
+  }
+  .elsewhere-line {
+    grid-column: 1;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .elsewhere-arrow {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+    color: var(--ink-3);
+  }
+  .elsewhere-row:hover .elsewhere-name {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .elsewhere-row:hover .elsewhere-arrow {
+    color: var(--ink);
+  }
+</style>

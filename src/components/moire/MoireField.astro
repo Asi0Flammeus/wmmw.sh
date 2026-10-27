@@ -1,0 +1,183 @@
+---
+/**
+ * W1 field (spec §5.1, critique E11): the home hero section. The hero copy is
+ * the default slot; it must hold one `.w1-src` (the final é, the source) and
+ * mark its text with `data-w1-mask`. Server-rendered static frame first (two
+ * CSS ring gratings, AND by mask), then WebGL2 on demand (w1.ts).
+ */
+interface Props {
+  class?: string;
+  /** id of the heading that labels the section */
+  labelledby?: string;
+}
+
+const { class: className, labelledby } = Astro.props;
+---
+
+<section class:list={["w1", className]} data-w1 aria-labelledby={labelledby}>
+  <div class="w1-field" aria-hidden="true" data-moire-layer="w1">
+    <canvas data-w1-canvas></canvas>
+  </div>
+  <div class="wrap w1-content">
+    <slot />
+  </div>
+  <div class="w1-fade" aria-hidden="true"></div>
+</section>
+
+<script>
+  import { mountW1, type W1Handle } from "./w1";
+
+  type MoireQA = { w1?: Pick<W1Handle, "state" | "checkClearZones"> };
+  let w1: W1Handle | undefined;
+
+  document.addEventListener("astro:page-load", () => {
+    w1?.destroy();
+    const hero = document.querySelector<HTMLElement>("[data-w1]");
+    w1 = hero ? mountW1(hero) : undefined;
+    const qa = ((window as unknown as { __moire?: MoireQA }).__moire ??= {});
+    qa.w1 = w1 && { state: w1.state, checkClearZones: w1.checkClearZones };
+  });
+  document.addEventListener("astro:before-swap", () => {
+    w1?.destroy();
+    w1 = undefined;
+  });
+</script>
+
+<style>
+  /* The section clips the 1900 px static field (E11.1) and isolates its
+     z-index -1 layers (E11.2). The clip never touches Basteleur: the padding
+     keeps every line of the name far more than .4em from the edges. */
+  .w1 {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding-block: clamp(1.25rem, 4svh, 2rem) clamp(1.75rem, 5svh, 2.5rem);
+  }
+  @media (min-width: 768px) {
+    .w1 {
+      margin-top: calc(-1 * var(--header-h));
+      padding-block: calc(var(--header-h) + clamp(1.5rem, 7svh, 6rem)) clamp(1.75rem, 6svh, 4.5rem);
+    }
+  }
+  @media (max-height: 600px) and (min-width: 768px) {
+    .w1 {
+      padding-block: calc(var(--header-h) + 1.25rem) 1.5rem;
+    }
+  }
+
+  .w1-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .w1-field canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+  .w1[data-live] .w1-field canvas {
+    opacity: 1;
+  }
+  :global(html.anim) .w1-field canvas {
+    transition: opacity var(--t-3) ease;
+  }
+
+  /* page-coloured fade into the next section (E11.3): invisible as an object */
+  .w1-fade {
+    position: absolute;
+    inset: auto 0 0;
+    height: 38%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, var(--bg) 92%);
+  }
+
+  /* Static frame, server-rendered: the same composition as the first live
+     frame. A on the accent (--src-x/--src-y, em from the glyph box top),
+     B offset by the magnifier coupling for the rest pointer A + (90, 140):
+     desktop P = 260 px, below 768 px P = 206 px. Faded to 0 above the name. */
+  .w1 :global(.w1-src) {
+    position: relative;
+    --src-x: 0.313em;
+    --src-y: 0.057em;
+  }
+  .w1 :global(.w1-src)::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    left: var(--src-x);
+    top: var(--src-y);
+    width: 1900px;
+    height: 1900px;
+    translate: -50% -50%;
+    --p1: 6px;
+    --p2: 6.1417px;
+    --bx: -2.126px;
+    --by: -3.307px;
+    background: repeating-radial-gradient(
+      circle at 50% 50%,
+      var(--fringe) 0 calc(var(--p1) * 0.25 - 0.5px),
+      transparent calc(var(--p1) * 0.25 + 0.5px) calc(var(--p1) * 0.75 - 0.5px),
+      var(--fringe) calc(var(--p1) * 0.75 + 0.5px) var(--p1)
+    );
+    -webkit-mask-image:
+      repeating-radial-gradient(
+        circle at calc(50% + var(--bx)) calc(50% + var(--by)),
+        #000 0 calc(var(--p2) * 0.25 - 0.5px),
+        transparent calc(var(--p2) * 0.25 + 0.5px) calc(var(--p2) * 0.75 - 0.5px),
+        #000 calc(var(--p2) * 0.75 + 0.5px) var(--p2)
+      ),
+      radial-gradient(circle at 50% 50%, #000 0, #000 600px, transparent 950px),
+      linear-gradient(to bottom, transparent calc(50% - 0.15em), #000 calc(50% - 0.15em + 64px));
+    mask-image:
+      repeating-radial-gradient(
+        circle at calc(50% + var(--bx)) calc(50% + var(--by)),
+        #000 0 calc(var(--p2) * 0.25 - 0.5px),
+        transparent calc(var(--p2) * 0.25 + 0.5px) calc(var(--p2) * 0.75 - 0.5px),
+        #000 calc(var(--p2) * 0.75 + 0.5px) var(--p2)
+      ),
+      radial-gradient(circle at 50% 50%, #000 0, #000 600px, transparent 950px),
+      linear-gradient(to bottom, transparent calc(50% - 0.15em), #000 calc(50% - 0.15em + 64px));
+    -webkit-mask-composite: source-in, source-in;
+    mask-composite: intersect;
+    opacity: var(--fringe-a);
+  }
+  @media (max-width: 767px) {
+    .w1 :global(.w1-src)::before {
+      --p2: 6.18px;
+      --bx: -2.7px;
+      --by: -4.2px;
+    }
+  }
+  .w1[data-live] :global(.w1-src)::before {
+    opacity: 0;
+  }
+  :global(html.anim) .w1 :global(.w1-src)::before {
+    transition: opacity var(--t-3) ease;
+  }
+
+  /* While static, text is kept clear by an invisible page-coloured halo
+     (scoped to the hero, E11.5; fit-content so it never spans the row, E11.4). */
+  .w1 :global([data-w1-mask]) {
+    width: fit-content;
+  }
+  .w1:not([data-live]) :global([data-w1-mask]) {
+    background: var(--bg);
+    box-shadow: 0 0 22px 18px var(--bg);
+    border-radius: 14px;
+  }
+
+  @media (forced-colors: active), print {
+    .w1-field,
+    .w1 :global(.w1-src)::before {
+      display: none;
+    }
+    .w1 :global([data-w1-mask]) {
+      box-shadow: none !important;
+      background: none !important;
+    }
+  }
+</style>

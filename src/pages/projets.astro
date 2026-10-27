@@ -1,5 +1,8 @@
 ---
 import ProjetsPage from "@components/pages/ProjetsPage.astro";
+
+/* on demand: the no-JS Ghosts form posts here (spec §7.2) */
+export const prerender = false;
 ---
 
 <ProjetsPage locale="fr" />

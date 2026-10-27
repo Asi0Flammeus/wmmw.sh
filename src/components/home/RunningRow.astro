@@ -1,0 +1,229 @@
+---
+/**
+ * One « En ce moment » row (spec §7.1.2, §5.4). Link rows: the whole row is
+ * the <a> (owner: « chaque ligne est clickable »), M3 on hover and
+ * focus-visible (name underline, arrow nudge, Q2 strip). Ghosts row: not a
+ * link; the default slot holds the « Préviens-moi » disclosure under the line,
+ * the `lens` slot the W2 lens in its own column.
+ */
+import { type Locale, t } from "@i18n/index";
+import Arrow from "@components/ui/Arrow.astro";
+
+interface Props {
+  locale: Locale;
+  name: string;
+  line: string;
+  href?: string;
+  external?: boolean;
+  variant?: "link" | "ghosts";
+}
+
+const { locale, name, line, href, external = false, variant = "link" } = Astro.props;
+const dict = t(locale);
+---
+
+{
+  variant === "link" ? (
+    <li class="row" data-qa="now-row">
+      <a class="row-in row-link" href={href} rel={external ? "noopener" : undefined}>
+        <span class="row-name">{name}</span>
+        <span class="row-line">{line}</span>
+        <span class="row-arrow">
+          <Arrow dir={external ? "external" : "right"} size="1rem" />
+          {external && <span class="sr">{dict.a11y.external}</span>}
+        </span>
+        <span class="q2" aria-hidden="true" data-moire-layer="q2" />
+      </a>
+    </li>
+  ) : (
+    <li class="row row-ghosts" data-qa="now-row">
+      <div class="row-in">
+        <span class="row-name">{name}</span>
+        <div class="row-text">
+          <p class="row-line">{line}</p>
+          <slot />
+        </div>
+        <div class="row-lens">
+          <slot name="lens" />
+        </div>
+      </div>
+    </li>
+  )
+}
+
+<style>
+  .row {
+    border-top: 1px solid var(--line);
+  }
+  .row:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .row-in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1.5rem;
+    row-gap: 0.2rem;
+    align-items: baseline;
+    min-height: 4.5rem;
+    padding-block: 0.9rem;
+  }
+  .row-link {
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .row-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+    border-radius: var(--r-1);
+  }
+  .row-name {
+    font-family: var(--disp);
+    font-feature-settings: "ss01";
+    font-synthesis: none;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-disp);
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .row-line {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    color: var(--ink-2);
+  }
+  .row-arrow {
+    grid-column: 2;
+    grid-row: 1;
+    color: var(--ink-3);
+    line-height: 1;
+  }
+  .q2 {
+    display: none;
+  }
+
+  /* M3: the name underlines, the arrow nudges toward where the row goes */
+  .row-link:is(:hover, :focus-visible) .row-name {
+    text-decoration-color: currentColor;
+  }
+  .row-link:is(:hover, :focus-visible) .row-arrow {
+    color: var(--ink);
+  }
+  :global(html.anim) .row-link :global(.arrow) {
+    transition: transform 240ms var(--ease-out);
+  }
+  :global(html.anim) .row-link:is(:hover, :focus-visible) :global(.arrow) {
+    transform: translateX(2px);
+  }
+  :global(html.anim) .row-arrow {
+    transition: color 240ms ease;
+  }
+
+  /* Ghosts row: text, then the lens under it (below 768 px) */
+  .row-ghosts .row-in {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .row-ghosts .row-text {
+    grid-row: 2;
+  }
+  .row-ghosts .row-line {
+    grid-row: auto;
+  }
+  .row-lens {
+    margin-top: 1.25rem;
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    .row-in {
+      grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr) auto;
+    }
+    .row-line {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .row-arrow {
+      grid-column: 3;
+    }
+    .row-ghosts .row-in {
+      grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr) clamp(220px, 30vw, 400px);
+      align-items: start;
+    }
+    .row-ghosts .row-name {
+      padding-top: 0.15rem;
+    }
+    .row-ghosts .row-text {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .row-lens {
+      grid-column: 3;
+      grid-row: 1;
+      margin-top: 0;
+    }
+  }
+  @media (min-width: 1024px) {
+    .row-in {
+      grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr) auto;
+    }
+  }
+
+  /* Q2 strip: hover devices from 1024 px only, its own last column, never under text.
+     Invisible at rest; on hover the strip fades in while layer B turns 4 to 1.2 deg. */
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .row-link {
+      grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr) auto clamp(96px, 12vw, 168px);
+    }
+    .q2 {
+      display: block;
+      position: relative;
+      grid-column: 4;
+      grid-row: 1;
+      align-self: center;
+      height: 32px;
+      overflow: hidden;
+      isolation: isolate;
+      pointer-events: none;
+      opacity: 0;
+      -webkit-mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
+      mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
+    }
+    .q2::before,
+    .q2::after {
+      content: "";
+      position: absolute;
+      inset: -18px -6px;
+      background: repeating-linear-gradient(180deg, var(--fringe) 0 1.6px, transparent 1.6px 5px);
+    }
+    .q2::after {
+      transform: rotate(4deg);
+      transform-origin: 6px 50%;
+    }
+    .row-link:is(:hover, :focus-visible) .q2 {
+      opacity: var(--fringe-a);
+    }
+    .row-link:is(:hover, :focus-visible) .q2::after {
+      transform: rotate(1.2deg);
+    }
+    :global(html.anim) .q2 {
+      transition: opacity var(--t-2) ease;
+    }
+    :global(html.anim) .q2::after {
+      transition: transform 560ms var(--ease-out);
+    }
+    :global(html:not(.anim)) .q2 {
+      display: none;
+    }
+  }
+  @media (forced-colors: active), print {
+    .q2 {
+      display: none !important;
+    }
+  }
+</style>

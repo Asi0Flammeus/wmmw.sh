@@ -1,0 +1,48 @@
+---
+/**
+ * /mentions-legales (spec §7.8, copy deck §11): the reading layout, the locale
+ * MDX body imported as a component. EN and ES say the French text is binding.
+ */
+import { type Locale, t } from "@i18n/index";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import PageHead from "@components/ui/PageHead.astro";
+import LegalFr from "@components/legal/legal-fr.mdx";
+import LegalEn from "@components/legal/legal-en.mdx";
+import LegalEs from "@components/legal/legal-es.mdx";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const legal = t(locale).legal;
+const Body = { fr: LegalFr, en: LegalEn, es: LegalEs }[locale];
+---
+
+<BaseLayout locale={locale} title={legal.meta.title} description={legal.meta.description} path="/mentions-legales">
+  <article class="wrap">
+    <div class="measure legal">
+      <PageHead title={legal.heading} />
+      {legal.binding && <p class="legal-binding"><em>{legal.binding}</em></p>}
+      <div class="prose legal-body">
+        <Body />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal {
+    margin-inline: auto;
+  }
+  .legal-binding {
+    margin: 1rem 0 0;
+    color: var(--ink-2);
+  }
+  .legal-body {
+    margin-top: var(--block-gap);
+  }
+  .legal-body :global(h2) {
+    scroll-margin-top: calc(var(--header-h) + 1rem);
+  }
+</style>

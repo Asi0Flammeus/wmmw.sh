@@ -1,0 +1,130 @@
+---
+/**
+ * W2 · Ghosts lens (spec §5.2). The CSS rest frame is the no-JS and
+ * reduced-motion state; w2.ts adds the slider role, drag and keys. Only the
+ * line layers are aria-hidden (critique E15): the lens is a focusable slider.
+ */
+import { type Locale, t } from "@i18n/index";
+
+interface Props {
+  locale: Locale;
+  label?: string;
+  class?: string;
+}
+
+const { locale, label, class: className } = Astro.props;
+const lensLabel = label ?? t(locale).home.now.ghosts.lensLabel;
+---
+
+<div class:list={["gl", className]} data-w2 data-label={lensLabel} data-qa="ghosts-lens">
+  <div class="gl-base" aria-hidden="true" data-moire-layer="w2"></div>
+  <div class="gl-fade" aria-hidden="true"></div>
+  <div class="gl-lens" data-w2-lens>
+    <div class="gl-grating" aria-hidden="true" data-moire-layer="w2"></div>
+    <div class="gl-ghosts" aria-hidden="true" data-moire-layer="w2"></div>
+  </div>
+</div>
+
+<script>
+  import { mountW2, type W2Handle } from "./w2";
+
+  let mounted: W2Handle[] = [];
+  document.addEventListener("astro:page-load", () => {
+    for (const m of mounted) m.destroy();
+    mounted = [...document.querySelectorAll<HTMLElement>("[data-w2]")].map(mountW2);
+  });
+  document.addEventListener("astro:before-swap", () => {
+    for (const m of mounted) m.destroy();
+    mounted = [];
+  });
+</script>
+
+<style>
+  .gl {
+    --pb: 4px;
+    --period: 68px;
+    --gh: 78px;
+    --lens-w: 136px;
+    --L: 56px;
+    --gx: 0px;
+    --ghost: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 78' preserveAspectRatio='none'%3E%3Cpath fill-rule='evenodd' d='M12 32a22 22 0 0 1 44 0v38l-7.33-6-7.34 6-7.33-6-7.33 6-7.34-6L12 70zM22 26.5a4.5 6 0 1 0 9 0a4.5 6 0 1 0-9 0zM37 26.5a4.5 6 0 1 0 9 0a4.5 6 0 1 0-9 0z'/%3E%3C/svg%3E");
+    position: relative;
+    height: 88px;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* every line layer peaks at --fringe-a, no multiplier (spec §1.2, dossier §9 cap) */
+  .gl-base {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--fringe);
+    opacity: var(--fringe-a);
+    -webkit-mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
+    mask: var(--ghost) left center / var(--pb) var(--gh) repeat-x;
+  }
+  .gl-fade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--bg), transparent 18%, transparent 82%, var(--bg));
+  }
+  .gl-lens {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--lens-w);
+    height: 100%;
+    transform: translateX(var(--L));
+    border-radius: var(--r-3);
+    background: var(--bg);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 22%, transparent);
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .gl-lens:active {
+    cursor: grabbing;
+  }
+  .gl-lens:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .gl-lens:hover {
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 40%, transparent);
+    }
+  }
+  .gl-grating {
+    position: absolute;
+    inset: 1px;
+    border-radius: 11px;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--ink) 9%, transparent) 0 1.7px,
+      transparent 1.7px 4.25px
+    );
+  }
+  .gl-ghosts {
+    position: absolute;
+    inset: 1px;
+    border-radius: 11px;
+    pointer-events: none;
+    background: var(--fringe);
+    -webkit-mask:
+      var(--ghost) calc(var(--gx) - 1px) center / var(--period) var(--gh) repeat-x,
+      repeating-linear-gradient(90deg, #000 0 1.7px, transparent 1.7px 4.25px);
+    -webkit-mask-composite: source-in;
+    mask:
+      var(--ghost) calc(var(--gx) - 1px) center / var(--period) var(--gh) repeat-x,
+      repeating-linear-gradient(90deg, #000 0 1.7px, transparent 1.7px 4.25px);
+    mask-composite: intersect;
+    opacity: var(--reveal, 1);
+  }
+  @media (forced-colors: active), print {
+    .gl {
+      display: none;
+    }
+  }
+</style>

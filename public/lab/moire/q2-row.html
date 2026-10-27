@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Q2 · Lignes « En ce moment » · labo moiré</title>
+<script>
+(() => {
+  const d = document.documentElement, q = new URLSearchParams(location.search);
+  const t = q.get("theme"); if (t === "light" || t === "dark") d.dataset.theme = t;
+  if (q.has("bare")) d.classList.add("bare");
+  if (q.has("rm")) d.classList.add("rm");
+  d.classList.add("anim");        /* production: html.anim gates every transition (kept across astro:before-swap) */
+})();
+</script>
+<link rel="stylesheet" href="tokens.css">
+<style>
+.now { padding-block: clamp(4rem, 14vh, 9rem) 6rem; }
+
+.row {
+  display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr clamp(96px, 12vw, 168px) auto;
+  gap: .25rem 1.5rem; align-items: center; padding: 1rem 0 1.05rem;
+  border-radius: 6px; outline-offset: 4px;
+}
+.row:focus-visible { outline: 2px solid var(--focus); }
+html.anim .u, html.anim .u .arrow { transition: color .24s ease, transform .24s cubic-bezier(.2, .8, .2, 1); }
+.row:is(:hover, :focus-visible) .u { color: var(--ink); }
+.row:is(:hover, :focus-visible) .u .arrow { transform: translateX(2px); }
+.row:is(:hover, :focus-visible) .u .arrow.ext { transform: translate(1.5px, -1.5px); }
+
+/* ===== Q2 · running-row strip =====
+   Its own grid column: text never sits on it. Two line layers (pitch 5 px)
+   drawn at full ink inside an isolated group, then the group fades to a low
+   opacity, so the layers combine before they fade and the fringe stays visible
+   at a faint line alpha. Hover or focus turns layer B from 4 deg to 1.2 deg
+   about the strip's left edge: fringe period 72 px to 239 px, the bands slide
+   out toward the arrow and widen. Transform only, compositor. */
+.q2 {
+  position: relative; height: 32px; overflow: hidden; isolation: isolate; pointer-events: none;
+  opacity: var(--fringe-a);                       /* a line layer: §9 alpha cap */
+  -webkit-mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 34%, #000 92%, transparent);
+}
+.q2::before, .q2::after {
+  content: ""; position: absolute; inset: -18px -6px;
+  background: repeating-linear-gradient(180deg, var(--fringe) 0 1.6px, transparent 1.6px 5px);
+}
+.q2::after { transform: rotate(4deg); transform-origin: 6px 50%; }
+html.anim .q2::after { transition: transform .7s cubic-bezier(.2, .8, .2, 1); }
+.row:is(:hover, :focus-visible) .q2::after { transform: rotate(1.2deg); will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) { html.anim .q2::after { transition: none; } }
+html.rm .q2::after { transition: none !important; }
+@media (forced-colors: active) { .q2 { display: none; } }
+@media print { .q2 { display: none; } }
+@media (hover: none) { .q2 { display: none; } }          /* hover only (dossier): no strip on touch */
+@media (max-width: 767px) {
+  .row { grid-template-columns: 1fr auto; } .row .d { grid-column: 1 / -1; grid-row: 2; }
+  .q2 { display: none; }
+}
+
+.ghosts .row { grid-template-columns: minmax(10rem, 16rem) 1fr auto; }
+.note { font: 400 var(--fs-meta)/1.4 var(--mono); color: var(--ink-3); }
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ext" viewBox="0 0 16 16"><path d="M5 11 11 5M6 5h5v5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+<main>
+  <section class="now">
+    <div class="wrap">
+      <h2>En ce moment</h2>
+      <ul class="rows">
+        <li><a class="row" href="#"><span class="t">Plan ₿ Academy</span><span class="d">Le savoir Bitcoin, libre, dans ta langue. J'en maintiens les cours.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow ext" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">alysis</span><span class="d">Des sites faits main pour des métiers faits main.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow ext" aria-hidden="true"><use href="#i-ext"/></svg><span class="sr">(site externe)</span></span></a></li>
+        <li><a class="row" href="#"><span class="t">Outils sur mesure</span><span class="d">Un logiciel pour une seule personne ? C'est exactement ma taille.</span><span class="q2" aria-hidden="true"></span><span class="u"><svg class="arrow" aria-hidden="true"><use href="#i-next"/></svg></span></a></li>
+        <li class="ghosts"><div class="row"><span class="t">Ghosts</span><span class="d">Des agents au très long cours. J'en dis plus bientôt.</span><span class="note">W2</span></div></li>
+      </ul>
+    </div>
+  </section>
+</main>
+<div class="lab" role="group" aria-label="Labo">
+  <b>Q2 lignes</b>
+  <button type="button" data-act="theme">thème</button>
+  <label><input type="checkbox" data-act="rm"> mouvement réduit</label>
+</div>
+<script>
+document.querySelector(".lab").addEventListener("click", (e) => {
+  const root = document.documentElement, b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.dataset.act === "theme") { const dark = getComputedStyle(root).colorScheme === "dark"; root.dataset.theme = dark ? "light" : "dark"; }
+  if (b.dataset.act === "rm") root.classList.toggle("rm", b.checked);
+});
+</script>
+</body>
+</html>
