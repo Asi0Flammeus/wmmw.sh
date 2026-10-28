@@ -20,8 +20,8 @@ Preview: https://moire.wmmw.sh (ANNOTATION_SYSTEM=true, noindex in the page and 
 
 ## Decisions where the spec was silent or contradicted itself
 
-1. **Line-layer alpha.** §1.2 says every line layer peaks at `--fringe-a` with no multiplier (dossier §9 cap, confirmed by the lab README); §5.2 (base ×2.6) and §5.4 (Q2 ×1.5) still carry multipliers. Built without multipliers.
-2. **Q2 at rest.** A9 (invisible at rest, fades in on hover) wins over the prototype (always visible).
+1. **Line-layer alpha.** §1.2 says every line layer peaks at `--fringe-a` with no multiplier (dossier §9 cap, confirmed by the lab README); §5.2 (base ×2.6) and §5.4 (Q2 ×1.5) still carry multipliers. Built without multipliers, except Q2 on hover (see 2).
+2. **Q2 at rest.** A9 (invisible at rest, fades in on hover) wins over the prototype (always visible). Fix pass 28 Oct: at the bare `--fringe-a` the hovered strip measured a 13 (light) / 9 (dark) luma range at 1280 × 800, invisible; the hover peak is now `--fringe-a × 4` (.32 / .24, luma range 50 / 35). At rest it stays at 0, so the §9 cap on what sits on screen holds. Touch has no Q2 column (E24): a press (`:active`) shows M3 (underline, arrow) before navigating.
 3. **W1 above the name.** A16 asks the field to fade to 0 above the name. Implemented as a 64 px ramp starting 0.15em above the accent, identical in the CSS frame (third mask layer) and the shader (`uTop`). The rest centre stays at A + (90, 140) as in the §5.1 table, so the first live frame equals the static frame; "largest free area" placement was not built.
 4. **W1 dock masks.** Pills are not clear zones (critique E11.6): the clear zones are the hero's own text lines.
 5. **V1 travelling dot.** Drawn as the list's `::after`, a grid item spanning beats 1 to 2, moved by `background-position`: no script measures anything (the spec forbids client JS for V1/V2).
@@ -38,11 +38,28 @@ Preview: https://moire.wmmw.sh (ANNOTATION_SYSTEM=true, noindex in the page and 
 
 - Booking or reservation pages (owner Q6, asi0 27 Oct: later, maybe a dedicated webapp).
 - `rss.xsl` (designed feed page, A19).
-- The em/en dash and `--` cleanup of writing bodies and `src/components/blog/*` (§9.2, about 120 occurrences in 13 files): needs a sentence-by-sentence pass; open.
 - `scripts/qa/*` harness (WP1a's untracked files in the live tree were left alone) and the T1 to T16 automation; checks were run by hand (see the end report).
 - `llms.txt`, `PRODUCT.md`, `README.md` refresh (WP5 docs) and the final `registry.json` path audit.
 - `SCALEWAY_TEL` (not verified: null, the sentence keeps the address) and `MEDIATEUR` (not designated: the section is not rendered, the build logs one warning).
 - `/lectures-sf` is untracked in the live tree, so it is not in this preview.
+
+## Home performance (fix pass 28 Oct)
+
+LCP element: the `h1` (« William Moiré », Basteleur, preloaded). Nothing is render-blocking (CSS inlined, scripts are modules); the cost was main-thread work and bytes before the first paint.
+
+- **W1 WebGL boots on the first pointer intent in the hero**, no longer at load + idle (`w1.ts`). The static CSS frame is the first live frame, so nothing changes on screen; the shader compile and first GPU commit (about 0.8 s of the 4× trace on this host) leave the load window.
+- **Edge gzip is missing.** The vhost has no `gzip`, so the home ships 101 KB of HTML (64 KB of it inlined CSS, 80 KB before the `h1`) and the scripts uncompressed; gzip gives 22 KB. Needed in `/etc/nginx/applications/moire.wmmw.sh.conf` (server 443): `gzip on; gzip_proxied any; gzip_types text/css application/javascript application/json image/svg+xml text/xml;` (`text/html` is implied).
+
+Lighthouse 13 medians, local build against a build of the previous HEAD, desktop 1280 × 800 unless noted (as `pw perf --lighthouse`); "gzip" is a local gzip proxy standing in for the vhost directive. This host benchmarks at `benchmarkIndex` 130 to 380, a slow CPU for Lighthouse (its threshold is 1000), so the default 4× CPU slowdown over-states a mid phone, and the variance is large (host load 9 to 18): single runs swing by a second.
+
+| Profile | Before | After | Before + gzip | After + gzip |
+|---|---|---|---|---|
+| Lighthouse default (Slow 4G, 4× CPU) | perf .43, LCP 2.58 s, TBT 1.51 s (n=5) | perf .49, LCP 2.60 s, TBT 0.61 s (n=5) | perf .46, LCP 2.18 s, TBT 1.50 s (n=4) | perf .78, LCP 2.14 s, TBT 0.09 s (n=4) |
+| Slow 4G, 1× CPU (n=4) | | | LCP 2.12 s, TBT 0.02 s | LCP 2.12 s, TBT 0 |
+| Spec §5.6: Fast 4G, mobile 390, 4× CPU (n=3) | LCP 1.35 s | LCP 1.48 s | | LCP 1.12 s |
+| Fast 4G, desktop 1280, 4× CPU (n=3) | perf .57, LCP 1.61 s, TBT 1.73 s | perf .78, LCP 1.40 s, TBT 0.33 s | | |
+
+Under the spec's own profile (Fast 4G, mid phone) the LCP budget of 1.8 s holds before and after (on a coarse pointer W1 never booted at load, so the mobile difference is run noise). Under Lighthouse's default Slow 4G the LCP floor is about 2.1 s even at 1× CPU and with gzip: it is network-bound (HTML, Basteleur 45 KB, JetBrains Mono 40 KB and Schibsted 47 KB all land before the first paint). Going under 1.8 s there needs fewer font bytes before the first paint (subset or instance the two variable fonts), which the §5.6 font budget does not ask for.
 
 ## Redeploy
 
