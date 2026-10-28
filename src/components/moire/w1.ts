@@ -122,7 +122,6 @@ export function mountW1(hero: HTMLElement): W1Handle {
   const opt = { signal: ac.signal, passive: true } as const;
   const mqReduce = matchMedia("(prefers-reduced-motion: reduce)");
   const mqNarrow = matchMedia("(max-width: 767px)");
-  const coarse = matchMedia("(pointer: coarse)").matches;
 
   let canvas = canvas0;
   let gl: WebGL2RenderingContext | null = null;
@@ -371,8 +370,14 @@ export function mountW1(hero: HTMLElement): W1Handle {
     mo.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
+  /* GL boots on the first pointer intent in the hero (move with a fine pointer,
+     tap with a coarse one), never at load or idle: the static CSS frame is the
+     first live frame, so nothing changes on screen until the pointer acts, and
+     the shader compile plus first GPU commit stay out of the load window
+     (Lighthouse TBT, LCP budget §5.6). Waits for fonts: the accent is measured
+     from rendered Basteleur. */
   function follow(e: PointerEvent): void {
-    if (!live) goLive();
+    if (!live && document.fonts.status === "loaded") goLive();
     if (!live) return;
     const r = hero.getBoundingClientRect();
     setTarget(e.clientX - r.left, e.clientY - r.top);
@@ -419,18 +424,6 @@ export function mountW1(hero: HTMLElement): W1Handle {
     opt,
   );
   mqReduce.addEventListener("change", (m) => m.matches && goStatic(), opt);
-
-  /* GL after load, fonts and idle on fine pointers; on coarse pointers, the first tap in the hero */
-  if (!coarse && !mqReduce.matches) {
-    const boot = (): void => {
-      if (dead) return;
-      if ("requestIdleCallback" in window) requestIdleCallback(() => goLive(), { timeout: 1500 });
-      else setTimeout(goLive, 200);
-    };
-    void document.fonts.ready.then(() =>
-      document.readyState === "complete" ? boot() : window.addEventListener("load", boot, { once: true, signal: ac.signal }),
-    );
-  }
 
   return {
     destroy(): void {
