@@ -108,20 +108,25 @@ const dict = t(locale);
     display: none;
   }
 
-  /* M3: the name underlines, the arrow nudges toward where the row goes */
+  /* M3: the name underlines, the arrow nudges toward where the row goes.
+     :active is the tap equivalent: touch has no hover and no Q2 column
+     (§3.2 q2 query, E24), so the press itself shows M3 before navigating. */
   .row-link:hover .row-name,
-  .row-link:focus-visible .row-name {
+  .row-link:focus-visible .row-name,
+  .row-link:active .row-name {
     text-decoration-color: currentColor;
   }
   .row-link:hover .row-arrow,
-  .row-link:focus-visible .row-arrow {
+  .row-link:focus-visible .row-arrow,
+  .row-link:active .row-arrow {
     color: var(--ink);
   }
   :global(html.anim) .row-link :global(.arrow) {
     transition: transform 240ms var(--ease-out);
   }
   :global(html.anim) .row-link:hover :global(.arrow),
-  :global(html.anim) .row-link:focus-visible :global(.arrow) {
+  :global(html.anim) .row-link:focus-visible :global(.arrow),
+  :global(html.anim) .row-link:active :global(.arrow) {
     transform: translateX(2px);
   }
   :global(html.anim) .row-arrow {
@@ -178,7 +183,11 @@ const dict = t(locale);
   }
 
   /* Q2 strip: hover devices from 1024 px only, its own last column, never under text.
-     Invisible at rest; on hover the strip fades in while layer B turns 4 to 1.2 deg. */
+     Invisible at rest; on hover the strip fades in while layer B turns 4 to 1.2 deg.
+     Hover peak is --fringe-a x 4 (.32 light, .24 dark): at the bare --fringe-a cap
+     the two 1.6 px gratings measured a 13 (light) / 9 (dark) luma range at
+     1280 x 800, unreadable. The cap governs what sits on screen at rest; this
+     strip is at 0 then and only shows under the pointer or keyboard focus. */
   @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
     .row-link {
       grid-template-columns: minmax(11rem, 16rem) minmax(0, 1fr) auto clamp(96px, 12vw, 168px);
@@ -210,7 +219,7 @@ const dict = t(locale);
     }
     .row-link:hover .q2,
     .row-link:focus-visible .q2 {
-      opacity: var(--fringe-a);
+      opacity: calc(var(--fringe-a) * 4);
     }
     .row-link:hover .q2::after,
     .row-link:focus-visible .q2::after {
