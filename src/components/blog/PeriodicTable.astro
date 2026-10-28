@@ -177,7 +177,7 @@ const highlightSet = new Set(highlightElements);
             highlightSet.has(el.z) && 'ptable-el--highlight',
           ]}
           style={`grid-row: ${el.row}; grid-column: ${el.col};`}
-          title={`${el.z} — ${el.name}`}
+          title={`${el.z}: ${el.name}`}
         >
           <span class="ptable-z">{el.z}</span>
           <span class="ptable-sym">{el.symbol}</span>
@@ -295,7 +295,7 @@ const highlightSet = new Set(highlightElements);
 
   /* ===== Category colors ===== */
 
-  /* Alkali metals — red */
+  /* Alkali metals: red */
   .ptable-cat--alkali {
     background: color-mix(in oklab, var(--red-400) 22%, transparent);
     border-color: color-mix(in srgb, var(--red-400) 30%, var(--border-subtle));
@@ -303,7 +303,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--alkali .ptable-sym { color: var(--red-400); }
 
-  /* Alkaline earth — orange */
+  /* Alkaline earth: orange */
   .ptable-cat--alkaline {
     background: color-mix(in oklab, var(--orange-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--orange-400) 25%, var(--border-subtle));
@@ -311,7 +311,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--alkaline .ptable-sym { color: var(--orange-600); }
 
-  /* Transition metals — blue */
+  /* Transition metals: blue */
   .ptable-cat--transition {
     background: color-mix(in oklab, var(--blue-400) 18%, transparent);
     border-color: color-mix(in srgb, var(--blue-400) 20%, var(--border-subtle));
@@ -319,7 +319,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--transition .ptable-sym { color: var(--blue-400); }
 
-  /* Post-transition metals — purple */
+  /* Post-transition metals: purple */
   .ptable-cat--post-transition {
     background: color-mix(in oklab, var(--purple-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--purple-400) 22%, var(--border-subtle));
@@ -327,7 +327,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--post-transition .ptable-sym { color: var(--purple-400); }
 
-  /* Metalloids — cyan */
+  /* Metalloids: cyan */
   .ptable-cat--metalloid {
     background: color-mix(in oklab, var(--cyan-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--cyan-400) 25%, var(--border-subtle));
@@ -335,7 +335,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--metalloid .ptable-sym { color: var(--cyan-400); }
 
-  /* Reactive nonmetals — yellow */
+  /* Reactive nonmetals: yellow */
   .ptable-cat--nonmetal {
     background: color-mix(in oklab, var(--yellow-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--yellow-400) 22%, var(--border-subtle));
@@ -343,7 +343,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--nonmetal .ptable-sym { color: var(--yellow-400); }
 
-  /* Halogens — green */
+  /* Halogens: green */
   .ptable-cat--halogen {
     background: color-mix(in oklab, var(--green-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--green-400) 25%, var(--border-subtle));
@@ -351,7 +351,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--halogen .ptable-sym { color: var(--green-400); }
 
-  /* Noble gases — magenta */
+  /* Noble gases: magenta */
   .ptable-cat--noble {
     background: color-mix(in oklab, var(--magenta-400) 20%, transparent);
     border-color: color-mix(in srgb, var(--magenta-400) 22%, var(--border-subtle));
@@ -359,7 +359,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--noble .ptable-sym { color: var(--magenta-400); }
 
-  /* Lanthanides — softer red/pink */
+  /* Lanthanides: softer red/pink */
   .ptable-cat--lanthanide {
     background: color-mix(in oklab, var(--red-400) 14%, transparent);
     border-color: color-mix(in srgb, var(--red-400) 15%, var(--border-subtle));
@@ -367,7 +367,7 @@ const highlightSet = new Set(highlightElements);
   }
   .ptable-cat--lanthanide .ptable-sym { color: color-mix(in srgb, var(--red-400) 70%, var(--text-primary)); }
 
-  /* Actinides — softer orange/peach */
+  /* Actinides: softer orange/peach */
   .ptable-cat--actinide {
     background: color-mix(in oklab, var(--orange-400) 14%, transparent);
     border-color: color-mix(in srgb, var(--orange-400) 15%, var(--border-subtle));

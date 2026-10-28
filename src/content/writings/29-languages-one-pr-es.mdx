@@ -17,7 +17,7 @@ import wfV1 from './workflow-v1.png';
 import wfV2 from './workflow-v2.png';
 import wfV3 from './workflow-v3.png';
 
-*Por asi0 — y un agente sin cabeza*
+*Por asi0 y un agente sin cabeza*
 
 ---
 
@@ -41,7 +41,7 @@ La rueda, aquí, es toda la infraestructura educativa Bitcoin. La barrera es esa
 
 Durante tres años he estado dando vueltas alrededor de esa frontera con LLM. Y en cada versión del workflow, no cambió solo la técnica. Cambió mi manera de sostener el problema.
 
-## Versión 1 — la oración API
+## Versión 1: la oración API
 
 La primera versión era casi vergonzosamente simple.
 
@@ -49,7 +49,7 @@ Tomas el contenido. Lo envías a la API de GPT-3.5. Recibes una traducción. Rep
 
 Y lo peor es que funcionaba.
 
-No perfectamente. Pero lo suficiente para crear la ilusión peligrosa de que el problema estaba casi resuelto. La tasa de alucinación era baja — alrededor del 1 %. Si pruebas eso en tres párrafos, puedes pensar: fantástico. Si lo lanzas sobre más de diez mil líneas, en una docena de idiomas, el 1 % deja de ser un error marginal. Se vuelve una certeza estadística.
+No perfectamente. Pero lo suficiente para crear la ilusión peligrosa de que el problema estaba casi resuelto. La tasa de alucinación era baja, alrededor del 1 %. Si pruebas eso en tres párrafos, puedes pensar: fantástico. Si lo lanzas sobre más de diez mil líneas, en una docena de idiomas, el 1 % deja de ser un error marginal. Se vuelve una certeza estadística.
 
 En algún lugar, en algún archivo, una frase se deslizó. Un término técnico cambió de sentido. Un trozo de estructura fue devorado. Una URL fue tocada. Y no sabes dónde.
 
@@ -57,7 +57,7 @@ La v1 fue mi fase de confianza ingenua. Estaba descubriendo que una máquina pod
 
 El silicio hablaba. Pero a veces hablaba demasiado rápido, y yo todavía no había aprendido dónde poner las barandillas.
 
-## Versión 2 — la jaula determinista
+## Versión 2: la jaula determinista
 
 La segunda versión fue mi respuesta de desarrollador inquieto: ya que el modelo es probabilístico, vamos a encerrarlo dentro del determinismo.
 
@@ -75,7 +75,7 @@ Había construido un workflow con LLM, pero seguía pensando como si el problema
 
 Quizá eso sea el sobre-engineering: una arquitectura que conserva el miedo a su herramienta en el centro del diseño.
 
-## Versión 3 — el determinismo adaptativo
+## Versión 3: el determinismo adaptativo
 
 La tercera versión, la de la PR #4552, hace casi lo contrario.
 
@@ -87,11 +87,11 @@ En la entrada: un script encuentra exactamente lo que falta. Sin LLM. Sin red. S
 
 En el medio: un agente `omp -p`, headless, trabaja archivo por archivo. Traduce in situ. Respeta la estructura. Consulta el glosario vivo. Escribe lo que aprende en un archivo de conocimiento por idioma.
 
-En la salida: un verificador determinista compara fuente y destino. Títulos, fences, YAML, identificadores, enlaces críticos. Si la estructura se rompe, no pasa. Si falla, reintentamos — pero no al azar: bajamos por una cadena de modelos adaptada al idioma.
+En la salida: un verificador determinista compara fuente y destino. Títulos, fences, YAML, identificadores, enlaces críticos. Si la estructura se rompe, no pasa. Si falla, reintentamos, pero no al azar: bajamos por una cadena de modelos adaptada al idioma.
 
 El determinismo ya no reemplaza la inteligencia del modelo. Le da un cauce de río.
 
-Ahí sentí el vuelco. La v3 es más simple que la v2, mejor en calidad, y su coste se mantiene en el mismo orden de magnitud — probablemente incluso inferior en ciertos casos, gracias al batching y a la caché. La prueba a escala real sobre `scr403` lo mostró: 29 idiomas, 1349 archivos, casi todo pasa, y el resto queda explícitamente excluido en vez de deslizarse bajo la alfombra.
+Ahí sentí el vuelco. La v3 es más simple que la v2, mejor en calidad, y su coste se mantiene en el mismo orden de magnitud, probablemente incluso inferior en ciertos casos, gracias al batching y a la caché. La prueba a escala real sobre `scr403` lo mostró: 29 idiomas, 1349 archivos, casi todo pasa, y el resto queda explícitamente excluido en vez de deslizarse bajo la alfombra.
 
 <Timeline items={[
   { n: 1, tone: "muted", when: "v1 · API GPT-3.5 bruta", title: "la confianza ingenua", desc: "Traducir directamente por la API. Funciona lo suficiente para creer, pero ~1 % de alucinación sobre +10k líneas y una docena de idiomas se vuelve la certeza de que algo estará mal en algún lugar.", image: wfV1, imageAlt: "Manos abiertas liberando un estallido de partículas luminosas en la oscuridad" },
@@ -109,7 +109,7 @@ La v3 no es solo un workflow que usa LLM agénticos. Es un workflow que, en gran
 
 ALLM que craftean un workflow para orquestar ALLM.
 
-La serpiente se muerde la cola — pero esta vez produce un diff limpio.
+La serpiente se muerde la cola. Pero esta vez produce un diff limpio.
 
 Esa frase habría sonado ridícula hace tres años. Hoy es una forma bastante precisa de describir mi trabajo. Ya no estoy simplemente llamando una API. Estoy formando un pequeño ecosistema de competencias: un script determinista, un agente traductor, un verificador, un governor de cuota, un agente de release, archivos de conocimiento que persisten de una batch a la siguiente.
 
@@ -121,7 +121,7 @@ Coordinación.
 
 ## Shoutout a omp
 
-Nada de esto habría tomado esta forma sin **omp — Oh My Pi**.
+Nada de esto habría tomado esta forma sin **omp (Oh My Pi)**.
 
 `omp -p`, en este workflow, es la pieza que me permite dejar de tratar al LLM como una caja de texto. Le doy una misión, un repo, herramientas, restricciones, y trabaja sin interfaz de chat. Lo headless no es un detalle ergonómico: es lo que permite al sistema entrar en el flujo real del repositorio.
 
@@ -186,7 +186,7 @@ Todavía no tengo mi respuesta. O más bien: tengo una intuición, pero prefiero
 <Poll
   id="universal-translation-solved"
   lang="es"
-  question="¿Cuándo será la traducción universal un problema completamente resuelto — sin ninguna revisión humana?"
+  question="¿Cuándo será la traducción universal un problema completamente resuelto, sin ninguna revisión humana?"
   options={["ya", "~2 años", "~5 años", "~10 años", "nunca · el humano se queda en el bucle"]}
 />
 
@@ -208,4 +208,4 @@ Y en algún lugar de un worktree, un agente sin cabeza sigue traduciendo.
 
 ---
 
-*Escrito el 4 de julio de 2026, mientras la PR #4552 del pipeline de traducción agéntico está a punto de unirse a `dev`. El run `scr403` en 29 idiomas sigue siendo la prueba a escala real que me convenció de que esta versión se sostenía. Las versiones inglesa y española de este texto fueron producidas por un agente — obviamente.*
+*Escrito el 4 de julio de 2026, mientras la PR #4552 del pipeline de traducción agéntico está a punto de unirse a `dev`. El run `scr403` en 29 idiomas sigue siendo la prueba a escala real que me convenció de que esta versión se sostenía. Las versiones inglesa y española de este texto fueron producidas por un agente. Obviamente.*

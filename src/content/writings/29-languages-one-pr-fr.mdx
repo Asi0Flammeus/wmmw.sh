@@ -57,7 +57,7 @@ La v1, c'était ma phase de confiance naïve. Je découvrais qu'une machine pouv
 
 Le silicium craché du texte. Souvent trop vite, et je n'avais pas encore appris où mettre les garde-fous.
 
-## Version 2 — la cage déterministe
+## Version 2 : la cage déterministe
 
 La deuxième version a été ma réponse de "control freak" qui jette le bébé avec l'eau du bain; puisque le modèle est probabiliste, on reconstruit tout avec des process le plus déterminisme possible.
 
@@ -73,7 +73,7 @@ Une ligne seule ne comprend pas le chapitre. Une phrase seule ne comprend pas le
 
 C'est peut-être aussi ça le sur-engineering : une architecture qui conserve la peur de son outil au centre du design et devient sous-optimale.
 
-## Version 3 — le déterminisme adaptatif
+## Version 3 : le déterminisme adaptatif
 
 La troisième version, celle de la PR #4552, fait presque l'inverse.
 
@@ -89,7 +89,7 @@ En sortie : un vérificateur déterministe compare la source et la cible. Titres
 
 Le déterminisme ne remplace plus l'intelligence du modèle. Il lui donne un lit de rivière dans lequel couler.
 
-C'est là que j'ai senti le basculement. La v3 est plus simple que la v2, meilleure en qualité, et son coût reste du même ordre de grandeur — probablement même inférieur dans certains cas. Le test grandeur nature sur `scr403` l'a montré : 29 langues, 1349 fichiers, presque tout passe, et le reste est explicitement exclu plutôt que glissé sous le tapis.
+C'est là que j'ai senti le basculement. La v3 est plus simple que la v2, meilleure en qualité, et son coût reste du même ordre de grandeur, probablement même inférieur dans certains cas. Le test grandeur nature sur `scr403` l'a montré : 29 langues, 1349 fichiers, presque tout passe, et le reste est explicitement exclu plutôt que glissé sous le tapis.
 
 <Timeline items={[
   { n: 1, tone: "muted", when: "v1 · GPT-3.5 API brute", title: "la confiance naïve", desc: "Traduire directement via l'API. Ça marche assez pour y croire, mais ~1 % d'hallucination sur +10k lignes et une douzaine de langues devient une certitude d'erreur quelque part.", image: wfV1, imageAlt: "Des mains ouvertes libérant une gerbe de particules lumineuses dans le noir" },
@@ -117,7 +117,7 @@ Un process coordinateur qui s'adapte à chaque situation.
 
 ## Shoutout à omp
 
-Rien de tout ça n'aurait pris cette forme sans **omp — Oh My Pi**.
+Rien de tout ça n'aurait pris cette forme sans **omp (Oh My Pi)**.
 
 `omp -p`, dans ce workflow, c'est la pièce qui me permet d'arrêter de traiter le LLM comme une boîte de texte. Je lui donne une mission, un dépôt, des outils, des contraintes, et il travaille sans interface de chat. Le côté headless n'est pas un détail ergonomique : c'est ce qui permet au système d'entrer dans le flux réel du dépôt.
 
@@ -182,7 +182,7 @@ Je n'ai pas encore ma réponse. Ou plutôt : j'ai une intuition, mais je préfè
 <Poll
   id="universal-translation-solved"
   lang="fr"
-  question="Quand la traduction universelle sera-t-elle un problème complètement résolu — plus aucune relecture humaine nécessaire ?"
+  question="Quand la traduction universelle sera-t-elle un problème complètement résolu, sans plus aucune relecture humaine nécessaire ?"
   options={["déjà", "~2 ans", "~5 ans", "~10 ans", "jamais · l'humain reste dans la boucle"]}
 />
 
@@ -204,4 +204,4 @@ Et quelque part dans un worktree, un agent sans tête continue de traduire.
 
 ---
 
-*Écrit le 4 juillet 2026, au moment où la PR #4552 du pipeline de traduction agentique s'apprête à rejoindre `dev`. Le run `scr403` sur 29 langues reste le test grandeur nature qui m'a convaincu que cette version tenait debout. Les versions anglaise et espagnole de ce billet ont été produites par un agent — évidemment.*
+*Écrit le 4 juillet 2026, au moment où la PR #4552 du pipeline de traduction agentique s'apprête à rejoindre `dev`. Le run `scr403` sur 29 langues reste le test grandeur nature qui m'a convaincu que cette version tenait debout. Les versions anglaise et espagnole de ce billet ont été produites par un agent. Évidemment.*

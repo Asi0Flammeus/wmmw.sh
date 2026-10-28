@@ -216,7 +216,7 @@ const labels = allLabels[lang];
 
     trigger.addEventListener('click', () => {
       if (prefersReducedMotion) {
-        // Skip animation entirely — show welcome message immediately
+        // Skip the animation entirely and show the welcome message immediately
         trigger.hidden = true;
         space.hidden = false;
         numberEl.textContent = labels.welcomeBack;
